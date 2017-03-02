@@ -1,6 +1,5 @@
 from text.sentence import Sentence
 
-
 class Paragraph(object):
     """Object representation of a pargraph."""
     
