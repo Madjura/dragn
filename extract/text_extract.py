@@ -229,8 +229,6 @@ def generate_source(token2sentences, paragraph_id, distance_threshhold=5, \
                 # check if terms are relevant enough
                 if w > weight_threshold:
                     closenesses.append(Closeness(term1, term2, w, paragraph_id))
-                    
-    ## exclude: max_stmt <= 0
     
     w2statements = defaultdict(list)
     for closeness in closenesses:
