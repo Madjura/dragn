@@ -1,5 +1,6 @@
 from os.path import sys, os
 import re
+from _collections import defaultdict
 
 class Lexicon:
     """
@@ -9,7 +10,9 @@ class Lexicon:
     def __init__(self,items=[]):
         self.lex2int = {}
         self.int2lex = {}
-        self.freqdct = {}
+        self.freqdct = defaultdict(int) ### changed to defaultdict
+        self.frequency = defaultdict(int) ###
+        self.terms = [] ###
         self.current = 0
         if len(items):
             self.update(items)
@@ -87,6 +90,19 @@ class Lexicon:
                   str(filename))
         return errors
 
+    def update_from_closeness(self, closenesses):
+        """
+        Updated update method. Not actively used, should accomplish what the 
+        original tried to accomplish (and failed).
+        """
+        
+        for closeness_list in closenesses:
+            for closeness in closeness_list:
+                self.frequency[closeness.term] += 1
+                self.freqdct[closeness.term] += 1 ### experimental to keep his old stuff
+                if closeness.term not in self.terms:
+                    self.terms.append(closeness.term)
+
     def update(self, items: [str]):
         """
         Updates the lexicon with new terms.
@@ -95,7 +111,6 @@ class Lexicon:
             Args:
                 items: A list of items to be inserted into the lexicon.
         """
-        
         updates = []
         if type(items) is str:
             # make sure that single word updates are handled correctly
@@ -124,6 +139,7 @@ class Lexicon:
                 raise KeyError('Index %s not present in the lexicon' % (key,))
         elif type(key) in [str,str]:
             if key in self.lex2int:
+                print(self.lex2int[key])
                 return self.lex2int[key]
             else:
                 raise KeyError('Expression %s not present in the lexicon' % (key,))

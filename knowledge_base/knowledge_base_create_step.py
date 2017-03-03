@@ -4,8 +4,8 @@ import pickle
 
 # STEP 2
 memstore = MemStore()
-closenesses = pickle.load(open(paths.CLOSENESS_PATH + "/closeness.tsv", "rb"))
-memstore.incorporate(closenesses)
-memstore.computeCorpus()
-memstore.normaliseCorpus()
-pickle.dump(memstore, open(paths.MEMSTORE_PATH + "/" + "memstore", "wb"))
+closenesses = pickle.load(open(paths.CLOSENESS_PATH + "/closeness.p", "rb"))
+memstore.incorporate(closenesses) ### FINISHED, 3 march
+memstore.computeCorpus() ### 3 march, should be good2go
+memstore.normaliseCorpus() ### 3 march, does just computations - should be unbreakable
+pickle.dump(memstore, open(paths.MEMSTORE_PATH + "/" + "memstore.p", "wb"))

@@ -3,6 +3,7 @@ from knowledge_base.lexicon import Lexicon
 from knowledge_base.tensor import Tensor
 import os, pickle, gzip
 from math import log
+from _collections import defaultdict
 
 PERSP_TYPES = ['LAxLIRA','LIxLARA','RAxLALI','LIRAxLA','LARAxLI','LALIxRA',\
 'LAxLIRA_COMPRESSED','LIxLARA_COMPRESSED','RAxLALI_COMPRESSED',\
@@ -37,12 +38,14 @@ class MemStore:
 
         return tuple([self.lexicon[x] for x in statement])
 
-    ## TAKES .tsv FILE
     def incorporate(self, closenesses):
         """
         Imports the statements into the store, processing all files with the
         specified extension ext in the path location. Lexicon and sources
         structures are updated (not overwritten) in the process.
+        
+            Args:
+                closenesses: The calculcated Closeness objects from extract_step.
         """
         
         expressions = []
@@ -50,15 +53,19 @@ class MemStore:
         # first pass: update lexicon with terms
         for paragraph_closeness in closenesses:
             for closeness in paragraph_closeness:
-                ## removed "close to" from this, was in the original code
-                ## probably not needed?
                 expressions += [closeness.term, "close to", closeness.close_to, closeness.paragraph_id]
         self.lexicon.update(expressions)
         
         for paragraph_closeness in closenesses:
             for closeness in paragraph_closeness:
-                line = [closeness.term, "close to", closeness.close_to, closeness.paragraph_id]
-                key = tuple([self.lexicon[x] for x in line])
+                #line = [closeness.term, "close to", closeness.close_to, closeness.paragraph_id]
+                
+                key = (closeness.term, "close to", closeness.close_to, closeness.paragraph_id)
+                ### DOES NOT WORK BECAUSE I DONT USE THE LEX2INT STUFF
+                ### RETURNS INT
+                #key = tuple([self.lexicon[x] for x in line]) ### square brackets calls __getitem__
+                #print("MY SYSTEM, KEY", key)
+                ####print("MY SYSTEM KEY", key)
                 self.sources[key] = closeness.closeness
 
     def dump(self,filename):
@@ -124,13 +131,13 @@ class MemStore:
         # number of all triples
         N = 0
         # x -> number of independednt occurences in the store
-        indep_freq = {}
+        indep_freq = defaultdict(int)
         
         # (x,y) -> number of joint occurences in the store
-        joint_freq = {}
+        joint_freq = defaultdict(int)
         
         # (s,p,o) -> number of occurences
-        tripl_freq = {}
+        tripl_freq = defaultdict(int)
         
         # (s,p,o) -> (provenance, relevance)
         spo2pr = {}
@@ -138,22 +145,12 @@ class MemStore:
         # going through all the statements in the sources
         for s,p,o,d in list(self.sources.keys()):
             N += 1
-            if s in indep_freq:
-                indep_freq[s] += 1
-            else:
-                indep_freq[s] = 1
-            if o in indep_freq:
-                indep_freq[o] += 1
-            else:
-                indep_freq[o] = 1
-            if (s,o) in joint_freq:
-                joint_freq[(s,o)] += 1
-            else:
-                joint_freq[(s,o)] = 1
-            if (s,p,o) in tripl_freq:
-                tripl_freq[(s,p,o)] += 1
-            else:
-                tripl_freq[(s,p,o)] = 1
+            
+            ### refactored to use defaultdict
+            indep_freq[s] += 1
+            indep_freq[o] += 1
+            joint_freq[(s,o)] += 1
+            tripl_freq[(s,p,o)] += 1
             if (s,p,o) not in spo2pr:
                 spo2pr[(s,p,o)] = []
             spo2pr[(s,p,o)].append((d,self.sources[(s,p,o,d)]))
@@ -161,9 +158,12 @@ class MemStore:
         for s,p,o in spo2pr:
             # a list of relevances of particular statement sources
             src_rels = [x[1] for x in spo2pr[(s,p,o)]]
+            ### src rels has sometimes more than 1 value
+            
             # absolute frequency of the triple times it's mutual information score
             joint = joint_freq[(s,o)]
             if (o,s) in joint_freq:
+                ### o and s are terms
                 joint += joint_freq[(o,s)]
             # frequency times mutual information score
             fMI = 0.0
