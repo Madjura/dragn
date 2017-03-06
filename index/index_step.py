@@ -8,9 +8,9 @@ import os, gzip
 ## in gen_sim_suid2puid has format sim_suid:  17925  puid:  felt  prov_w:  0.5535716091513591
 ## maybe an issue, should be consistent
 
+# STEP 4
 memstore = pickle.load(open(paths.MEMSTORE_PATH + "/" + "memstore_comp", "rb"))
 ftext = open_index(paths.FULLTEXT_PATH)
-
 text2index = {}
 for text, index in list(memstore.lexicon.lex2int.items()):
     text2index[text] = str(index)
