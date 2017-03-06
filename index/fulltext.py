@@ -43,7 +43,7 @@ def gen_cooc_suid2puid(sources,stmt2suid):
         try:
             suid = stmt2suid[(s,p,o)][0]
         except KeyError:
-            suid = None ##todo
+            suid = None # TODO: handling
         if not suid in dct:
             dct[suid] = []
         dct[suid].append((prov,w))
