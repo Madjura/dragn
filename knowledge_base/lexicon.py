@@ -180,6 +180,7 @@ class Lexicon:
         else:
             return 0
 
+    ### TODO: CHANGE THIS TO RETURN STRINGS INSTEAD OF INTS
     def sorted(self,reverse=True,limit=-1,ignored=[],lexical=False):
         # list of lexicalised tokens sorted according to their frequency;
         # limit can be one of the following:
@@ -210,7 +211,7 @@ class Lexicon:
                 if not ignore:
                     l_cut.append(item)
             # copmputing average from that list
-            avg = sum([x[1] for x in l_cut])/float(len(l_cut))
+            avg = sum([x[1] for x in l_cut])/float(len(l_cut)) ### average occurance, x[1] is the how ofen the phrase appears
             # including only the values >= average
             l = [x for x in l_cut if x[1] >= avg]
         else:
@@ -220,4 +221,5 @@ class Lexicon:
             # returning lexical values
             return [x[0] for x in l]
         # returning integer ID values
-        return [self.lex2int[x[0]] for x in l]
+        return [x[0] for x in l] ### return not ids, but phrases/terms
+        ###return [self.lex2int[x[0]] for x in l]

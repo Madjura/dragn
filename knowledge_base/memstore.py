@@ -65,7 +65,7 @@ class MemStore:
                 ### RETURNS INT
                 #key = tuple([self.lexicon[x] for x in line]) ### square brackets calls __getitem__
                 #print("MY SYSTEM, KEY", key)
-                ####print("MY SYSTEM KEY", key)
+                print("MY SYSTEM KEY", key)
                 self.sources[key] = closeness.closeness
 
     def dump(self,filename):

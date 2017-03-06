@@ -67,10 +67,13 @@ class Analyser:
         # @NOTE - an implementation that makes use of a simple dictionary-based 
         #         sparse matrix representation and corresponding column to row 
         #         index
-    
+        
+        ### ENTITY IS INTEGER. MUST BE STRING AT THIS POINT!
         entity_id = entity
-        if isinstance(entity_id,str) or isinstance(entity_id,str):
-            entity_id = self.store.convert((entity,))[0]
+        #======================================================================
+        # if isinstance(entity_id,str) or isinstance(entity_id,str):
+        #     entity_id = self.store.convert((entity,))[0]
+        #======================================================================
         if entity_id == None or not entity_id in self.sparse:
             return []
         # the row vector of the sparse matrix (a column_index:weight dictionary)

@@ -9,3 +9,4 @@ memstore.incorporate(closenesses) ### FINISHED, 3 march
 memstore.computeCorpus() ### 3 march, should be good2go
 memstore.normaliseCorpus() ### 3 march, does just computations - should be unbreakable
 pickle.dump(memstore, open(paths.MEMSTORE_PATH + "/" + "memstore.p", "wb"))
+print("SOURCES - ", memstore.sources)
