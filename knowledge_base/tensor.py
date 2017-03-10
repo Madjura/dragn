@@ -365,8 +365,9 @@ class Tensor:
         Generates a string with tab-separated values representing the tensor.
         """
         
-        return '\n'.join(['\t'.join([str(elem) for elem in key]+\
+        tsv = '\n'.join(['\t'.join([str(elem) for elem in key]+\
           [str(self.base_dict[key])]) for key in self.base_dict])
+        return tsv
 
     def to_file(self,filename):
         """
@@ -408,10 +409,8 @@ class Tensor:
                 sys.stderr.write('W (importing a tensor) - cannot import from: %s\n',\
                                  str(filename))
         for line in lines:
-            try:
                 key_val = line.split('\t')[:self.rank+1]
-                key = tuple([int(x) for x in key_val[:-1]])
+                key = tuple(x for x in key_val[:-1]) ### CHANGED TO STRINGS
+                #key = tuple([int(x) for x in key_val[:-1]])
                 val = float(key_val[-1])
                 self.base_dict[key] = val
-            except:
-                sys.stderr.write('W (importing a tensor) - fishy line:\n%s' % (line,))

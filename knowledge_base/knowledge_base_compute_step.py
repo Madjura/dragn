@@ -1,15 +1,27 @@
 from util import paths
 import pickle
 from knowledge_base.analyser import Analyser
+from knowledge_base.memstore import MemStore
 
 # STEP 3
 # TODO: MAKE THIS WORK WITH STRINGS INSTEAD OF INTS
 # breaks with memstore.p instead of memstore
-memstore = pickle.load(open(paths.MEMSTORE_PATH + "/" + "memstore.p", "rb"))
+memstore = MemStore(trace=True)
+memstore.imp(paths.MEMSTORE_PATH)
 original_size = len(memstore.corpus)
-memstore.lexicon.update("related_to")
-rel_id = memstore.lexicon["related_to"]
-memstore.computePerspective("LAxLIRA") ### complicated, mathematical
+print("ORIGINAL SIZE: ", original_size)
+memstore.lexicon.update("related to")
+rel_id = memstore.lexicon["related to"]
+print("RELATED_TO ID IN LEXICON: ", rel_id)
+memstore.computePerspective('LAxLIRA')
+
+#==============================================================================
+# memstore = pickle.load(open(paths.MEMSTORE_PATH + "/" + "memstore.p", "rb"))
+# original_size = len(memstore.corpus)
+# memstore.lexicon.update("related_to")
+# rel_id = memstore.lexicon["related_to"]
+# memstore.computePerspective("LAxLIRA") ### complicated, mathematical
+#==============================================================================
 
 ## does not work with trace=False - TODO: investigate why
 analyser = Analyser(memstore, "LAxLIRA", compute=False, trace=True)
@@ -32,7 +44,9 @@ for t1 in term_ids:
             sim_dict[(t1, "related_to", t2)] = s
             # storing the computed values to the corpus
 for key, value in sim_dict.items():
+    print("MEMSTORE.CORPUS[<KEY>] = <VALUE> --- KEY: ", key, " --- VALUE: ", value)
     memstore.corpus[key] = value
 
+memstore.exp(paths.MEMSTORE_PATH + "/")
 ### CHANGED TO .p EXTENSION
 pickle.dump(memstore, open(paths.MEMSTORE_PATH + "/" + "memstore_comp.p", "wb"))

@@ -25,3 +25,5 @@ FULLTEXT_PATH = "../data/fulltext"
 
 # Path to suids
 SUIDS_PATH = "../data/suids"
+
+INDEX_PATH = "../data/index"

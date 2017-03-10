@@ -120,6 +120,8 @@ class MemStore:
         lex_f = openner(lex_fn,sig)
         src_f = openner(src_fn,sig)
         crp_f = openner(crp_fn,sig)
+        foo = self.lexicon.freqdct
+        print(self.lexicon.freqdct.items())
         self.lexicon.from_file(lex_f)
         self.sources.from_file(src_f)
         self.corpus.from_file(crp_f)

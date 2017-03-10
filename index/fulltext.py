@@ -44,12 +44,13 @@ def gen_cooc_suid2puid(sources,stmt2suid):
             suid = stmt2suid[(s,p,o)][0]
         except KeyError:
             suid = None # TODO: handling
+        # SUID IS THE INDEX IN CORPUS.ITEMS
         if not suid in dct:
             dct[suid] = []
         dct[suid].append((prov,w))
     return dct
 
-def gen_sim_suid2puid(stmt2suid,suid2puid,simrel_id):
+def gen_sim_suid2puid(stmt2suid,suid2puid,simrel_id, out_file=None):
     # process the stmt2suid, creating the dictionary mapping subjects to 
     # (predicate,object) tuples, and also generating a list of similarity
     # relationship statements together with their SUIDs and weights
@@ -59,13 +60,18 @@ def gen_sim_suid2puid(stmt2suid,suid2puid,simrel_id):
         if not s in s2po:
             s2po[s] = set()
         s2po[s].add((p,o))
-        if p == simrel_id:
+        
+        ### THIS CHECKS FOR SIM_REL ID 
+        ### WHICH IS RELATED TO
+        #if p == simrel_id:
+        if p == "related_to":
             sim_stmts[(s,o)] = stmt2suid[(s,p,o)]
     # process all the similarity statements, determining the co-occurrence
     # statements that led to them as an intersection of the (predicate,object)
     # tuple sets corresponding to the similar arguments
     print("  - processing the similarity statements")
     i, missing, processed = 0, 0, 0
+    out_lines = []
     for s, o in sim_stmts:
         i += 1
         print("    ...", i, "out of", len(sim_stmts))
@@ -91,12 +97,16 @@ def gen_sim_suid2puid(stmt2suid,suid2puid,simrel_id):
             # provenance weight of related co-occurrence statement and the similarity
             # value
             prov_w = max(puid2weight[puid])*sim_w
+            
             # writing the provenance line to the out-file
-            #f_out.write('\n'.encode())
+            if out_file is not None:
+                print("OUTFILE: ", out_file)
+                out_file.write(str.encode('\n'+'\t'.join([str(sim_suid),str(puid),str(prov_w)])))
             #f_out.write('\t'.join([str(sim_suid),str(puid),str(prov_w)]).encode())
+            out_lines.append('\t'.join([str(sim_suid),str(puid),str(prov_w)]))
             print("sim_suid: ", sim_suid, " puid: ", puid, " prov_w: ", prov_w)
             processed += 1
-    return missing, processed
+    return missing, processed, out_lines
 
 def load_suids(fname):
     # load the mapping of the statements to their IDs
@@ -106,5 +116,8 @@ def load_suids(fname):
         spl = line.split('\t')
         if len(spl) != 5:
             continue
-        dct[(int(spl[1]),int(spl[2]),int(spl[3]))] = (int(spl[0]), float(spl[4]))
+        ### CHANGED
+        ### ORIGINAL 
+        ###dct[(int(spl[1]),int(spl[2]),int(spl[3]))] = (int(spl[0]), float(spl[4]))
+        dct[(spl[1],spl[2],spl[3])] = (int(spl[0]), float(spl[4]))
     return dct

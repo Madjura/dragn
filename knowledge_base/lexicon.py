@@ -53,11 +53,16 @@ class Lexicon:
                 expr, indx, freq = line.split('\t')[:3]
                 indx = int(indx)
                 freq = int(freq)
+                try:
+                    expr = expr.decode()
+                except AttributeError:
+                    pass
                 self.lex2int[expr] = indx
                 self.int2lex[indx] = expr
                 self.freqdct[expr] = freq
-            except:
-                sys.stderr.write('W (importing a lexicon) - fishy line:\n%s' % (line,))
+            except ValueError:
+                print("Error loading lexicon. Line was ", line)
+            #    sys.stderr.write('W (importing a lexicon) - fishy line:\n%s' % (line,))
         self.current = max(self.int2lex.keys()) + 1
 
     def to_file(self,filename):
@@ -69,10 +74,10 @@ class Lexicon:
             #  str(self.freqdct[x])]) for x in self.lex2int]))
             for lex in self.lex2int:
                 try:
-                    tmp = ('\t'.join([lex, str(self.lex2int[lex]),
-                                      str(self.freqdct[lex])
-                                     ])+'\n')
-                    filename.write(tmp.encode())
+                    foo = '\t'.join([lex,str(self.lex2int[lex]),\
+                    str(self.freqdct[lex])])+'\n'
+                    ### write format: <phrase> <id> <how often it appears>
+                    filename.write(str.encode(foo))
                 except UnicodeEncodeError:
                     errors += 1
             filename.flush()
@@ -118,6 +123,7 @@ class Lexicon:
         else:
             # expect iterable here
             updates = list(items)
+        print(self.freqdct.items())
         for item in updates:
             # updating the frequency dictionary first
             if item in self.freqdct:
@@ -126,7 +132,7 @@ class Lexicon:
                 self.freqdct[item] = 1
             if item not in self.lex2int:
                 # udpate the dictionaries if the item is not present
-                ## what the FUCK
+                ### what the FUCK
                 self.lex2int[item] = self.current
                 self.int2lex[self.current] = item
                 self.current += 1
