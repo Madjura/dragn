@@ -216,7 +216,7 @@ def generate_source(token2sentences, paragraph_id, distance_threshhold=5, \
             
             # get positions of second term
             for position2 in token2sentences[term2]:
-                
+
                 # get the distance between the terms, measured in "terms between"
                 distance = math.fabs(position1-position2)
                 
@@ -225,10 +225,10 @@ def generate_source(token2sentences, paragraph_id, distance_threshhold=5, \
                     
                     # calculate new weight
                     w += 1/(1 + distance)
-                
-                # check if terms are relevant enough
-                if w > weight_threshold:
-                    closenesses.append(Closeness(term1, term2, w, paragraph_id))
+
+        # check if terms are relevant enough
+        if w > weight_threshold:
+            closenesses.append(Closeness(term1, term2, w, paragraph_id))
     
     w2statements = defaultdict(list)
     for closeness in closenesses:

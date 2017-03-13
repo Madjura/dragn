@@ -94,7 +94,7 @@ for file in os.listdir(paths.TEXT_PATH):
             closeness_list = generate_source(text2sentence, text + "_"+str(count))
             closeness.append(closeness_list)
             pickle.dump(text2sentence, open(paths.TOKEN_TO_SENTENCE_PATH + "/" \
-                        + str(new_paragraph.paragraph_id) + ".t2s", "wb"))
+                        + str(new_paragraph.paragraph_id) + file + ".t2s", "wb"))
         
         """
         format is:

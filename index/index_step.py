@@ -65,10 +65,9 @@ for suid in suid2puid:
 f_out.write(str.encode('\n'.join(lines)))
 simrel_id = -1
 try:
-    simrel_id = memstore.lexicon["related_to"]
+    simrel_id = memstore.lexicon["related to"]
 except KeyError:
     print('\nW@ixkb.py - no similarity relationships present\n')
-
 ### THIS WRITES PROVENANCE FILE
 ### LOOKS CORRECT BUT SOMETIMES THE SPACING IS INCOSISTENT IN FILE, TODO: FIX
 missing, processed, out = gen_sim_suid2puid(suid_lines,suid2puid,simrel_id, out_file=f_out)
