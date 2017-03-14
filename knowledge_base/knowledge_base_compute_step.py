@@ -8,7 +8,7 @@ import re
 #STEP 3
 ### NEW AND EXPERIMENTAL
 memstore = NeoMemStore()
-memstore.import_memstore(paths.MEMSTORE_PATH)
+memstore.import_memstore(paths.MEMSTORE_PATH_EXPERIMENTAL)
 memstore.update_lexicon("related to")
 rel_id = "related to"
 memstore.computePerspective("LAxLIRA")
@@ -26,12 +26,12 @@ for i, t1 in enumerate(terms):
             sim_dict[(t1, rel_id, t2)] = s
 for key, value in sim_dict.items():
     print("MEMSTORE.CORPUS[<KEY>] = <VALUE> --- KEY: ", key, " --- VALUE: ", value)
-    memstore.corpus[key] = value
-memstore.export(paths.MEMSTORE_PATH + "/")
+    memstore.corpus[key] = value ### purge memstore before doing this?
+memstore.export(paths.MEMSTORE_PATH_EXPERIMENTAL + "/")
 
-
-## OLD BUT WORKS
 #==============================================================================
+# 
+# # OLD BUT WORKS
 # memstore = MemStore(trace=True)
 # memstore.imp(paths.MEMSTORE_PATH)
 # print(memstore.lexicon["look"])

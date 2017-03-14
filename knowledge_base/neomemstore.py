@@ -207,6 +207,7 @@ class NeoMemStore(object):
         print("NUMBER OF WEIRD LINES: ", len(weird_lines), weird_lines)
         
     def sorted(self):
+        ### TODO: return only if value > average, see his code
         sorted_by_value = [x[0] for x in sorted(self.lexicon.items(), key=operator.itemgetter(1), reverse=True)]
         return sorted_by_value
     

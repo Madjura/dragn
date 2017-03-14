@@ -33,6 +33,12 @@ def update_index(ix,text2index):
                              '  problematic text: '+text+'\n')
     writer.commit()
     
+def update_index_exp(ix, terms: [str]):
+    writer = ix.writer()
+    for text in terms:
+        writer.add_document(identifier=text, content=text)
+    writer.commit()
+    
 def gen_cooc_suid2puid(sources,stmt2suid):
     # generating the mapping from extracted statements to provenances and their
     # weights

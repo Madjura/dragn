@@ -19,11 +19,19 @@ CLOSENESS_PATH = "../data/closeness"
 # Path to the memstore
 MEMSTORE_PATH = "../data/memstore"
 
+MEMSTORE_PATH_EXPERIMENTAL = "../data/memstoreexperimental"
+
 # Path to fulltext
 # TODO: what the hell is this?
 FULLTEXT_PATH = "../data/fulltext"
 
+FULLTEXT_PATH_EXPERIMENTAL = "../data/fulltextexperimental"
+
 # Path to suids
 SUIDS_PATH = "../data/suids"
 
+SUIDS_PATH_EXPERIMENTAL = "../data/suidsexperimental"
+
 INDEX_PATH = "../data/index"
+
+EXPRESSION_SET_PATH_EXPERIMENTAL = "../data/expressionsexperimental"

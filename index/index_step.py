@@ -1,9 +1,52 @@
 import pickle
 from util import paths
 from index.fulltext import open_index, update_index, gen_cooc_suid2puid,\
-    gen_sim_suid2puid, load_suids
+    gen_sim_suid2puid, load_suids, update_index_exp
 import os, gzip
 from knowledge_base.memstore import MemStore
+from knowledge_base.neomemstore import NeoMemStore
+from _collections import defaultdict
+import pprint
+
+memstore = NeoMemStore()
+memstore.import_memstore(paths.MEMSTORE_PATH_EXPERIMENTAL)
+ftext = open_index(paths.FULLTEXT_PATH_EXPERIMENTAL)
+expressions = memstore.lexicon.keys() ### get all expressions
+update_index_exp(ftext, expressions)
+i = 0
+suid_lines = []
+expression_dictionary = defaultdict(lambda: set())
+
+#
+# WRITE EXPRESSION AND HOW THEY ARE RELATED AS SUIDS
+#
+### original loads corpus with load_corpus, possibly needed
+for (expression, related_to, other_expression), weight in list(memstore.corpus.items()):
+    suid_lines.append("\t".join([str(x) for x in [i, expression, related_to, other_expression, weight]]))
+    i += 1
+    expression_dictionary[expression].add((other_expression, weight))
+    expression_dictionary[other_expression].add((expression, weight))
+with gzip.open(os.path.join(paths.SUIDS_PATH_EXPERIMENTAL, "suids.tsv.gsz"), "wb") as f:
+    f.write(("\n".join(suid_lines)).encode())
+f.close()
+
+#
+# WRITE EXPRESSION SET
+#
+term_lines = []
+for expression1, related_set in list(expression_dictionary.items()):
+    for expression2, weight in related_set:
+        term_lines.append("\t".join([str(x) for x in [expression1, expression2, weight]]))
+with gzip.open(os.path.join(paths.EXPRESSION_SET_PATH_EXPERIMENTAL, "expressionsets.tsv.gsz"), "wb") as f:
+    f.write(("\n".join(term_lines)).encode())
+f.close()
+
+
+pprint.pprint(expression_dictionary["door"])
+print("foo")
+a = memstore.sources
+
+### TODO: map suid_lines to provenance, see below gen_cooc_suid2puid
 
 # STEP 4
 ### CHANGED TO .p
