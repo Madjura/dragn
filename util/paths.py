@@ -34,4 +34,6 @@ SUIDS_PATH_EXPERIMENTAL = "../data/suidsexperimental"
 
 INDEX_PATH = "../data/index"
 
+INDEX_PATH_EXPERIMENTAL = "../data/indexexperimental"
+
 EXPRESSION_SET_PATH_EXPERIMENTAL = "../data/expressionsexperimental"

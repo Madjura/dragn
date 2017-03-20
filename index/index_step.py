@@ -1,7 +1,8 @@
 import pickle
 from util import paths
 from index.fulltext import open_index, update_index, gen_cooc_suid2puid,\
-    gen_sim_suid2puid, load_suids, update_index_exp
+    gen_sim_suid2puid, load_suids, update_index_exp, gen_cooc_suid2puid_exp,\
+    gen_sim_suid2puid_exp
 import os, gzip
 from knowledge_base.memstore import MemStore
 from knowledge_base.neomemstore import NeoMemStore
@@ -16,7 +17,7 @@ update_index_exp(ftext, expressions)
 i = 0
 suid_lines = []
 expression_dictionary = defaultdict(lambda: set())
-
+ 
 #
 # WRITE EXPRESSION AND HOW THEY ARE RELATED AS SUIDS
 #
@@ -26,10 +27,10 @@ for (expression, related_to, other_expression), weight in list(memstore.corpus.i
     i += 1
     expression_dictionary[expression].add((other_expression, weight))
     expression_dictionary[other_expression].add((expression, weight))
-with gzip.open(os.path.join(paths.SUIDS_PATH_EXPERIMENTAL, "suids.tsv.gsz"), "wb") as f:
+with gzip.open(os.path.join(paths.SUIDS_PATH_EXPERIMENTAL, "suids.tsv.gz"), "wb") as f:
     f.write(("\n".join(suid_lines)).encode())
 f.close()
-
+ 
 #
 # WRITE EXPRESSION SET
 #
@@ -37,15 +38,24 @@ term_lines = []
 for expression1, related_set in list(expression_dictionary.items()):
     for expression2, weight in related_set:
         term_lines.append("\t".join([str(x) for x in [expression1, expression2, weight]]))
-with gzip.open(os.path.join(paths.EXPRESSION_SET_PATH_EXPERIMENTAL, "expressionsets.tsv.gsz"), "wb") as f:
+with gzip.open(os.path.join(paths.EXPRESSION_SET_PATH_EXPERIMENTAL, "expressionsets.tsv.gz"), "wb") as f:
     f.write(("\n".join(term_lines)).encode())
 f.close()
+ 
+### pprint.pprint(expression_dictionary["door"])
+suids = load_suids(paths.SUIDS_PATH_EXPERIMENTAL + "/suids.tsv.gz")
+suid2puid = gen_cooc_suid2puid_exp(memstore.sources, suids) # TODO: RENAME
+ 
+lines = []
+with gzip.open(os.path.join(paths.INDEX_PATH_EXPERIMENTAL, "provenances.tsv.gz"), "wb") as f_out:
+    for suid in suid2puid:
+        for puid, w in suid2puid[suid]:
+            lines.append("\t".join( [str(suid), str(puid), str(w)] ))
+    f_out.write(str.encode("\n".join(lines)))
+    missing, processed, out = gen_sim_suid2puid_exp(suids, suid2puid, out_file=f_out)
+f_out.close()
 
-
-pprint.pprint(expression_dictionary["door"])
 print("foo")
-a = memstore.sources
-
 ### TODO: map suid_lines to provenance, see below gen_cooc_suid2puid
 
 # STEP 4
