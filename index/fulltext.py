@@ -185,9 +185,9 @@ def gen_sim_suid2puid_exp(stmt2suid, suid2puid, out_file=None):
             
             # writing the provenance line to the out-file
             if out_file is not None:
-                line = "\n\t".join([str(sim_suid), puid, str(prov_w)])
+                line = "\t".join([str(sim_suid), puid, str(prov_w)])
                 out_file.write(str.encode(line))
-            out_lines.append('\n\t'.join([str(sim_suid),str(puid),str(prov_w)]))
+            out_lines.append('\t'.join([str(sim_suid),str(puid),str(prov_w)]))
             processed += 1
     return missing, processed, out_lines
 
@@ -202,5 +202,8 @@ def load_suids(fname):
         ### CHANGED
         ### ORIGINAL 
         ###dct[(int(spl[1]),int(spl[2]),int(spl[3]))] = (int(spl[0]), float(spl[4]))
-        dct[(spl[1],spl[2],spl[3])] = (int(spl[0]), float(spl[4]))
+        try:
+            dct[(spl[1],spl[2],spl[3])] = (int(spl[0]), float(spl[4]))
+        except ValueError:
+            dct[(spl[1],spl[2],spl[3])] = (spl[0], float(spl[4]))
     return dct
