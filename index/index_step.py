@@ -21,7 +21,7 @@ expression_dictionary = defaultdict(lambda: set())
 #
 ### original loads corpus with load_corpus, possibly needed
 for (expression, related_to, other_expression), weight in list(memstore.corpus.items()):
-    suid_lines.append("\t".join([str(x) for x in [expression, expression, related_to, other_expression, weight]])) ### changed first expression from i
+    suid_lines.append("\t".join([str(x) for x in [i, expression, related_to, other_expression, weight]])) ### changed first expression from i
     i += 1
     expression_dictionary[expression].add((other_expression, weight))
     expression_dictionary[other_expression].add((expression, weight))
@@ -52,7 +52,7 @@ with gzip.open(os.path.join(paths.INDEX_PATH_EXPERIMENTAL, "provenances.tsv.gz")
     for suid in suid2puid:
         for puid, w in suid2puid[suid]:
             lines.append("\t".join( [str(suid), str(puid), str(w)] ))
-    f_out.write("\n".join(lines).encode())
+    f_out.write(("\n".join(lines)).encode())
     missing, processed, out = gen_sim_suid2puid_exp(suids, suid2puid, out_file=f_out)
 f_out.close()
 ### out:  '8033\ta.txt_14\t0.19269787540304012',

@@ -127,17 +127,16 @@ class MemStoreQueryResult:
         return suid2stmt, tuid2suid
 
     def load_suid2prov(self):
-        suid2prov = {}
+        suid2prov = defaultdict(lambda: list())
         if os.path.exists(os.path.join(paths.INDEX_PATH_EXPERIMENTAL, 'provenances.tsv.gz')):
             fn = os.path.join(paths.INDEX_PATH_EXPERIMENTAL, 'provenances.tsv.gz')
             f = gzip.open(fn, 'rb')
             for line in f.read().decode().split('\n'):
                 spl = line.split('\t')
                 if len(spl) != 3:
+                    print("INVALID LENGTH")
                     continue
                 key, value = spl[0], (spl[1], float(spl[2]))
-                if not key in suid2prov:
-                    suid2prov[key] = []
                 suid2prov[key].append(value)
             f.close()
         else:
@@ -170,8 +169,9 @@ class MemStoreQueryResult:
                 
                 ### his suid2sttmt dict: {0: (304, 1, 170, 0.24094163517471326), 1: (981, 1, 972, 0.39100798646527024),
                 try:
-                    s, _p, o, suid_weight = self.suid2stmt[tuid]
+                    s, _p, o, suid_weight = self.suid2stmt[suid]
                 except KeyError:
+                    print("KEYERROR")
                     continue ### TODO: investigate why this happens
                 if not (s in self.queried or o in self.queried):
                     # don't process statements that are not related to the queried terms
@@ -188,6 +188,8 @@ class MemStoreQueryResult:
                     self.tuid_dict[o] += self.suid_dict[suid]
                 # updating the result provenance dict with the combined tuid/suid/puid
                 # weight
+                
+                ### ENTRYPOINT 21 march - INVESTIGATE KEY ERROR
                 for puid, puid_weight in suid2prov[suid]:
                     self.puid_dict[puid] += tuid_weight * suid_weight * puid_weight
                 # updating the self.prov_rels dictionary
@@ -200,6 +202,7 @@ class MemStoreQueryResult:
         # dictionaries
         self.suid_set = self._generate_fuzzy_set(self.suid_dict)
         self.puid_set = self._generate_fuzzy_set(self.puid_dict)
+        print("foo")
 
     def _generate_fuzzy_set(self, dct, agg=max):
         # generates a fuzzy set from a member->weight dictionary, normalising the
@@ -289,6 +292,7 @@ class MemStoreQueryResult:
         l.sort(key=lambda x: x[1], reverse=True)
         for suid, w in l:
             if num_edges > max_edges:
+                print("MAX EDGES")
                 break
             s, p, o, _corp_w = self.suid2stmt[suid]
             # adding the edge if both arguments are present in the node set
