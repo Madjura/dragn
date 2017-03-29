@@ -90,12 +90,8 @@ def gen_sim_suid2puid(stmt2suid,suid2puid,simrel_id, out_file=None):
         ### THIS CHECKS FOR SIM_REL ID 
         ### WHICH IS RELATED TO
         ##if p == simrel_id:
-        if p != "close to":
-            print("FOO")
         if p == "related to":
             sim_stmts[(s,o)] = stmt2suid[(s,p,o)]
-        if p == "related_to":
-            print("RADSKJDSA")
     # process all the similarity statements, determining the co-occurrence
     # statements that led to them as an intersection of the (predicate,object)
     # tuple sets corresponding to the similar arguments
@@ -185,7 +181,7 @@ def gen_sim_suid2puid_exp(stmt2suid, suid2puid, out_file=None):
             
             # writing the provenance line to the out-file
             if out_file is not None:
-                line = "\t".join([str(sim_suid), puid, str(prov_w)])
+                line = "\n" + "\t".join([str(sim_suid), puid, str(prov_w)])
                 out_file.write(str.encode(line))
             out_lines.append('\t'.join([str(sim_suid),str(puid),str(prov_w)]))
             processed += 1
