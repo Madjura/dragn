@@ -360,7 +360,7 @@ class Tensor:
         return '\n'.join(['\t'.join([str(elem) for elem in key])+' -> '+\
                           str(self.base_dict[key]) for key in self.base_dict])
 
-    def tsv(self):
+    def tab_separated(self):
         """
         Generates a string with tab-separated values representing the tensor.
         """
@@ -369,26 +369,15 @@ class Tensor:
           [str(self.base_dict[key])]) for key in self.base_dict])
         return tsv
 
-    def to_file(self,filename):
+    def to_file(self, filename):
         """
         Exporting a lexicon to a filename or file-like object (tab-separated 
         values).
         """
-        # LEXICON
-        try:
-            # assuming a file object
-            filename.write(self.tsv().encode())
-            filename.flush()
-        except AttributeError:
-            # assuming a filename
-            try:
-                f = open(filename,'w')
-                f.write(self.tsv())
-                f.close()
-            except:
-                # if neither file nor filename, proceed with empty lines
-                sys.stderr.write('W (exporting a tensor) - cannot export to: %s\n',\
-                                str(filename))
+        
+        filename.write(self.tab_separated().encode())
+        filename.flush()
+
 
     def from_file(self,filename):
         """

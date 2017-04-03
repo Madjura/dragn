@@ -4,6 +4,7 @@ from math import log
 import os
 import gzip
 import operator
+from util import paths
 
 PERSP_TYPES = ['LAxLIRA','LIxLARA','RAxLALI','LIRAxLA','LARAxLI','LALIxRA',\
 'LAxLIRA_COMPRESSED','LIxLARA_COMPRESSED','RAxLALI_COMPRESSED',\
@@ -19,6 +20,7 @@ PERSP2PIVDIM = {
   'LALIxRA' : (0,1)
 }
 
+
 class NeoMemStore(object):
     
     def __init__(self):
@@ -26,12 +28,22 @@ class NeoMemStore(object):
         Format will be:
             <expression>: <frequency>
         """
+        
         self.lexicon = defaultdict(int)
+        
+        # <Token> close to <Token2>, ParagraphID: Closeness value
         self.sources = Tensor(rank=4)
         self.corpus = Tensor(rank=3)
-        self.perspectives = dict([(x,Tensor(rank=2)) for x in PERSP_TYPES])
+        self.perspectives = dict([(x, Tensor(rank=2)) for x in PERSP_TYPES])
 
-    def incorporate(self, closenesses):
+    def incorporate(self, closenesses: ["Closeness"]) -> None:
+        """
+        Incorporates Closeness objects into this NeoMemStore.
+            
+            Args:
+                closenesses: A list of Closeness objects, as created in extract_step.
+        """
+        
         expressions = []
         
         # first pass: update lexicon with terms
@@ -46,6 +58,13 @@ class NeoMemStore(object):
                 self.sources[key] = closeness.closeness
                 
     def update_lexicon(self, items):
+        """
+        Helper function to fill the lexicon with the expressions.
+        
+            Args:
+                items: A list of expressions the lexicon is being updated with.
+        """
+        
         if type(items) is str:
             items = list(items)
         for item in items:
@@ -66,42 +85,38 @@ class NeoMemStore(object):
         tripl_freq = defaultdict(int)
         
         # (s,p,o) -> (provenance, relevance)
-        spo2pr = {}
+        spo2pr = defaultdict(lambda: [])
         
         # going through all the statements in the sources
-        for s,p,o,d in list(self.sources.keys()):
+        for s, p, o, paragraph_id in list(self.sources.keys()):
             N += 1
-            
             ### refactored to use defaultdict
             indep_freq[s] += 1
             indep_freq[o] += 1
-            joint_freq[(s,o)] += 1
-            tripl_freq[(s,p,o)] += 1
-            if (s,p,o) not in spo2pr:
-                spo2pr[(s,p,o)] = []
-            spo2pr[(s,p,o)].append((d,self.sources[(s,p,o,d)]))
+            joint_freq[(s, o)] += 1
+            tripl_freq[(s, p, o)] += 1
+            spo2pr[(s, p, o)].append((paragraph_id, self.sources[(s, p, o, paragraph_id)]))
         # going only through the unique triples now regardless of their provenance
-        for s,p,o in spo2pr:
+        for s, p, o in spo2pr:
             # a list of relevances of particular statement sources
             src_rels = [x[1] for x in spo2pr[(s,p,o)]]
             ### src rels has sometimes more than 1 value
             
             # absolute frequency of the triple times it's mutual information score
-            joint = joint_freq[(s,o)]
-            if (o,s) in joint_freq:
+            joint = joint_freq[(s, o)]
+            if (o, s) in joint_freq:
                 ### o and s are terms
-                joint += joint_freq[(o,s)]
+                joint += joint_freq[(o, s)]
             # frequency times mutual information score
             fMI = 0.0
             try:
-                fMI = \
-                tripl_freq[(s,p,o)]*log(float(N*joint)/(indep_freq[s]*indep_freq[o]),2)
+                fMI = tripl_freq[(s, p, o)] * log(float(N * joint) / (indep_freq[s] * indep_freq[o]), 2)
             except ValueError:
                 continue
             # setting the corpus tensor value
-            self.corpus[(s,p,o)] = fMI*(float(sum(src_rels))/len(src_rels))
+            self.corpus[(s, p, o)] = fMI * (float(sum(src_rels))/len(src_rels))
             
-    def normaliseCorpus(self,cut_off=0.95,min_quo=0.1):
+    def normaliseCorpus(self, cut_off=0.95, min_quo=0.1):
         ### untouched
         
         # corpus normalisation by a value that is greater or equal to the
@@ -109,8 +124,8 @@ class NeoMemStore(object):
         # (if the values are below zero, they are set to the min_quo
         # fraction of the minimal normalised value
         ws = sorted(self.corpus.values())
-        norm_cons = ws[int(cut_off*len(ws)):][0]
-        min_norm = min([x for x in ws if x > 0])*min_quo
+        norm_cons = ws[int(cut_off * len(ws)):][0]
+        min_norm = min([x for x in ws if x > 0]) * min_quo
         for key in self.corpus:
             w = self.corpus[key]/norm_cons
             if w < 0:
@@ -119,73 +134,43 @@ class NeoMemStore(object):
                 w = 1.0
             self.corpus[key] = w
             
-    def export(self, path, compress=True):
-        # exporting the whole store as tab-separated value files to a directory
-        # (gzip compression is used by default)
-        # note that only lexicon, sources and corpus structures are exported, any
-        # possibly precomputed corpus perspectives have to be re-created!
-        # also, integer indices are used - for lexicalised (human readable) export
-        # of sources and corpus, use exportSources() and exportCorpus() functions
-        # setting the filenames
-        lex_fn = os.path.join(path,'lexicon.tsv')
-        src_fn = os.path.join(path,'sources.tsv')
-        crp_fn = os.path.join(path,'corpus.tsv')
-        if compress:
-            lex_fn += '.gz'
-            src_fn += '.gz'
-            crp_fn += '.gz'
-        openner, sig = open, 'w'
-        if compress:
-            openner, sig = gzip.open, 'w'
-        lex_f = openner(lex_fn,sig)
-        src_f = openner(src_fn,sig)
-        crp_f = openner(crp_fn,sig)
-        self.lexicon_to_file(lex_f)
-        self.sources.to_file(src_f)
-        self.corpus.to_file(crp_f)
+    def export(self, path=paths.MEMSTORE_PATH_EXPERIMENTAL):
+        """Exports the lexicon, sources and corpus and writes them to disk."""
+        
+        with (gzip.open(path + "/lexicon.tsv.gz" , "w")) as lex_f:
+                self.lexicon_to_file(lex_f)
         lex_f.close()
+        
+        with (gzip.open(path + "/sources.tsv.gz", "w")) as src_f:
+            self.sources.to_file(src_f)
         src_f.close()
+        
+        with (gzip.open(path + "/corpus.tsv.gz", "w")) as crp_f:
+            self.corpus.to_file(crp_f)
         crp_f.close()
         
-    def import_memstore(self, path, compress=True):
-        # importing the whole store as tab-separated value files from a directory
-        # effectively an inverse of the exp() function
-        lex_fn = os.path.join(path,'lexicon.tsv')
-        src_fn = os.path.join(path,'sources.tsv')
-        crp_fn = os.path.join(path,'corpus.tsv')
-        if compress:
-            lex_fn += '.gz'
-            src_fn += '.gz'
-            crp_fn += '.gz'
-        openner, sig = open, 'r'
-        if compress:
-            openner, sig = gzip.open, 'rb'
-        lex_f = openner(lex_fn,sig)
-        src_f = openner(src_fn,sig)
-        crp_f = openner(crp_fn,sig)
-        self.lexicon_from_file(lex_f)
-        self.sources.from_file(src_f)
-        self.corpus.from_file(crp_f)
-        lex_f.close()
-        src_f.close()
-        crp_f.close()
-
+    def import_memstore(self, path=paths.MEMSTORE_PATH_EXPERIMENTAL):
+        """Imports the lexicon, sources and corpus from disk."""
         
-    def lexicon_to_file(self, filename):
+        with (gzip.open(path + "/lexicon.tsv.gz", "rb")) as lexicon_file:
+            self.lexicon_from_file(lexicon_file)
+        lexicon_file.close()
+        
+        with (gzip.open(path + "/sources.tsv.gz", "rb")) as sources_file:
+            self.sources.from_file(sources_file)
+        sources_file.close()
+        
+        with (gzip.open(path + "/corpus.tsv.gz", "rb")) as corpus_file:
+            self.corpus.from_file(corpus_file)
+        corpus_file.close()
+        
+    def lexicon_to_file(self, out_file):
         # exporting a lexicon - inverse to import
         for phrase, frequency in self.lexicon.items():
             line = '\t'.join( [ phrase, str(frequency)] ) + '\n'
-            try:
-                filename.write(str.encode(line))
-            except AttributeError:
-                # assuming a filename
-                with open(filename, "w") as f:
-                    f = open(filename,'w')
-                    f.write(line)
-                    f.close()
-                    return
-        filename.flush()
-        os.fsync(filename.fileno())
+            out_file.write(str.encode(line))
+        out_file.flush()
+        os.fsync(out_file.fileno())
         
     def lexicon_from_file(self, filename):
         # import a lexicon from a tab-separated file (including the index mapping

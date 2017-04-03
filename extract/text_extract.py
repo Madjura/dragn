@@ -18,12 +18,14 @@ NP_GRAMMAR_SIMPLE = """
 NP: {<JJ.*>*(<N.*>|<JJ.*>)+}
 """
 
+
 def split_paragraphs(text: str) -> [str]:
     """
     Takes a text and collects the paragaphs of the text.
     
         Args:
-            text: The input string.
+            text: The input string. Unmodified, keep it as is. Supposed to be
+                the content of a file read with .read().
         Returns:
             A list of strings, where each element is a paragraph of the original
             text.
@@ -35,7 +37,7 @@ def split_paragraphs(text: str) -> [str]:
     
     # iterate over each line of the text, with .strip() applied to remove
     # trailing whitespace
-    for line in map(lambda x : x.strip(), lines):
+    for line in map(lambda x: x.strip(), lines):
         if (len(line) > 0):
             # the line is NOT a paragraph if there is something there
             current_paragraph.append(line)
@@ -55,11 +57,11 @@ def split_paragraphs(text: str) -> [str]:
 def pos_tag(text: str) -> [Sentence]:
     """
     Tokenizes a given text and generates a list of Sentence objects.
-    
-    Args:
-        text: The input text that is to be POS tagged.
-    Returns:
-        A list of Sentence objects.
+        
+        Args:
+            text: The input text that is to be POS tagged.
+        Returns:
+            A list of Sentence objects.
     """
     
     sentences = []
@@ -89,16 +91,15 @@ def parse_pos(sentences: [Sentence]) -> {int, (str, str)}:
 
     dictionary = {}
     for sentence in sentences:
-        dictionary[sentence.sentence_id] = [(token, tag) for token,tag  \
-                                            in sentence.tokens.items()]
+        dictionary[sentence.sentence_id] = [(token, tag) for token, tag in sentence.tokens.items()]
     return dictionary
 
 
 def text2cooc(pos_dictionary: {int, (str, str)}, add_verbs=True) -> {str, list}:
     """
-    Processes the input pos_dictionary of sentence_id number -> list of (token,POS-tag) 
-    tuples by the chunkers and generates/stores the term->sentence_id numbers 
-    mapping for further processing by co-occurrence statement builder.
+    Processes the input dictionary in the format:
+        {sentence_id: [(Token, POS-tag),}
+    and returns a dictionary mapping tokens to ID of the sentence they appear in.
     """
     
     parser_cmp = RegexpParser(NP_GRAMMAR_COMPOUND)
@@ -114,7 +115,7 @@ def text2cooc(pos_dictionary: {int, (str, str)}, add_verbs=True) -> {str, list}:
                 # Penn Treebank uses VB for all verbs
                 # for more details see https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
                 if tag.startswith("VB"):
-                    verb = lemmatizer.lemmatize(token,'v').lower()
+                    verb = lemmatizer.lemmatize(token, "v").lower()
                     # check if verb is not a stopword and also new
                     # newness must be checked to avoid duplicates
                     if verb not in stopwords.words("english"):
@@ -134,14 +135,14 @@ def text2cooc(pos_dictionary: {int, (str, str)}, add_verbs=True) -> {str, list}:
         smp_triples, _ = get_cooc(simple_trees, stoplist=True)
         
         # updating the inverse occurrence index with NPs 
-        for s, _p, o in cmp_triples + smp_triples:
-            if s.lower() not in term2sentence_id:
-                term2sentence_id[s.lower()] = set()
-            if o.lower() not in term2sentence_id:
-                term2sentence_id[o.lower()] = set()
+        for subject, _, objecT in cmp_triples + smp_triples:
+            if subject.lower() not in term2sentence_id:
+                term2sentence_id[subject.lower()] = set()
+            if objecT.lower() not in term2sentence_id:
+                term2sentence_id[objecT.lower()] = set()
                 
-            term2sentence_id[s.lower()].add(sentence_id)
-            term2sentence_id[o.lower()].add(sentence_id)
+            term2sentence_id[subject.lower()].add(sentence_id)
+            term2sentence_id[objecT.lower()].add(sentence_id)
             
     return term2sentence_id
     
@@ -155,14 +156,15 @@ def get_cooc(chunk_trees, stoplist=True):
             stoplist: Whether or not stopwords are to be removed.
     """
     
-    triples, simple_trees = [], []
+    triples = []
+    simple_trees = []
     lemmatizer = WordNetLemmatizer() # from nltk
     parser_simple = RegexpParser(NP_GRAMMAR_SIMPLE) # from nltk
     
     for t in chunk_trees:
         entities = []
         for chunk in t[:]:
-            if isinstance(chunk,Tree) and chunk.label() == 'NP':
+            if isinstance(chunk, Tree) and chunk.label() == 'NP':
                 # getting a tree for later processing of triples from the simple noun 
                 # phrases (if present)
                 simple_trees.append(parser_simple.parse(chunk.leaves()))
@@ -183,18 +185,19 @@ def get_cooc(chunk_trees, stoplist=True):
                 if len(words) > 0:
                     entities.append("_".join(words))
         for e1, e2 in combinations(entities,2):
-            triples.append((e1,"close_to",e2))
-            triples.append((e2,"close_to",e1))
+            triples.append((e1, "close to", e2)) ### changed from close_to
+            triples.append((e2, "close to", e1))
     return triples, simple_trees
 
 
-def generate_source(token2sentences, paragraph_id, distance_threshhold=5, \
+def generate_source(token2sentences, paragraph_id: int, distance_threshhold=5, \
                     weight_threshold = 1/3) -> [Closeness]:
     """
     Generates source/statement (srcstm) for following steps.
     
         Args:
-            token2sentences: A dictionary in the format {str: List[int]},
+            token2sentences: A dictionary in the format 
+                    {str: List[int]},
                 from text2cooc function.
             paragraph_id: The ID of the paragraph the text2sentences dictionary
                 belongs to.
@@ -218,7 +221,7 @@ def generate_source(token2sentences, paragraph_id, distance_threshhold=5, \
             for position2 in token2sentences[term2]:
 
                 # get the distance between the terms, measured in "terms between"
-                distance = math.fabs(position1-position2)
+                distance = math.fabs(position1 - position2)
                 
                 # check if terms are close enough to each other
                 if (distance < distance_threshhold):
@@ -233,7 +236,7 @@ def generate_source(token2sentences, paragraph_id, distance_threshhold=5, \
     w2statements = defaultdict(list)
     for closeness in closenesses:
         w2statements[closeness.closeness].append(closeness)
-        
+    
     ## get weight values in descending orders - why?
     keys = list(w2statements.keys())
     keys.sort(reverse=True)
