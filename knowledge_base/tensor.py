@@ -329,7 +329,7 @@ class Tensor:
                 m[(key[pivot_dim],col_id)] = value
         return m
 
-    def getSparseDict(self,col2row=True):
+    def get_sparse_dict(self,col2row=True):
     # returns a sparse matrix in a simple dictionary representation that can be
     # directly used for retrieving whole rows (applicable only to matrices); 
     # optionally also an index mapping column IDs to set of rows that have a 

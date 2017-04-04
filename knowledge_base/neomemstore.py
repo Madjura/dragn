@@ -22,17 +22,20 @@ PERSP2PIVDIM = {
 
 
 class NeoMemStore(object):
+    """
+    Used to store / hold relevant "metadata": Which expressions exist, how often
+    they appear in the texts, weighted expressions for further processing.
+    """
+    
     
     def __init__(self):
-        """
-        Format will be:
-            <expression>: <frequency>
-        """
-        
+        # Format: <expression>: <frequency>
         self.lexicon = defaultdict(int)
         
-        # <Token> close to <Token2>, ParagraphID: Closeness value
+        # <Expression> close to <Expression2>, ParagraphID: Closeness value
         self.sources = Tensor(rank=4)
+        
+        # <Expression> close to <Expression2>: Value
         self.corpus = Tensor(rank=3)
         self.perspectives = dict([(x, Tensor(rank=2)) for x in PERSP_TYPES])
 
@@ -59,7 +62,13 @@ class NeoMemStore(object):
                 
     def update_lexicon(self, items):
         """
-        Helper function to fill the lexicon with the expressions.
+        Helper function to fill the lexicon with how often each expression 
+        appears in "close to" relations.
+        Example:
+            [understand] = 42
+            "understand" appears in 42 "X close to Y" relations.
+        Used to find the "most relevant" expressions to boost the speed by taking
+        only the most common ones into account.
         
             Args:
                 items: A list of expressions the lexicon is being updated with.
@@ -70,7 +79,7 @@ class NeoMemStore(object):
         for item in items:
             self.lexicon[item] += 1
             
-    def computeCorpus(self):
+    def compute_corpus(self):
         ### mostly untouched
         
         # number of all triples
@@ -116,7 +125,7 @@ class NeoMemStore(object):
             # setting the corpus tensor value
             self.corpus[(s, p, o)] = fMI * (float(sum(src_rels))/len(src_rels))
             
-    def normaliseCorpus(self, cut_off=0.95, min_quo=0.1):
+    def normalise_corpus(self, cut_off=0.95, min_quo=0.1):
         ### untouched
         
         # corpus normalisation by a value that is greater or equal to the
@@ -193,6 +202,7 @@ class NeoMemStore(object):
         
     def sorted(self):
         ### TODO: return only if value > average, see his code
+        print(self.lexicon.items())
         sorted_by_value = [x[0] for x in sorted(self.lexicon.items(), key=operator.itemgetter(1), reverse=True)]
         return sorted_by_value
     

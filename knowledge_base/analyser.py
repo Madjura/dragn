@@ -1,4 +1,5 @@
 import math
+from knowledge_base.neomemstore import NeoMemStore
 
 class Analyser:
     """
@@ -7,18 +8,13 @@ class Analyser:
       - learning of rules from the perspective and its compressed counterpart
     """
 
-    def __init__(self,store,ptype,compute=True,mem=True,trace=False,\
-               log_name='analyser.log'):
+    def __init__(self, store: NeoMemStore, ptype: str, compute=True, mem=True, trace=False):
         """
         Initialising the class with an input matrix to be analysed.
         """
     
         self.trace = trace
-        self.logger = open(log_name,'a')
-        # the store to access all the underlying data
         self.store = store
-        #self.max_bulk = store.max_bulk
-        # the type of the perspective to be analysed by this class
         self.ptype = ptype
         # the matrix handler of the perspective, computed from scratch by default
         self.matrix = self.store.perspectives[self.ptype]
@@ -29,35 +25,11 @@ class Analyser:
         self.cmaps = None
         self.col2row = None
         # get an in-memory representation of the matrix
-        if mem:
-            if self.trace:
-                print("DEBUG - getting the sparse in-memory matrix")
-                self.sparse, self.col2row = self.matrix.getSparseDict()
-                # @TODO - possibly get back to the SciPy sparse if necessary
-                #self.sparse, self.rmaps, self.cmaps = self.matrix.getSparse('CSR')
-                #if self.trace:
-                #  print 'DEBUG - finished - now computing the similar stuff'
-                #  print 'DEBUG - sparse dimensions :', self.sparse.shape
-                #  print 'DEBUG - size of the matrix:', len(self.matrix)
+        if mem and trace:
+            print("DEBUG - getting the sparse in-memory matrix")
+            self.sparse, self.col2row = self.matrix.get_sparse_dict()
 
-    def __del__(self):
-        """
-        Clean up and close stuff.
-        """
-        
-        self.logger.close()
-
-    def getMostSpecificTerms(self,limit=10):
-        """
-        Returns labels of the most specific vectors (i.e., the vectors that have 
-        at least limit non-zero feature values).
-        """
-
-        return [self.store.convert((x,)) for x in self.matrix \
-                if len(self.matrix[x]) >= limit]
-
-    def similarTo(self,entity,top=100,lexicalised=False,minsim=0.001,\
-                  sims2src={}):
+    def similar_to(self, entity: str, top=100, minsim=0.001, sims2src={}):
         """
         Generates a list of (similar_entity,similarity) tuples for an input entity.
         sims2src is for storage of mapping pairs of similar things (or rather 
@@ -79,8 +51,8 @@ class Analyser:
         for col in row:
             promising |= self.col2row[col]
         if self.trace:
-            print("DEBUG@similarTo() - entity vector size        :", len(row))
-            print("DEBUG@similarTo() - number of possibly similar:", len(promising))
+            print("DEBUG@similar_to() - entity vector size        :", len(row))
+            print("DEBUG@similar_to() - number of possibly similar:", len(promising))
         # structures for:
         # - (similarity,vector ID) tuples
         # - similar vector ID tuples mapped to source statements that were used
@@ -105,7 +77,6 @@ class Analyser:
                 if self.ptype == 'LAxLIRA':
                     statements_used.add((entity_id,x[0],x[1]))
                     statements_used.add((v_id,x[0],x[1]))
-                # @TODO - implement also for other types !!!
                 vn += compared_row[x]**2
             vn = math.sqrt(vn)
             sim = float(uv)/(un*vn)
@@ -115,16 +86,10 @@ class Analyser:
                 sim_vec.append((sim,v_id))
                 sims2src[(entity_id,v_id)] = statements_used
         if self.trace:
-            print("DEBUG@similarTo() - number of actually similar:", len(sim_vec))
-            #      print 'DEBUG@similarTo() - the results:\n', sim_vec
-            #      print 'DEBUG@similarTo() - the results (names converted):'
-            #      for s, x in sim_vec:
-            #        print (self.store.convert((x,)),s)
-            print("DEBUG@similarTo() - sorting and converting the results now")
+            print("DEBUG@similar_to() - number of actually similar:", len(sim_vec))
+            print("DEBUG@similar_to() - sorting and converting the results now")
         # getting the (similarity, row vector ID) tuples sorted
         sorted_tuples = sorted(sim_vec,key=lambda x: x[0])
         sorted_tuples.reverse()
-        if not lexicalised:
-            return [(x[1],x[0]) for x in sorted_tuples[:top]]
-        else:
-            return [(self.store.convert((x,))[0],s) for s,x in sorted_tuples[:top]]
+        return [(x[1], x[0]) for x in sorted_tuples[:top]]
+

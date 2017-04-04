@@ -127,7 +127,7 @@ class MemStore:
         src_f.close()
         crp_f.close()
 
-    def computeCorpus(self):
+    def compute_corpus(self):
         # number of all triples
         N = 0
         # x -> number of independednt occurences in the store
@@ -175,7 +175,7 @@ class MemStore:
             # setting the corpus tensor value
             self.corpus[(s,p,o)] = fMI*(float(sum(src_rels))/len(src_rels))
 
-    def normaliseCorpus(self,cut_off=0.95,min_quo=0.1):
+    def normalise_corpus(self,cut_off=0.95,min_quo=0.1):
         # corpus normalisation by a value that is greater or equal to the
         # percentage of weight values given by the cut_off parameter
         # (if the values are below zero, they are set to the min_quo
