@@ -1,39 +1,38 @@
-## TODO: generate all the folders
+MAIN_FOLDER = "../data"
 
 # Path to where the texts are placed
-TEXT_PATH = "../data/texts"
+TEXT_PATH = MAIN_FOLDER + "/texts"
 
 # Path to where the paragraph files will be placed
-PARAGRAPHS_PATH = "../data/paragraphs"
+PARAGRAPHS_PATH = MAIN_FOLDER + "/paragraphs"
 
 # Path to where the POS tagged text / sentence chunks are
-POS_PATH = "../data/pos"
+POS_PATH = MAIN_FOLDER + "/pos"
 
 # Path to the token -> sentence id mapping
-TOKEN_TO_SENTENCE_PATH = "../data/term2sentence"
+TOKEN_TO_SENTENCE_PATH = MAIN_FOLDER + "/term2sentence"
 
 # Path the closeness file
 # Pickled list of a list of Closeness objects
-CLOSENESS_PATH = "../data/closeness"
+CLOSENESS_PATH = MAIN_FOLDER + "/closeness"
 
-# Path to the memstore
-MEMSTORE_PATH = "../data/memstore"
+MEMSTORE_PATH_EXPERIMENTAL = MAIN_FOLDER + "/memstoreexperimental"
 
-MEMSTORE_PATH_EXPERIMENTAL = "../data/memstoreexperimental"
+SUIDS_PATH_EXPERIMENTAL = MAIN_FOLDER + "/suidsexperimental"
 
-# Path to fulltext
-# TODO: what the hell is this?
-FULLTEXT_PATH = "../data/fulltext"
+INDEX_PATH_EXPERIMENTAL = MAIN_FOLDER + "/indexexperimental"
 
-FULLTEXT_PATH_EXPERIMENTAL = "../data/fulltextexperimental"
+EXPRESSION_SET_PATH_EXPERIMENTAL = MAIN_FOLDER + "/expressionsexperimental"
 
-# Path to suids
-SUIDS_PATH = "../data/suids"
-
-SUIDS_PATH_EXPERIMENTAL = "../data/suidsexperimental"
-
-INDEX_PATH = "../data/index"
-
-INDEX_PATH_EXPERIMENTAL = "../data/indexexperimental"
-
-EXPRESSION_SET_PATH_EXPERIMENTAL = "../data/expressionsexperimental"
+ALL = [
+    MAIN_FOLDER,
+    TEXT_PATH,
+    PARAGRAPHS_PATH,
+    POS_PATH,
+    TOKEN_TO_SENTENCE_PATH,
+    CLOSENESS_PATH,
+    MEMSTORE_PATH_EXPERIMENTAL,
+    SUIDS_PATH_EXPERIMENTAL,
+    INDEX_PATH_EXPERIMENTAL,
+    EXPRESSION_SET_PATH_EXPERIMENTAL
+    ]

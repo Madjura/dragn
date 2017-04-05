@@ -20,9 +20,11 @@ class Analyser:
         self.matrix = self.store.perspectives[self.ptype]
         if compute:
             self.matrix = self.store.computePerspective(self.ptype)
+            
+        # <expression>: {(close to, <expression2>): value}
         self.sparse = None
-        self.rmaps = None
-        self.cmaps = None
+        
+        # (close to, <expression>): [<expressions>], essentially the reverse of self.sparse
         self.col2row = None
         # get an in-memory representation of the matrix
         if mem and trace:
@@ -36,60 +38,60 @@ class Analyser:
         their IDs) to the statements that were used for computing their similarity.
         """
     
-        # @NOTE - an implementation that makes use of a simple dictionary-based 
-        #         sparse matrix representation and corresponding column to row 
-        #         index
-        
-        entity_id = entity
-        if entity_id == None or not entity_id in self.sparse:
+        if entity == None or not entity in self.sparse:
             return []
         # the row vector of the sparse matrix (a column_index:weight dictionary)
-        row = self.sparse[entity_id]
-        un = math.sqrt(sum([row[x]**2 for x in row]))
-        # getting promising vectors for the similarity computation
+        row = self.sparse[entity]
+        un = math.sqrt(sum([row[expression]**2 for expression in row]))
+        
+        # promising holds all expressions that are possibly relevant
         promising = set()
         for col in row:
             promising |= self.col2row[col]
         if self.trace:
             print("DEBUG@similar_to() - entity vector size        :", len(row))
             print("DEBUG@similar_to() - number of possibly similar:", len(promising))
-        # structures for:
-        # - (similarity,vector ID) tuples
-        # - similar vector ID tuples mapped to source statements that were used
-        #   to compute them
-        #sim_vec, sims2src = [], {}
         sim_vec = []
-        # going through all promising rows in the sparse matrix representation
-        for v_id in promising:
-            if v_id == entity_id:
-                # don't process the same entity as similar
+
+        # now check all possibly relevant expressions for actual relevancy
+        for possible_expression in promising:
+            
+            # ignore same, no reason to check
+            if possible_expression == entity:
                 continue
+            
             # container for statements that lead to particular similarities
             statements_used = set()
-            compared_row = self.sparse[v_id]
+            
+            """
+            this has the format:
+                ("close to / relevant to", <expression>): value
+            """
+            compared_row = self.sparse[possible_expression]
             # computing the actual similarity
-            uv, vn = 0.0, 0.0
-            for x in compared_row:
-                if x in row:
-                    tmp = row[x]*compared_row[x]
+            uv = 0.0
+            vn = 0.0
+            for expression in compared_row:
+                if expression in row:
+                    tmp = row[expression]*compared_row[expression]
                     uv += tmp
                 # updating the statements used information
                 if self.ptype == 'LAxLIRA':
-                    statements_used.add((entity_id,x[0],x[1]))
-                    statements_used.add((v_id,x[0],x[1]))
-                vn += compared_row[x]**2
+                    statements_used.add((entity, expression[0], expression[1]))
+                    statements_used.add((possible_expression, expression[0], expression[1]))
+                vn += compared_row[expression]**2
             vn = math.sqrt(vn)
             sim = float(uv)/(un*vn)
             if math.fabs(sim) >= minsim:
                 # add only if similarity crosses the threshold (adding code 
                 # translated from the sparse representation row index)
-                sim_vec.append((sim,v_id))
-                sims2src[(entity_id,v_id)] = statements_used
+                sim_vec.append((sim, possible_expression))
+                sims2src[(entity, possible_expression)] = statements_used
         if self.trace:
             print("DEBUG@similar_to() - number of actually similar:", len(sim_vec))
             print("DEBUG@similar_to() - sorting and converting the results now")
         # getting the (similarity, row vector ID) tuples sorted
-        sorted_tuples = sorted(sim_vec,key=lambda x: x[0])
+        sorted_tuples = sorted(sim_vec,key=lambda expression: expression[0])
         sorted_tuples.reverse()
-        return [(x[1], x[0]) for x in sorted_tuples[:top]]
+        return [(expression[1], expression[0]) for expression in sorted_tuples[:top]]
 

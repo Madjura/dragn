@@ -6,7 +6,7 @@ from query.termsets import load_tuid2relt
 from query.memstorequeryresult import MemStoreQueryResult
 
 if __name__ == "__main__":
-    QUERY = ["cthulhu", "cult", "shoggoth", "dark", "shape"]
+    QUERY = ["cthulhu", "cult", "shoggoth", "dark", "shape", "battle", "disable"]
     res_set = FuzzySet()
     with gzip.open(os.path.join(paths.EXPRESSION_SET_PATH_EXPERIMENTAL, "expressionsets.tsv.gz"), "rb") as f:
         lines = f.read().decode()

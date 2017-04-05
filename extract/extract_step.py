@@ -5,6 +5,10 @@ from extract.text_extract import split_paragraphs, pos_tag, parse_pos, text2cooc
 from text.paragraph import Paragraph
 from util import paths
 
+def make_folders():
+    for path in paths.ALL:
+        if not os.path.exists(path):
+            os.makedirs(path)
 
 def extract_step(text_path: str=paths.TEXT_PATH):
     # STEP 1
@@ -55,6 +59,7 @@ def extract_step(text_path: str=paths.TEXT_PATH):
             
             
 if __name__ == "__main__":
+    make_folders()
     extract_step()
     """
     april 3: looks good
