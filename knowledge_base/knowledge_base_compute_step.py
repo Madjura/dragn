@@ -20,7 +20,7 @@ def knowledge_base_compute():
     analyser = Analyser(memstore, "LAxLIRA", compute=False, trace=True)
     SIM_LIM = 10
     
-    tokens = [x for x in memstore.sorted() if not re.search(".*_[0-9]+$|related to|close to", x)]
+    tokens = [x for x in memstore.sorted(ignored=".*_[0-9]+$|related to|close to")] # if not re.search(".*_[0-9]+$|related to|close to", x) moved to sorted
     
     # holds similarity statements - <expression> related to <expression2>: value
     similarity_dictionary = {}

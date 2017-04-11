@@ -79,6 +79,6 @@ def load_suids(fname):
             spl = line.split('\t')
             if len(spl) != 5:
                 continue
-            dct[(spl[1],spl[2],spl[3])] = (int(spl[0]), float(spl[4]))
+            dct[(spl[1],spl[2],spl[3])] = ((spl[0]), float(spl[4]))
     suids.close()
     return dct

@@ -17,14 +17,39 @@ def index_step():
     # WRITE EXPRESSION AND HOW THEY ARE RELATED AS SUIDS
     #
     ### original loads corpus with load_corpus, possibly needed
+    ### april 10: ERROR HERE. HAS MULTIPLE ENTRIES, SEE QUERYSTEP
     for (expression, related_to, other_expression), weight in list(memstore.corpus.items()):
-        suid_lines.append("\t".join([str(x) for x in [i, expression, related_to, other_expression, weight]]))
+        if (expression == "feel" and other_expression == "charming_boy") or (expression == "charming_boy" and other_expression == "feel"):
+            print("INVESTIGATE WHY THIS HAPPENS")
+            ### answer: one is CLOSE TO the other is RELATED TO
+            ### memstore.corpus seems wrong
+        suid_lines.append("\t".join([str(x) for x in [(expression, related_to, other_expression), expression, related_to, other_expression, weight]]))
         i += 1
         expression_dictionary[expression].add((other_expression, weight))
         expression_dictionary[other_expression].add((expression, weight))
     with gzip.open(os.path.join(paths.SUIDS_PATH_EXPERIMENTAL, "suids.tsv.gz"), "wb") as f:
         f.write("\n".join(suid_lines).encode())
     f.close()
+    
+    """
+    ORIGINAL CODE
+    for (s,p,o), w in list(corpus.items()):
+        # updating the lines of the SUID CSV
+        suid_lines.append('\t'.join([str(x) for x in [i,s,p,o,w]]))
+        i += 1
+        # updating the TERM CSV dictionary
+        if not s in term_dict:
+            term_dict[s] = set()
+        if not o in term_dict:
+            term_dict[o] = set()
+        term_dict[s].add((o,w))
+        term_dict[o].add((s,w))
+    end = time.time()
+    print('...finished in %s seconds' % (str(end-start),))
+    print('  ... storing the CSV file:', os.path.join(index_path,'suids.tsv.gz'))
+    
+    TERM_DICT IS USED FOR TERMSETS
+    """
      
     #
     # WRITE EXPRESSION SET
@@ -37,6 +62,16 @@ def index_step():
     with gzip.open(os.path.join(paths.EXPRESSION_SET_PATH_EXPERIMENTAL, "expressionsets.tsv.gz"), "wb") as f:
         f.write(("\n".join(term_lines)).encode())
     f.close()
+    """
+    ORIGINAL CODE
+    for t1, rel_set in list(term_dict.items()):
+        for t2, w in rel_set:
+            term_lines.append('\t'.join([str(x) for x in [t1,t2,w]]))
+    f = gzip.open(os.path.join(index_path,'termsets.tsv.gz'),'wb')
+    f.write(str.encode('\n'.join(term_lines)))
+    f.close()
+    end = time.time()
+    """
      
     suids = load_suids(paths.SUIDS_PATH_EXPERIMENTAL + "/suids.tsv.gz")
     suid2puid = gen_cooc_suid2puid_exp(memstore.sources, suids) # TODO: RENAME

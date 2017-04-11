@@ -399,6 +399,8 @@ class Tensor:
                                  str(filename))
         for line in lines:
                 key_val = line.split('\t')[:self.rank+1]
+                if "charming_boy" in key_val and "feel" in key_val:
+                    print("INVESTIGATE") 
                 key = tuple(x for x in key_val[:-1]) ### CHANGED TO STRINGS
                 #key = tuple([int(x) for x in key_val[:-1]])
                 val = float(key_val[-1])

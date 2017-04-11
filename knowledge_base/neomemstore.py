@@ -5,6 +5,9 @@ import os
 import gzip
 import operator
 from util import paths
+from numpy.core.fromnumeric import sort
+import re
+from http.cookiejar import vals_sorted_by_key
 
 PERSP_TYPES = ['LAxLIRA','LIxLARA','RAxLALI','LIRAxLA','LARAxLI','LALIxRA',\
 'LAxLIRA_COMPRESSED','LIxLARA_COMPRESSED','RAxLALI_COMPRESSED',\
@@ -200,11 +203,28 @@ class NeoMemStore(object):
             self.lexicon[expression] = frequency
         print("NUMBER OF WEIRD LINES: ", len(weird_lines), weird_lines)
         
-    def sorted(self):
+    def sorted(self, ignored=None, limit=0):
         ### TODO: return only if value > average, see his code
         print(self.lexicon.items())
-        sorted_by_value = [x[0] for x in sorted(self.lexicon.items(), key=operator.itemgetter(1), reverse=True)]
+        
+        # format is [(expression, frequency), (expression2, frequency2), ...]
+        sorted_by_value = [x for x in sorted(self.lexicon.items(), key=operator.itemgetter(1), reverse=True)]
+        
+        print("NeoMemStore, sorted. ~ LENGTH OF SORTED BY VALUE WITHOUT LIMIT IS ", len(sorted_by_value))
+        if limit > 0:
+            sorted_by_value = sorted_by_value[:limit] # from 0 to limit
+        elif limit <= 0 and ignored:
+            # < included to handle that case as well
+            
+            sorted_by_value_with_limit = []
+            for frequency in sorted_by_value:
+                if not re.search(ignored, frequency[0]):
+                    sorted_by_value_with_limit.append(frequency)
+            avg = sum(x[1] for x in sorted_by_value_with_limit) / float(len(sorted_by_value_with_limit))
+            print("NeoMemStore, sorted. ~ THE AVERAGE IS: ", avg)
+            sorted_by_value = [x[0] for x in sorted_by_value_with_limit if x[1] >= avg]
+            print("NeoMemStore, sorted. ~ NEW LENGTH WITH LIMIT: ", len(sorted_by_value))
         return sorted_by_value
-    
+
     def computePerspective(self,ptype):
         self.perspectives[ptype] = self.corpus.matricise(PERSP2PIVDIM[ptype])
