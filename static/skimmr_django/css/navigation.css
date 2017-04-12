@@ -1,0 +1,63 @@
+#nav {
+	position: fixed;
+  	top: 0;
+  	left: 0;
+  	z-index: 9999;
+  	width: 100%;
+  	height: 60px;
+  	background-color: #00a087;
+}
+
+#nav-ul {
+	height:50px;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+}
+
+#nav-ul li {
+    float: left;
+}
+
+#nav-ul li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.hover a:hover:not(.active) {
+    background-color: #111;
+}
+
+.active {
+	background-color:#4CAF50;
+}
+
+#left, #left-overlap {
+	min-height:100%;
+	position:fixed;
+	float:left;
+	left:0px;
+	width:30px;
+	height:100vh;
+    background-color: lightblue;
+  	margin-bottom: -5000px; /* any large number will do */
+  	padding-bottom: 5000px;
+  	overflow:hidden;
+  	background-color:#333;
+}
+
+#left-overlap {
+	background-color:#00a087;
+	width:40px;
+}
+
+#content {
+	float:left;
+	margin-top:50px;
+	padding-left:40px;
+}

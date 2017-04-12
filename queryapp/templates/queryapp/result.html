@@ -1,0 +1,14 @@
+{% extends "queryapp/base.html" %}
+{% block content %}
+{% block title %}Default query page{% endblock %}
+{% load static %}
+<script>
+var graphElements = {{ graph_elements|safe }};
+</script>
+<script src="{% static 'skimmr_django/js/jquery-3.1.1.min.js' %}"></script>
+<script src="{% static 'queryapp/js/cytoscape.js' %}"></script>
+<script src="{% static 'queryapp/js/result.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'queryapp/css/result.css' %}" />
+
+<div id="cy"></div>
+{% endblock %}

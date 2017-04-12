@@ -7,6 +7,10 @@ import os
 from util import paths
 import gzip
 from _collections import defaultdict
+from graph import node
+from graph.node import Node
+from graph.edge import Edge
+from graph.graph import Graph
 
 class MemStoreQueryResult:
     """
@@ -176,39 +180,6 @@ class MemStoreQueryResult:
             sys.stderr.write('\nW @ MemStoreIndex() - prov. cannot be loaded!\n')
         return suid2prov
 
-
-    def populate_dictionaries_exp(self, provenances, relation_dictionary):
-        for tuid, tuid_weight in self.tuid_cut.items():
-            #print(tuid, tuid_weight) ### this is the same as in the old one!
-            for relation in ["close to", "related to"]:
-                for suid in relation_dictionary[tuid][relation]:
-                    s = tuid
-                    p = relation
-                    o = suid[0]
-                    suid_weight = suid[1]
-                    if not (s in self.queried or o in self.queried):
-                        continue
-                    self.suid_dict[(s, p, o, suid_weight)] += tuid_weight * suid_weight
-                    self.tuid_dict[tuid] += self.suid_dict[(s, p, o, suid_weight)]
-                    if s != tuid:
-                        self.tuid_dict[s] += self.suid_dict[(s, p, o, suid_weight)]
-                    if o != tuid:
-                        self.tuid_dict[o] += self.suid_dict[(s, p, o, suid_weight)]
-                        
-                    for puid, puid_weight in provenances[(s, p, o)]:
-                        self.puid_dict[puid] += tuid_weight * suid_weight * puid_weight
-                    # updating the self.prov_rels dictionary
-                    for (puid1, w1), (puid2, w2) in combinations(provenances[(s, p, o)], 2):
-                        # aggregate value for the provenance-provenance relation
-                        w = tuid_weight * suid_weight * (w1 + w2) / 2
-                        self.prov_rels[(puid2, puid1)] += w
-        self.suid_set = self._generate_fuzzy_set(self.suid_dict)
-        print("SUID DICT LENGTH EXP: ", len(self.suid_dict))
-        print("SUID SET LENGTH EXP: ", len(self.suid_set))
-        self.puid_set = self._generate_fuzzy_set(self.puid_dict)
-        print("PUID DICT LENGTH EXP: ", len(self.puid_dict))
-        print("PUID SET LENGTH EXP: ", len(self.puid_set))
-
     def populate_dictionaries(self):
         # populates the statement and provenance relevance dictionaries
 
@@ -282,105 +253,12 @@ class MemStoreQueryResult:
                 w = 0
             fset[member] = w
         return fset
-
-    def generate_visualisations_exp(self, relation_dictionary, max_n=50, max_e=250):
-        self.gen_term_vis_exp(self.visualization_dictionary['TERMS'], relation_dictionary, max_n, max_e)
-        self.gen_stmt_vis_exp(self.visualization_dictionary['STMTS'], relation_dictionary, max_n, max_e)
-        self.gen_prov_vis_exp(self.visualization_dictionary['PROVS'], max_n, max_e)
     
     def generate_visualisations(self, max_n=50, max_e=250):
         # generate visualisations from the populated results
         self._gen_term_vis(self.visualization_dictionary['TERMS'], max_n, max_e)
-        self._gen_stmt_vis(self.visualization_dictionary['STMTS'], max_n, max_e)
+        return self._gen_stmt_vis(self.visualization_dictionary['STMTS'], max_n, max_e)
         self._gen_prov_vis(self.visualization_dictionary['PROVS'], max_n, max_e)
-
-
-    def gen_term_vis_exp(self, graph, relation_dictionary, max_nodes, max_edges):
-        tuids = [x[0] for x in self.tuid_cut.sort(reverse=True, limit=max_nodes)]
-        
-        # getting the scale factors for the size of each term node
-        tuid2scale = dict([(x, self.tuid_dict[x]) for x in tuids])
-        norm_const = 1.0
-        if len(tuid2scale):
-            norm_const = min(tuid2scale.values())
-        for tuid in tuid2scale:
-            tuid2scale[tuid] /= norm_const
-    
-        # constructing the graph nodes
-        nodes = {}
-        for index, tuid in enumerate(tuids):
-            # setting the node label -> node name mapping
-            node_name = tuid
-            node_label = str(index)
-            self.vis_maps['TERMS'].append((node_label, node_name))
-            
-            # setting the node size and deriving the fontsize from it
-            ### the 1.0 is originally a scaled factor based on the tuid weight value
-            node_width = log(self.visualization_parameters['BASE_WIDTH'] * 1.0, self.visualization_parameters['SCALE_BASE'])
-            # enforcing a minimal size of the scaled nodes
-            if node_width < 0.4:
-                node_width = 0.4
-            font_size = int(24 * node_width)  # 1/3 of the node, 72 points per inch
-            # setting the node colour
-            node_col = self.visualization_parameters['NCOL_MAP']['TERM_TRM']
-            
-            # used to trunctuate if name too long
-            label = node_name[:self.visualization_parameters['MAX_NLABLEN']]
-            
-            # creating the node
-            nodes[tuid] = pydot.Node(\
-              label, \
-              style = self.visualization_parameters['NODE_STYLE'], \
-              fillcolor = node_col, \
-              shape = self.visualization_parameters['NODE_SHAPE'], \
-              width = str(node_width), \
-              fontsize = str(font_size), \
-              fixedsize = self.visualization_parameters['FIXED_SIZE']\
-            )
-        # adding the graph nodes to the TERMS visualisation
-        for node in list(nodes.values()):
-            self.visualization_dictionary['TERMS'].add_node(node)
-        # constructing the edges (limited by max_edges)
-        suid_list = list(self.suid_set.items())
-        num_edges =  0
-        suid_list.sort(key=lambda x: x[1], reverse=True)
-        for suid, w in suid_list:
-            if num_edges > max_edges:
-                print("MAX EDGES")
-                break
-            s = suid[0]
-            p = suid[1]
-            o = suid[2]
-            # adding the edge if both arguments are present in the node set
-            if s in nodes and o in nodes:
-                # edge label, if different from related_to, observed_with (those are
-                # distinguished by the red and blue colours, respectively)
-                edge_label = ''
-                if p not in self.visualization_parameters['EDGE_COL']:
-                    # non-default edge type, add a specific label
-                    edge_label = p
-                edge_label = edge_label[:self.visualization_parameters['MAX_ELABLEN']]
-                # edge = pydot.Edge(nodes[s],nodes[o],label=edge_label)
-                edge_col = 'black'  # default colour
-                if p in self.visualization_parameters['EDGE_COL']:
-                    edge_col = self.visualization_parameters['EDGE_COL'][p]
-                edge_wgh = str(int(w * 10000))
-                edge = None
-                if len(edge_label):
-                    edge = pydot.Edge(nodes[s],
-                                      nodes[o],
-                                      color=edge_col,
-                                      weight=edge_wgh, \
-                      label=edge_label)
-                else:
-                    edge = pydot.Edge(nodes[s],
-                                      nodes[o],
-                                      color=edge_col,
-                                      weight=edge_wgh)
-                            
-                self.visualization_dictionary['TERMS'].add_edge(edge)
-                num_edges += 1
-                        
                 
 ### CHECK GRAPH
     def _gen_term_vis(self, graph: pydot.Dot, max_nodes: int, max_edges: int):
@@ -474,80 +352,8 @@ class MemStoreQueryResult:
                                       weight=edge_wgh)
                 self.visualization_dictionary['TERMS'].add_edge(edge)
                 num_edges += 1
-
-    def gen_stmt_vis_exp(self, graph: pydot.Dot, relation_dictionary, max_nodes: int, max_edges: int):
-        tuid_list = list(self.tuid_dict.items())
-        tuid_list.sort(key=lambda x: x[1], reverse=True)
-        tuids = [x[0] for x in tuid_list[:max_nodes]]
-        tuid2scale = dict([(x, self.tuid_dict[x]) for x in tuids])
-        norm_constant = 1.0
-        if len(tuid2scale):
-            norm_constant = min(tuid2scale.values())
-        for tuid in tuid2scale:
-            tuid2scale[tuid] /= norm_constant
-        nodes = {}
-        i = 0
-        for tuid in tuids:
-            node_name = tuid
-            node_label = str(i)
-            self.vis_maps["STMTS"].append((node_label, node_name))
-            node_width = log(self.visualization_parameters["BASE_WIDTH"] * tuid2scale[tuid], self.visualization_parameters["SCALE_BASE"])
-            if node_width < 0.4:
-                node_width = 0.4
-            font_size = int(24 * node_width)
-            node_col = self.visualization_parameters["NCOL_MAP"]["TERM_STM"]
-            label = node_name[:self.visualization_parameters["MAX_NLABLEN"]]
-            nodes[tuid] = pydot.Node(\
-              label, \
-              style=self.visualization_parameters['NODE_STYLE'], \
-              fillcolor=node_col, \
-              shape=self.visualization_parameters['NODE_SHAPE'], \
-              width=str(node_width), \
-              fontsize=str(font_size), \
-              fixedsize=self.visualization_parameters['FIXED_SIZE']\
-            )
-            i += 1
-        for node in list(nodes.values()):
-            self.visualization_dictionary['STMTS'].add_node(node)
-        
-        tuid_list = list(self.suid_set.items())
-        num_edges = 0
-        tuid_list.sort(key=lambda x: x[1], reverse=True)
-        for suid, w in tuid_list:
-            ### ('want', 'close to', 'feel', 0.19919456341360223) 0.10933834637512385
-            s = suid[0]
-            p = suid[1]
-            o = suid[2]
-            if s in nodes and o in nodes:
-                # edge label, if different from related_to, observed_with (those are
-                # distinguished by the red and blue colours, respectively)
-                edge_label = ''
-                if p not in self.visualization_parameters['EDGE_COL']:
-                    # non-default edge type, add a specific label
-                    edge_label = p
-                edge_label = edge_label[:self.visualization_parameters['MAX_ELABLEN']]
-                # edge = pydot.Edge(nodes[s],nodes[o],label=edge_label)
-                edge_col = 'black'  # default colour
-                if p in self.visualization_parameters['EDGE_COL']:
-                    edge_col = self.visualization_parameters['EDGE_COL'][p]
-                edge_wgh = str(int(w * 10000))
-                edge = None
-                if len(edge_label):
-                    edge = pydot.Edge(nodes[s], nodes[o], color=edge_col, weight=edge_wgh, \
-                      label=edge_label)
-                else:
-                    edge = pydot.Edge(nodes[s], nodes[o], color=edge_col, weight=edge_wgh)
-                self.visualization_dictionary['STMTS'].add_edge(edge)
-                num_edges += 1
-            
-    def _gen_stmt_vis(self, graph: pydot.Dot, max_nodes: int, max_edges: int):
-        # generate the more statement oriented visualisation of the results (up to
-        # max_nodes most relevant statement nodes in the graph), similarly to the
-        # term visualisation, however, this time including all terms from the
-        # result statements, not only the terms in the term-result set
-        # if lex_labels is True, the true lexical labels are used for the nodes,
-        # otherwise numbers are being used
-
+    
+    def generate_statement_nodes(self, max_nodes):
         # getting the relevant term IDs
         tuid_list = list(self.tuid_dict.items())
         tuid_list.sort(key=lambda x: x[1], reverse=True)
@@ -560,7 +366,9 @@ class MemStoreQueryResult:
         for tuid in tuid2scale:
             tuid2scale[tuid] /= norm_const
         # constructing the graph nodes
-        nodes, i = {}, 0
+        nodes = {}
+        i = 0
+        graph_nodes = {}
         for tuid in tuids:
             # setting the node label -> node name mapping
             node_name = tuid
@@ -587,11 +395,22 @@ class MemStoreQueryResult:
               fontsize=str(font_size), \
               fixedsize=self.visualization_parameters['FIXED_SIZE']\
             )
+            graph_nodes[tuid] = Node(name=tuid)
             i += 1
         # adding the graph nodes to the TERMS visualisation
         for node in list(nodes.values()):
             self.visualization_dictionary['STMTS'].add_node(node)
+        return nodes, graph_nodes
             
+    def _gen_stmt_vis(self, graph: pydot.Dot, max_nodes: int, max_edges: int):
+        # generate the more statement oriented visualisation of the results (up to
+        # max_nodes most relevant statement nodes in the graph), similarly to the
+        # term visualisation, however, this time including all terms from the
+        # result statements, not only the terms in the term-result set
+        # if lex_labels is True, the true lexical labels are used for the nodes,
+        # otherwise numbers are being used
+        
+        nodes, graph_nodes = self.generate_statement_nodes(max_nodes)
         # constructing the edges (limited by max_edges)
         tuid_list, num_edges = list(self.suid_set.items()), 0
         tuid_list.sort(key=lambda x: x[1], reverse=True)
@@ -620,7 +439,11 @@ class MemStoreQueryResult:
                 else:
                     edge = pydot.Edge(nodes[s], nodes[o], color=edge_col, weight=edge_wgh)
                 self.visualization_dictionary['STMTS'].add_edge(edge)
+                graph_edge = Edge(graph_nodes[s], graph_nodes[o], color=edge_col)
+                graph_nodes[s].add_edge_object(graph_edge)
                 num_edges += 1
+                
+        return Graph(graph_nodes.values())
         # print 'DEBUG -- number of STMTS graph nodes:', \
         #  len(self.visualization_dictionary['STMTS'].get_node_list())
         # print 'DEBUG -- number of TERMS graph edges:', \

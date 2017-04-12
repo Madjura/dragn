@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {% load static %}
+  <meta charset="utf-8">
+  <title>{% block title %}Budget{% endblock %}</title>
+</head>
+
+<body>
+	<div id="nav">
+	<ul id="nav-ul">
+		{% if request.user.is_authenticated %}
+			<li><a class="hover" href="{% url 'account_create' %}">Create/Edit account</a></li>
+		{% endif %}
+	</ul>
+	</div>
+  	
+  	<div id="left-overlap">
+  	</div>
+  	<div id="left">
+  	</div>
+	<div id="content">
+  		<hr>
+	  	    {% block includehelp %}{% endblock %}
+	       {% block content %}{% endblock %}
+  		<hr>
+  	</div>
+</body>
+</html>

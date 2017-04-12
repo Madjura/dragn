@@ -1,0 +1,130 @@
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    -webkit-animation-name: fadeIn; /* Fade in the background */
+    -webkit-animation-duration: 0.4s;
+    animation-name: fadeIn;
+    animation-duration: 0.4s
+}
+
+/* Modal Content */
+.modal-content {
+    position: fixed;
+    right: 0;
+    top:60px;
+    background-color: #fefefe;
+    width: 50%;
+    height:70%;
+    -webkit-animation-name: slideIn;
+    -webkit-animation-duration: 0.4s;
+    animation-name: slideIn;
+    animation-duration: 0.4s;
+    overflow:auto;
+}
+
+/* The Close Button */
+.close {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-header {
+    padding: 2px 16px;
+    background-color: #222;
+    color: white;
+}
+
+.modal-body {
+	padding: 2px 16px;
+}
+
+/* Add Animation */
+@-webkit-keyframes slideIn {
+    from {right: -300px; opacity: 0} 
+    to {right: 0; opacity: 1}
+}
+
+@keyframes slideIn {
+    from {right: -300px; opacity: 0}
+    to {right: 0; opacity: 1}
+}
+
+@-webkit-keyframes fadeIn {
+    from {opacity: 0} 
+    to {opacity: 1}
+}
+
+@keyframes fadeIn {
+    from {opacity: 0} 
+    to {opacity: 1}
+}
+
+#modal-overlap {
+	width:190x;
+	background-color:#333;
+}
+
+#modal-sidebar, #modal-overlap {
+	min-height:70%;
+	max-height:70%;
+	position:fixed;
+	float:left;
+	width:130px;
+	height:70%;
+  	overflow:hidden;
+  	background-color:#222;
+  	-webkit-transform: translateX(-100%);
+    transform: translateX(0%);
+}
+
+#modal-wrapper {
+    position: absolute;
+    width: 100%;
+    height: 100px;
+    top:0px;
+    transition: all 1s;
+}
+
+#modal-body {
+	padding-left:135px;
+}
+
+#modal-header {
+	padding-left:135px;
+	width:100%;
+}
+
+#modal-help-menu ul li a {
+	display:block;
+	color:#00a087;
+	margin-left:-10px;
+}
+
+#modal-help-menu ul {
+	list-style-type: none;
+	display: table;
+    table-layout: fixed;
+    width: 100%;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+#modal-help-menu ul li a {
+	margin-bottom:10px;
+}
