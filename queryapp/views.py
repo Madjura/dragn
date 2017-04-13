@@ -10,7 +10,7 @@ def query(request):
             graph = querystep.query(queryform.cleaned_data["query"])
         
         context = {
-                "graph_elements": graph.to_json_dump(),
+                "graph_elements": graph.to_json(),
             }
         return render(request, "queryapp/result.html", context)
     elif request.method == "GET":

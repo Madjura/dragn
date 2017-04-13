@@ -5,7 +5,8 @@ class Node(object):
     Node of a graph.
     '''
 
-    def __init__(self, name: str, edges: [Edge] = None):
+    def __init__(self, name: str, edges: [Edge] = None, color = None,
+                 width = None, label_size = None):
         '''
         Constructor
         '''
@@ -15,6 +16,9 @@ class Node(object):
             self.edges = []
         else:
             self.edges = edges
+        self.color = color
+        self.width = width
+        self.label_size = label_size
         
     def add_edge(self, end: int = None, val: int = 0):
         """

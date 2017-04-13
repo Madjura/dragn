@@ -23,31 +23,38 @@ class Graph(object):
         return out
     
     def to_json(self):
-        json_string = "["
-        for node in self.nodes:
-            json_string += """{{"group": "nodes","data": {{"id": "{}"}},"grabbable": true,"classes": "node-class"}},""".format(node.name)
-        for j, node in enumerate(self.nodes):
-            for i, edge in enumerate(node.edges):
-                json_string += """{{"group": "edges","data": {{"id": "e{}-{}","source": "{}","target": "{}","color": "{}"}}}},""".format(j,i,edge.start.name,edge.end.name,edge.color)
-        json_string = json_string[:-1]
-        json_string += "]"
-        print(json_string)
-        return json_string
-    
-    def to_json_dump(self):
-        dump = []
-        for node in self.nodes:
-            dump.append({
+        """
+        Converts the graph into RFC4627 compliant JSON. 
+        The resulting JSON string is intended to be used with 
+        Cytoscape.js 3.0.0 (http://js.cytoscape.org/) and can be loaded into
+        it to display the graph.
+        
+            Returns:
+                An RFC4627 compliant JSON string for use with Cytoscape.js.
+        """
+        
+        # separate lists required to have the nodes before the edges,
+        # needed for cytoscape, the edges need the id of the node
+        nodes = []
+        edges = []
+        for i, node in enumerate(self.nodes):
+            nodes.append({
                 "group": "nodes",
                 "data": {
-                    "id": node.name
+                    "id": node.name,
+                    "width": node.width,
+                    "color": node.color,
+                    "label-size": node.label_size
                     },
+                "position": {
+                    "x": 1,
+                    "y": 1
+                },
                 "grabbable": True,
                 "classes": "node-class"
                 })
-        for i, node in enumerate(self.nodes):
             for j, edge in enumerate(node.edges):
-                dump.append({
+                edges.append({
                     "group": "edges",
                     "data": {
                         "id": "e{}-{}".format(i,j),
@@ -56,5 +63,4 @@ class Graph(object):
                         "color": edge.color
                         }
                     })
-        out = json.dumps(dump)
-        return out
+        return json.dumps(nodes + edges)

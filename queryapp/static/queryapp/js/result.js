@@ -1,15 +1,7 @@
 $( document ).ready(function() {
 	$("#cy").attr("foo", "foo");
 	var cy = cytoscape({
-
 		  container: $("#cy"),
-
-		  layout: {
-		    name: 'preset'
-		  },
-		  
-
-		  // so we can see the ids etc
 		  style: [
 		    {
 		      selector: 'node',
@@ -17,25 +9,14 @@ $( document ).ready(function() {
 		        'content': 'data(id)'
 		      }
 		    },
-		    
 		    {
 		    	selector: "edge",
 		    	style: {
 		    		"line-color": "data(color)"
 		    	}
 		    },
-		    
-		    {
-		      selector: ':parent',
-		      style: {
-		        'background-opacity': 0.6
-		      }
-		    }
 		  ]
-
 		});
-	
-	cy.add(graphElements);
 	var options = {
 			  name: 'cose',
 
@@ -103,7 +84,8 @@ $( document ).ready(function() {
 
 			  // Pass a reference to weaver to use threads for calculations
 			  weaver: false
-			};
-
-			cy.layout( options )
+	};
+	cy.add(graphElements);
+	var layout = cy.elements().layout(options);
+	layout.run();
 });

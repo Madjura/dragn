@@ -395,7 +395,8 @@ class MemStoreQueryResult:
               fontsize=str(font_size), \
               fixedsize=self.visualization_parameters['FIXED_SIZE']\
             )
-            graph_nodes[tuid] = Node(name=tuid)
+            graph_nodes[tuid] = Node(name=tuid, color=node_col, 
+                                     width=node_width, label_size=font_size)
             i += 1
         # adding the graph nodes to the TERMS visualisation
         for node in list(nodes.values()):
