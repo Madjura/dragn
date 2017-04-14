@@ -1,12 +1,16 @@
 $( document ).ready(function() {
-	$("#cy").attr("foo", "foo");
 	var cy = cytoscape({
 		  container: $("#cy"),
+		  boxSelectionEnabled: true,
 		  style: [
 		    {
 		      selector: 'node',
 		      style: {
-		        'content': 'data(id)'
+		        "content": "data(id)",
+		        "text-halign": "center",
+		        "text-valign": "center",
+		        "width": "data(size)",
+		        "height": "data(size)",
 		      }
 		    },
 		    {

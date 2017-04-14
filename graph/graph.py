@@ -42,13 +42,13 @@ class Graph(object):
                 "group": "nodes",
                 "data": {
                     "id": node.name,
+                    "size": node.label_size * 3,
                     "width": node.width,
-                    "color": node.color,
-                    "label-size": node.label_size
+                    "color": node.color
                     },
                 "position": {
-                    "x": 1,
-                    "y": 1
+                    "x": i,
+                    "y": i
                 },
                 "grabbable": True,
                 "classes": "node-class"
