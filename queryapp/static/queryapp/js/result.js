@@ -1,3 +1,11 @@
+function browserTarget(e) {
+	var target = e.cyTarget;
+	if (!target) {
+		target = e.target;
+	}
+	return target;
+}
+
 $( document ).ready(function() {
 	var cy = cytoscape({
 		  container: $("#cy"),
@@ -91,5 +99,34 @@ $( document ).ready(function() {
 	};
 	cy.add(graphElements);
 	var layout = cy.elements().layout(options);
-	layout.run();
+	try {
+		layout.run();
+	} catch (err) {}
+
+	cy.nodes().on("tap", function(e) {
+		// this check is needed for cross browser compability
+		var target = browserTarget(e);
+		target.closedNeighborhood().nodes()
+	    .selectify()
+	    .select()
+	    .unselectify()
+	    .style({
+	    	"background-color": "red"
+	    })
+	  ;
+	});
+	
+	cy.on("tap", function(e) {
+		var target = browserTarget(e);
+		if (target == cy) {
+			cy.nodes()
+				.selectify()
+				.unselect()
+				.unselectify()
+				.style({
+					"background-color": "grey"
+				});
+			;
+		}
+	});
 });
