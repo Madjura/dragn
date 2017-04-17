@@ -30,72 +30,22 @@ $( document ).ready(function() {
 		  ]
 		});
 	var options = {
-			  name: 'cose',
-
-			  // Called on `layoutready`
-			  ready: function(){},
-
-			  // Called on `layoutstop`
-			  stop: function(){},
-
-			  // Whether to animate while running the layout
-			  animate: true,
-
-			  // The layout animates only after this many milliseconds
-			  // (prevents flashing on fast runs)
-			  animationThreshold: 250,
-
-			  // Number of iterations between consecutive screen positions update
-			  // (0 -> only updated on the end)
-			  refresh: 20,
-
-			  // Whether to fit the network view after when done
-			  fit: true,
-
-			  // Padding on fit
-			  padding: 30,
-
-			  // Constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
-			  boundingBox: undefined,
-
-			  // Randomize the initial positions of the nodes (true) or use existing positions (false)
-			  randomize: false,
-
-			  // Extra spacing between components in non-compound graphs
-			  componentSpacing: 100,
-
-			  // Node repulsion (non overlapping) multiplier
-			  nodeRepulsion: function( node ){ return 400000; },
-
-			  // Node repulsion (overlapping) multiplier
-			  nodeOverlap: 10,
-
-			  // Ideal edge (non nested) length
-			  idealEdgeLength: function( edge ){ return 10; },
-
-			  // Divisor to compute edge forces
-			  edgeElasticity: function( edge ){ return 100; },
-
-			  // Nesting factor (multiplier) to compute ideal edge length for nested edges
-			  nestingFactor: 5,
-
-			  // Gravity force (constant)
-			  gravity: 80,
-
-			  // Maximum number of iterations to perform
-			  numIter: 1000,
-
-			  // Initial temperature (maximum node displacement)
-			  initialTemp: 200,
-
-			  // Cooling factor (how the temperature is reduced between consecutive iterations
-			  coolingFactor: 0.95,
-
-			  // Lower temperature threshold (below this point the layout will end)
-			  minTemp: 1.0,
-
-			  // Pass a reference to weaver to use threads for calculations
-			  weaver: false
+			  name: 'spread',
+			  animate: true, // whether to show the layout as it's running
+			  ready: undefined, // Callback on layoutready
+			  stop: undefined, // Callback on layoutstop
+			  fit: true, // Reset viewport to fit default simulationBounds
+			  minDist: 100, // Minimum distance between nodes
+			  padding: 20, // Padding
+			  expandingFactor: -1.0, // If the network does not satisfy the minDist
+			  // criterium then it expands the network of this amount
+			  // If it is set to -1.0 the amount of expansion is automatically
+			  // calculated based on the minDist, the aspect ratio and the
+			  // number of nodes
+			  maxFruchtermanReingoldIterations: 50, // Maximum number of initial force-directed iterations
+			  maxExpandIterations: 4, // Maximum number of expanding iterations
+			  boundingBox: undefined, // Constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
+			  randomize: false // uses random initial node positions on true
 	};
 	cy.add(graphElements);
 	var layout = cy.elements().layout(options);
@@ -129,4 +79,51 @@ $( document ).ready(function() {
 			;
 		}
 	});
+	
+	var menu = {
+		    // List of initial menu items
+		    menuItems: [
+		      {
+		        id: 'remove', // ID of menu item
+		        title: 'remove', // Title of menu item
+		        // Filters the elements to have this menu item on cxttap
+		        // If the selector is not truthy no elements will have this menu item on cxttap
+		        selector: 'node, edge', 
+		        onClickFunction: function (event) { // The function to be executed on click
+		          console.log('remove element');
+		        },
+		        disabled: false, // Whether the item will be created as disabled
+		        show: false, // Whether the item will be shown or not
+		        hasTrailingDivider: true, // Whether the item will have a trailing divider
+		        coreAsWell: false // Whether core instance have this item on cxttap
+		      },
+		      {
+		        id: 'hide',
+		        title: 'hide',
+		        selector: 'node, edge',
+		        onClickFunction: function (event) {
+		          console.log(browserTarget(event));
+		        },
+		        disabled: false
+		      },
+		      {
+		        id: 'add-node',
+		        title: 'add node',
+		        selector: 'node',
+		        coreAsWell: true,
+		        onClickFunction: function (event) {
+		          console.log('add node');
+		        }
+		      }
+		    ],
+		    // css classes that menu items will have
+		    menuItemClasses: [
+		      // add class names to this list
+		    ],
+		    // css classes that context menu will have
+		    contextMenuClasses: [
+		      // add class names to this list
+		    ]
+		};
+	cy.contextMenus(menu);
 });
