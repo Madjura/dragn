@@ -27,6 +27,12 @@ $( document ).ready(function() {
 		    		"line-color": "data(color)"
 		    	}
 		    },
+		    {
+		    	selector: ".hidden",
+		    	style: {
+		    		"visibility": "hidden"
+		    	}
+		    }
 		  ]
 		});
 	var options = {
@@ -56,14 +62,46 @@ $( document ).ready(function() {
 	cy.nodes().on("tap", function(e) {
 		// this check is needed for cross browser compability
 		var target = browserTarget(e);
-		target.closedNeighborhood().nodes()
+		
+		var connectedNodes = target.closedNeighborhood().nodes();
+		connectedNodes
 	    .selectify()
 	    .select()
 	    .unselectify()
 	    .style({
 	    	"background-color": "red"
-	    })
-	  ;
+	    });
+		var options = {
+				  name: 'concentric',
+
+				  fit: true, // whether to fit the viewport to the graph
+				  padding: 30, // the padding on fit
+				  startAngle: 3 / 2 * Math.PI, // where nodes start in radians
+				  sweep: undefined, // how many radians should be between the first and last node (defaults to full circle)
+				  clockwise: true, // whether the layout should go clockwise (true) or counterclockwise/anticlockwise (false)
+				  equidistant: false, // whether levels have an equal radial distance betwen them, may cause bounding box overflow
+				  minNodeSpacing: 10, // min spacing between outside of nodes (used for radius adjustment)
+				  boundingBox: undefined, // constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
+				  avoidOverlap: true, // prevents node overlap, may overflow boundingBox if not enough space
+				  height: undefined, // height of layout area (overrides container height)
+				  width: undefined, // width of layout area (overrides container width)
+				  concentric: function( node ){ // returns numeric value for each node, placing higher nodes in levels towards the centre
+				  return node.degree();
+				  },
+				  levelWidth: function( nodes ){ // the variation of concentric values in each level
+				  return nodes.maxDegree() / 4;
+				  },
+				  animate: false, // whether to transition the node positions
+				  animationDuration: 500, // duration of animation in ms if enabled
+				  animationEasing: undefined, // easing of animation if enabled
+				  ready: undefined, // callback on layoutready
+				  stop: undefined // callback on layoutstop
+				};
+		var layout = connectedNodes.union(connectedNodes.connectedEdges()).layout(options);
+		try {
+			console.log("LAYOUT");
+			layout.run();
+		} catch (err) {}
 	});
 	
 	cy.on("tap", function(e) {
@@ -84,36 +122,57 @@ $( document ).ready(function() {
 		    // List of initial menu items
 		    menuItems: [
 		      {
-		        id: 'remove', // ID of menu item
-		        title: 'remove', // Title of menu item
-		        // Filters the elements to have this menu item on cxttap
-		        // If the selector is not truthy no elements will have this menu item on cxttap
-		        selector: 'node, edge', 
-		        onClickFunction: function (event) { // The function to be executed on click
-		          console.log('remove element');
-		        },
-		        disabled: false, // Whether the item will be created as disabled
-		        show: false, // Whether the item will be shown or not
-		        hasTrailingDivider: true, // Whether the item will have a trailing divider
-		        coreAsWell: false // Whether core instance have this item on cxttap
-		      },
-		      {
-		        id: 'hide',
-		        title: 'hide',
-		        selector: 'node, edge',
+		        id: 'hide-this',
+		        title: 'Hide this and all connected',
+		        selector: 'node',
 		        onClickFunction: function (event) {
-		          console.log(browserTarget(event));
+		        	// get the selected node
+		        	var target = browserTarget(event);
+		        	
+		        	// get all edges connected to this node
+		        	var edges = target.connectedEdges();
+		        	
+		        	var connectedNodes = edges.connectedNodes();
+
+		    		target.addClass("hidden");
+		    		edges.addClass("hidden");
+		        	edges.connectedNodes().forEach(function(node) {
+		        		if (node.connectedEdges().filter(":visible").size() == 0) {
+		        			node.addClass("hidden");
+		        		}
+		        	});
+		        	
 		        },
+		        coreAsWell: false,
 		        disabled: false
 		      },
 		      {
-		        id: 'add-node',
-		        title: 'add node',
-		        selector: 'node',
-		        coreAsWell: true,
-		        onClickFunction: function (event) {
-		          console.log('add node');
-		        }
+		    	id: "show-only",
+		    	title: "Show only this and directly connected",
+		    	selector: "node",
+		    	onClickFunction: function(event) {
+		    		var target = browserTarget(event);
+		    		var edges = target.connectedEdges();
+		    		var connectedNodes = edges.connectedNodes();
+		    		cy.collection()
+		    		.union(target)
+		    		.union(edges)
+		    		.union(connectedNodes)
+		    		.absoluteComplement()
+		    		.addClass("hidden");
+		    	},
+		        coreAsWell: false,
+		      },
+		      {
+		    	  id: "show-all",
+		    	  title: "Show all nodes and edges",
+		    	  selector: "node, edge",
+			      coreAsWell: true,
+		    	  onClickFunction: function(event) {
+			    		cy.nodes().filter(":hidden").removeClass("hidden");
+			    		cy.edges().filter(":hidden").removeClass("hidden");
+		    	  },
+		    	  disabled: false
 		      }
 		    ],
 		    // css classes that menu items will have

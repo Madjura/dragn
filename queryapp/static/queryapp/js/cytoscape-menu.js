@@ -142,8 +142,8 @@
       var cxtCoreFcn;
       
       if(coreAsWell) {
-        cy.on('cxttap', cxtCoreFcn = function(event) {
-          if( event.cyTarget != cy ) {
+    	  cy.on('cxttap', cxtCoreFcn = function(event) {
+          if( browserTarget(event) != cy ) {
             return;
           }
           
