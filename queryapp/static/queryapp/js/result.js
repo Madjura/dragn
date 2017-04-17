@@ -34,7 +34,7 @@ $( document ).ready(function() {
 			  animate: true, // whether to show the layout as it's running
 			  ready: undefined, // Callback on layoutready
 			  stop: undefined, // Callback on layoutstop
-			  fit: true, // Reset viewport to fit default simulationBounds
+			  fit: false, // Reset viewport to fit default simulationBounds
 			  minDist: 100, // Minimum distance between nodes
 			  padding: 20, // Padding
 			  expandingFactor: -1.0, // If the network does not satisfy the minDist
