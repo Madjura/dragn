@@ -11,6 +11,7 @@ def query(request):
         
         context = {
                 "graph_elements": graph.to_json(),
+                "queryform": queryform,
             }
         return render(request, "queryapp/result.html", context)
     elif request.method == "GET":
@@ -18,4 +19,4 @@ def query(request):
         context = {
                 "queryform": queryform,
             }
-        return render(request, "queryapp/query_page.html", context)
+        return render(request, "queryapp/result.html", context)

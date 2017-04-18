@@ -1,0 +1,10 @@
+<div id="form">
+    <form action="{% url 'query' %}" method="post" id="query-form">
+        {% csrf_token %}
+        {% for field in queryform %}
+            <label for="{{ field.auto_id }}">{{ field.label }}</label> {{ field }}<br/>
+        {% endfor %}
+        <input type="submit" class="ajax" value="Search" name="search">
+    </form>
+</div>
+<div id="cy"></div>

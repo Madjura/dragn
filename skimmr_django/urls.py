@@ -19,5 +19,5 @@ from queryapp.views import query
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^query/$', query, name="query")
+    url(r'^query/$', query, name="query"),
 ]

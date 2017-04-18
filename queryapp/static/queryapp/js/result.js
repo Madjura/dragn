@@ -6,7 +6,7 @@ function browserTarget(e) {
 	return target;
 }
 
-$( document ).ready(function() {
+function updateCy(elements) {
 	var cy = cytoscape({
 		  container: $("#cy"),
 		  boxSelectionEnabled: true,
@@ -19,6 +19,7 @@ $( document ).ready(function() {
 		        "text-valign": "center",
 		        "width": "data(size)",
 		        "height": "data(size)",
+		        "background-color": "data(color)",
 		      }
 		    },
 		    {
@@ -53,7 +54,13 @@ $( document ).ready(function() {
 			  boundingBox: undefined, // Constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
 			  randomize: false // uses random initial node positions on true
 	};
-	cy.add(graphElements);
+	if (elements) {
+		cy.add(elements);
+		console.log(elements);
+	} else {
+		cy.add(graphElements);
+		console.log(graphElements);
+	}
 	var layout = cy.elements().layout(options);
 	try {
 		layout.run();
@@ -173,6 +180,16 @@ $( document ).ready(function() {
 			    		cy.edges().filter(":hidden").removeClass("hidden");
 		    	  },
 		    	  disabled: false
+		      },
+		      {
+		    	  id: "add-to-query",
+		    	  title: "Add this to query",
+		    	  selector: "node",
+		    	  coreAsWell: false,
+		    	  onClickFunction: function(event) {
+		    		  var target = browserTarget(event);
+		    		  $("#id_query").val($("#id_query").val() + "," + target.data("id"));
+		    	  }
 		      }
 		    ],
 		    // css classes that menu items will have
@@ -185,4 +202,31 @@ $( document ).ready(function() {
 		    ]
 		};
 	cy.contextMenus(menu);
+}
+
+$( document ).ready(function() {
+	$.ajaxSetup({
+	     beforeSend: function(xhr, settings) {
+	         function getCookie(name) {
+	             var cookieValue = null;
+	             if (document.cookie && document.cookie != '') {
+	                 var cookies = document.cookie.split(';');
+	                 for (var i = 0; i < cookies.length; i++) {
+	                     var cookie = jQuery.trim(cookies[i]);
+	                     // Does this cookie string begin with the name we want?
+	                     if (cookie.substring(0, name.length + 1) == (name + '=')) {
+	                         cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+	                         break;
+	                     }
+	                 }
+	             }
+	             return cookieValue;
+	         }
+	         if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+	             // Only send the token to relative URLs i.e. locally.
+	             xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+	         }
+	     } 
+	});
+	updateCy();
 });

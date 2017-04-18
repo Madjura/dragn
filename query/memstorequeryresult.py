@@ -395,6 +395,8 @@ class MemStoreQueryResult:
               fontsize=str(font_size), \
               fixedsize=self.visualization_parameters['FIXED_SIZE']\
             )
+            if tuid in self.queried:
+                node_col = "green"
             graph_nodes[tuid] = Node(name=tuid, color=node_col, 
                                      width=node_width, label_size=font_size)
             i += 1
