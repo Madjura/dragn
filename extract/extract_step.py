@@ -54,9 +54,7 @@ def extract_step(text_path: str=paths.TEXT_PATH):
             ]
             """
             pickle.dump(paragraph_list, open(paths.POS_PATH + "/" + text + ".p", "wb")) # used to be .pos
-    pickle.dump(closeness, open(paths.CLOSENESS_PATH + "/" + "closeness.p", "wb")) # used to be .tsv
-            # next: knowledge_base create
-            
+    pickle.dump(closeness, open(paths.CLOSENESS_PATH + "/" + "closeness.p", "wb")) # used to be .tsv            
             
 if __name__ == "__main__":
     make_folders()
