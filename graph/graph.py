@@ -1,8 +1,8 @@
 import json
+
+
 class Graph(object):
-    '''
-    Simple graph with nodes and edges.
-    '''
+    """Simple graph with nodes and edges."""
 
     def __init__(self, nodes: ["Node"] = None):
         '''

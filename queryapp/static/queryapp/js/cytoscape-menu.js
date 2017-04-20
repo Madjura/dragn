@@ -142,14 +142,14 @@
       var cxtCoreFcn;
       
       if(coreAsWell) {
-    	  cy.on('cxttap', cxtCoreFcn = function(event) {
-          if( browserTarget(event) != cy ) {
-            return;
-          }
-          
-          _cxtfcn(event);
-        });
-      }
+          cy.on('cxttap', cxtCoreFcn = function(event) {
+            if( browserTarget(event) != cy ) {
+              return;
+            }
+            
+            _cxtfcn(event);
+          });
+  }
       
       if(selector) {
         cy.on('cxttap', selector, cxtfcn = function(event) {
