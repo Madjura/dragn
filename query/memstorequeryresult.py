@@ -8,7 +8,7 @@ from util import paths
 import gzip
 from _collections import defaultdict
 from graph import node
-from graph.node import Node
+from graph.node import CytoNode
 from graph.edge import Edge
 from graph.graph import Graph
 
@@ -257,8 +257,8 @@ class MemStoreQueryResult:
     def generate_visualisations(self, max_n=50, max_e=250):
         # generate visualisations from the populated results
         self._gen_term_vis(self.visualization_dictionary['TERMS'], max_n, max_e)
-        return self._gen_stmt_vis(self.visualization_dictionary['STMTS'], max_n, max_e)
         self._gen_prov_vis(self.visualization_dictionary['PROVS'], max_n, max_e)
+        return self._gen_stmt_vis(self.visualization_dictionary['STMTS'], max_n, max_e)
                 
 ### CHECK GRAPH
     def _gen_term_vis(self, graph: pydot.Dot, max_nodes: int, max_edges: int):
@@ -397,7 +397,7 @@ class MemStoreQueryResult:
             )
             if tuid in self.queried:
                 node_col = "green"
-            graph_nodes[tuid] = Node(name=tuid, color=node_col, 
+            graph_nodes[tuid] = CytoNode(name=tuid, color=node_col, 
                                      width=node_width, label_size=font_size)
             i += 1
         # adding the graph nodes to the TERMS visualisation

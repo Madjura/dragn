@@ -7,7 +7,9 @@ def query(request):
     if request.method == "POST":
         queryform = QueryForm(request.POST)
         if queryform.is_valid():
-            graph = querystep.query(queryform.cleaned_data["query"])
+            graph = querystep.query(queryform.cleaned_data["query"],
+                                    max_nodes=queryform.cleaned_data["max_nodes"],
+                                    max_edges=queryform.cleaned_data["max_edges"])
         
         context = {
                 "graph_elements": graph.to_json(),

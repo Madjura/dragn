@@ -159,7 +159,7 @@ function updateCy(elements) {
 		    	  title: "Show only 'related to' edges",
 		    	  selector: "edge, node",
 		    	  onClickFunction: function(event) {
-		    		  var edges = cy.edges("[color != 'red']");
+		    		  var edges = cy.edges("[color != 'red'][color != 'magenta']");
 	          		  edges.forEach(function(edge) {
 	          			  edge.addClass("hidden");
 	          		  });
@@ -176,7 +176,7 @@ function updateCy(elements) {
 		    	  title: "Show only 'close to' edges",
 		    	  selector: "edge, node",
 		    	  onClickFunction: function(event) {
-		    		  var edges = cy.edges("[color != 'blue']");
+		    		  var edges = cy.edges("[color != 'blue'][color != 'magenta']");
 	          		  edges.forEach(function(edge) {
 	          			  edge.addClass("hidden");
 	          		  });

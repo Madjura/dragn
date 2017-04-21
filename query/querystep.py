@@ -7,7 +7,7 @@ from query.termsets import load_tuid2relt
 from query.memstorequeryresult import MemStoreQueryResult
 
 
-def query(query=[], queryname=None):
+def query(query=[], queryname=None, max_nodes=25, max_edges=50):
     if not queryname:
         queryname = str(uuid.uuid4())
     if not query:
@@ -24,12 +24,11 @@ def query(query=[], queryname=None):
     
     result = MemStoreQueryResult(queryname, result_set, query)
     result.populate_dictionaries()
-    graph = result.generate_visualisations()
-    return graph
-    print(graph.to_json())
+    graph = result.generate_visualisations(max_n=max_nodes, max_e=max_edges)
     ent_base = os.path.join(paths.EXPRESSION_SET_PATH_EXPERIMENTAL, ",".join(x for x in query))
     result.visualization_dictionary['PROVS'].write_png(ent_base+'.png',\
                                                        prog=result.visualization_parameters['PROG'])
+    return graph
     
 def png_query():
     QUERY = ["feel", "feeling"]
