@@ -14,12 +14,10 @@ def knowledge_base_create():
     
     memstore = NeoMemStore()
     closenesses = pickle.load(open(paths.CLOSENESS_PATH + "/closeness.p", "rb"))
-    memstore.incorporate(closenesses) ### FINISHED, 3 march
-    memstore.compute_corpus() ### 3 march, should be good2go
-    memstore.normalise_corpus() ### 3 march, does just computations - should be unbreakable
+    memstore.incorporate(closenesses)
+    memstore.compute_corpus()
+    memstore.normalise_corpus()
     memstore.export(paths.MEMSTORE_PATH_EXPERIMENTAL + "/")
 
 if __name__ == "__main__":
     knowledge_base_create()
-    ## CHECKED: 13 march - WORKS
-    ### prints: 67361 for study in temperament + call of cthulhu

@@ -53,7 +53,6 @@ def split_paragraphs(text: str) -> [str]:
     return paragraphs
 
 
-# text2postag
 def pos_tag(text: str) -> [Sentence]:
     """
     Tokenizes a given text and generates a list of Sentence objects.
@@ -105,7 +104,7 @@ def text2cooc(pos_dictionary: {int, (str, str)}, add_verbs=True) -> {str, list}:
     parser_cmp = RegexpParser(NP_GRAMMAR_COMPOUND)
     term2sentence_id = {}
     lemmatizer = WordNetLemmatizer()
-    # process all sentences
+    
     for sentence_id, pos_tagged_tokens in pos_dictionary.items():
         if add_verbs:
             # updating the inverse occurrence index with verbs
@@ -116,8 +115,6 @@ def text2cooc(pos_dictionary: {int, (str, str)}, add_verbs=True) -> {str, list}:
                 # for more details see https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
                 if tag.startswith("VB"):
                     verb = lemmatizer.lemmatize(token, "v").lower()
-                    # check if verb is not a stopword and also new
-                    # newness must be checked to avoid duplicates
                     if verb not in stopwords.words("english"):
                         if verb not in term2sentence_id:
                             term2sentence_id[verb] = set()
@@ -163,16 +160,17 @@ def get_cooc(chunk_trees, stoplist=True):
     
     for t in chunk_trees:
         entities = []
-        for chunk in t[:]:
+        for chunk in t:
             if isinstance(chunk, Tree) and chunk.label() == 'NP':
                 # getting a tree for later processing of triples from the simple noun 
                 # phrases (if present)
                 simple_trees.append(parser_simple.parse(chunk.leaves()))
                 words = []
-                for word, tag in chunk[:]:
+                for word, tag in chunk:
                     # stem/discard elements and construct an argument
+                    # old:  (len([x for x in word if x.isalnum()]) == 0)
                     if (stoplist and word in stopwords.words("english")) or \
-                        (len([x for x in word if x.isalnum()]) == 0):
+                        (not any(char.isalnum() for char in word)):
                         # do not process stopwords for simple trees, do not process purely 
                         # non alphanumeric characters
                         continue
@@ -184,8 +182,8 @@ def get_cooc(chunk_trees, stoplist=True):
                         words.append(word)
                 if len(words) > 0:
                     entities.append("_".join(words))
-        for e1, e2 in combinations(entities,2):
-            triples.append((e1, "close to", e2)) ### changed from close_to
+        for e1, e2 in combinations(entities, 2):
+            triples.append((e1, "close to", e2))
             triples.append((e2, "close to", e1))
     return triples, simple_trees
 
@@ -201,8 +199,9 @@ def generate_source(token2sentences, paragraph_id: int, distance_threshhold=5, \
                 from text2cooc function.
             paragraph_id: The ID of the paragraph the text2sentences dictionary
                 belongs to.
-            distance_threshhold: How far apart terms may be to be still
-                considered close / relevant to each other.
+            distance_threshhold: Optional. Default: 5. 
+                How far apart terms may be to be still considered close 
+                / relevant to each other.
         Returns:
             A list of Closeness objects, representing the "relatedness" of
             the terms in the sentences of token2sentences.
@@ -215,11 +214,12 @@ def generate_source(token2sentences, paragraph_id: int, distance_threshhold=5, \
         w = 0.0
         
         # get positions of first term
+        # positions are always per paragraph
         for position1 in token2sentences[term1]:
             
             # get positions of second term
             for position2 in token2sentences[term2]:
-
+ 
                 # get the distance between the terms, measured in "terms between"
                 distance = math.fabs(position1 - position2)
                 
