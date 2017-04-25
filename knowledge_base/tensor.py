@@ -297,7 +297,7 @@ class Tensor:
         representing the corresponding original tensor values.
         """
         
-        m = Tensor(rank=2)
+        matrix = Tensor(rank=2)
         try:
             # iterable (multiple) pivot dimensions
             if max(pivot_dim) >= self.rank:
@@ -316,22 +316,25 @@ class Tensor:
                     col_ids = col_ids[0]
                 if len(row_ids) == 1:
                     row_ids = row_ids[0]
-                m[(row_ids,col_ids)] = value
+                matrix[(row_ids,col_ids)] = value
         except TypeError:
             # single pivot dimension
+            # the only one currently implemented
             if pivot_dim >= self.rank:
                 raise NotImplementedError('Dimension %s higher than rank %s',\
                                           (str(pivot_dim),str(self.rank)))
             for key, value in self.base_dict.items():
-                col_id = tuple(key[:pivot_dim]+key[pivot_dim+1:])
-                m[(key[pivot_dim],col_id)] = value
-        return m
+                # keys are tuples in the format (X close to Y)
+                # value is the calculated weight from knowledge_base_create()
+                column_id = tuple(key[:pivot_dim] + key[pivot_dim+1:])
+                matrix[(key[pivot_dim], column_id)] = value
+        return matrix
 
     def get_sparse_dict(self,col2row=True):
-    # returns a sparse matrix in a simple dictionary representation that can be
-    # directly used for retrieving whole rows (applicable only to matrices); 
-    # optionally also an index mapping column IDs to set of rows that have a 
-    # non-zero element in that column
+        # returns a sparse matrix in a simple dictionary representation that can be
+        # directly used for retrieving whole rows (applicable only to matrices); 
+        # optionally also an index mapping column IDs to set of rows that have a 
+        # non-zero element in that column
         if self.rank != 2:
             raise NotImplemented('Not applicable for tensors of rank %s', \
                                  (self.rank,))

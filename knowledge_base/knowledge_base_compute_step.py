@@ -9,6 +9,67 @@ def knowledge_base_compute():
     The format is:
         <expression> related to <other expression>: Value
     This uses the Analyser class to perform the calculations and produce that format.
+    
+    Detailed explanation:
+        1) The memstore from the previous step (knowledge_base_create()) 
+            is loaded.
+        2) The perspective is computed:
+            2.1) The corpus is converted to a matrix.
+            2.2) The format is:
+                token (close to, other_token) -> weight
+        3) The Analyser is created. This is used to calculate the "related to"
+            relations.
+        4) The top memstore lexicon elements are calculated:
+            4.1) The lexicon is sorted by frequency values, descending.
+            4.2) Frequencies of tokens that are relation statements (close to,
+                related to) or provenances are ignored.
+            4.3) The average of the remaining frequencies is calculated.
+            4.4) All the tokens with above-average frequency are returned in 
+                a list.
+        5) The top elements from 4) are iterated over:
+            5.1) For each token, the tokens that are similar are calculated.
+                5.1.1) The basis for this are the sparse-representation of the
+                    matrix from 2) and the "inverse" of that that is calculated
+                    in the same step.
+                    The format of the sparse is:
+                        {token: {(relation, token): weight, ...} }
+                    The format of the inverse is:
+                        (relation, token: [tokens]
+                5.1.2) The row from the sparse matrix for the token is
+                    collected.
+                    Example:
+                        sparse[Paul] = 
+                            {(close to, ball): 0.8, (close to, roof): 0.7, ...}
+                5.1.3) The length of the row is calculated:
+                    sqrt(sum(weights)^2)
+                5.1.4) The possibly related tokens are collected from the 
+                    inverse and iterated over.
+                    5.1.4.1) The row for the token is collected from the sparse.
+                    5.1.4.2) For each expression ((close to, token)), check
+                        if it also appears in the row from 5.1.2).
+                    5.1.4.3) If it does, multiply the values from the rows
+                        and keep them in a variable and add the statements 
+                        to a list.
+                    5.1.4.4) Add the square of the compared row to a variable.
+                    5.1.4.5) After 5.1.4.2), take the square root of the value
+                        from 5.1.4.4) to get the length.
+                    5.1.4.6) If sum of the products from 5.1.4.3) divided by
+                        the length from the previous step multiplied by the sum
+                        is above the threshhold, add that value and the current
+                        token/expression to a list of results:
+                            [(value, token from 5.1.4))]
+                        This is used to indicate how closely related the token 
+                        from 5.1) and the current one are.
+                5.1.5) Sort the list from 5.1.4.6) by values, descending, and
+                    return a list of tuples of the relation value and the token,
+                    relative to the one from step 5.1).
+            5.2) For each "related to" relation from 5.1.5), add that 
+                relation to a dictionary:
+                    (token, "related to", other_token): value
+            5.3) Finally, add the "related to" relations to the corpus of
+                the memstore.
+        6) Write the memstore, now containing the "related to" relations,
+            to the disk.
     """
     
     #STEP 3
@@ -19,14 +80,14 @@ def knowledge_base_compute():
     analyser = Analyser(memstore, "LAxLIRA", compute=False, trace=True)
     SIM_LIM = 10
     
-    tokens = [x for x in memstore.sorted(ignored=".*_[0-9]+$|related to|close to")] # if not re.search(".*_[0-9]+$|related to|close to", x) moved to sorted
+    tokens = [x for x in memstore.sorted(ignored=".*_[0-9]+$|related to|close to")]
     
     # holds similarity statements - <expression> related to <expression2>: value
     similarity_dictionary = {}
     ###top_value = (0, 0, 0)
     for i, token1 in enumerate(tokens):
         print(i , " out of ", len(tokens))
-        sims2src = {}
+        sims2src = {} ### THIS SEEMS SUPER USELESS - does nothing in the original either!
         similar = analyser.similar_to(token1, top=SIM_LIM, sims2src=sims2src)
         for token2, s in similar:
             if not ((token1, "related to", token2) in similarity_dictionary or (token2, "related to", token1) in similarity_dictionary): ### fix here april4, token1 was token2 in second block
