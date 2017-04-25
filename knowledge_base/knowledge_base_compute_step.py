@@ -1,7 +1,6 @@
 from util import paths
 from knowledge_base.analyser import Analyser
 from knowledge_base.neomemstore import NeoMemStore
-import re
  
 def knowledge_base_compute():
     """

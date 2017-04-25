@@ -7,20 +7,18 @@ class Tensor:
     (implemented in parallel).
     """
     
-    # @TODO:
-    # - perhaps add loading/dumping functions for (de)serialisation
-    # - add row-based indexing for matrices (or solve otherwise via interface to
-    #   the dict.-based matrix implementation in strg.py
-    # - write a wrapper for the evolution of tensors
-    #   * related to the fitness function interface - sort that out conceptually
-    #     and generally enough
-    #   * general class for crossover, mutation and iterative evolution of the KB
-    
     def __init__(self,rank):
-        self.rank = rank # rank (index field lengt or dimension) of the tensor
-        self.base_dict = {} # core data structure mapping index tuples to values
-        self.midx = {} # auxiliary faster cross-dimensional indices (master)
-        self.ridx = {} # index mapping unique row IDs to particular base_dict keys
+        # index field length or dimension of tensor
+        self.rank = rank
+        
+        # used to map index tuples to values
+        self.base_dict = {}
+        
+        # auxiliary faster cross-dimensional indices (master)
+        self.midx = {}
+        
+        # index mapping unique row IDs to particular base_dict keys
+        self.ridx = {}
     
     def __getitem__(self,key):
         # returns the value indexed by the key
@@ -56,56 +54,56 @@ class Tensor:
                              (str(tpl),str(self.rank)))
     
     def __iter__(self):
-    # iterates through the list of all indices
+        # iterates through the list of all indices
         for key in self.base_dict:
             yield key
     
     def __contains__(self,key):
-    # checks for the presence of key among the basic indices
+        # checks for the presence of key among the basic indices
         tpl = tuple(key)
         return tpl in self.base_dict
     
     def __len__(self):
-    # returns length of the tensor in terms of non-zero indices
+        # returns length of the tensor in terms of non-zero indices
         return len(self.base_dict)
     
     def density(self):
-    # density of the tensor in terms of the ratio of number of non-zero 
-    # elements w.r.t. the maximum possible number of elements in the current
-    # tensor
+        # density of the tensor in terms of the ratio of number of non-zero 
+        # elements w.r.t. the maximum possible number of elements in the current
+        # tensor
         unique_indvals = set()
         for key in self.base_dict:
             unique_indvals |= set(key)
             return float(len(self.base_dict))/(len(unique_indvals)**self.rank)
     
     def dim_size(self,dim):
-    # size of a dimension (i.e., number of unique index IDs in a dimension)
-    # WARNING: can be relatively slow for large/dense tensors
+        # size of a dimension (i.e., number of unique index IDs in a dimension)
+        # WARNING: can be relatively slow for large/dense tensors
         if dim >= self.rank:
             return 0 
         return len(set([x[dim] for x in self.base_dict]))
     
     def lex_size(self):
-    # return the current lexicon size
+        # return the current lexicon size
         unique_indvals = set()
         for key in self.base_dict:
             unique_indvals |= set(key)
             return len(unique_indvals)
     
     def items(self):
-    # return all the (key,value) tuples of the tensor
+        # return all the (key,value) tuples of the tensor
         return self.base_dict.items()
     
     def keys(self):
-    # return all the keys of the tensor
+        # return all the keys of the tensor
         return self.base_dict.keys()
     
     def values(self):
-    # return all the values of the tensor
+        # return all the values of the tensor
         return self.base_dict.values()
     
     def has_key(self,key):
-    # checks for the presence of the key among the tensor indices
+        # checks for the presence of the key among the tensor indices
         return key in self.base_dict
     
     def __eq__(self,other):
@@ -399,9 +397,6 @@ class Tensor:
                                  str(filename))
         for line in lines:
                 key_val = line.split('\t')[:self.rank+1]
-                if "charming_boy" in key_val and "feel" in key_val:
-                    print("INVESTIGATE") 
-                key = tuple(x for x in key_val[:-1]) ### CHANGED TO STRINGS
-                #key = tuple([int(x) for x in key_val[:-1]])
+                key = tuple(x for x in key_val[:-1])
                 val = float(key_val[-1])
                 self.base_dict[key] = val
