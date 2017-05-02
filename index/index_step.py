@@ -1,14 +1,69 @@
 from util import paths
 from index.fulltext import load_suids, gen_cooc_suid2puid_exp,\
     gen_sim_suid2puid_exp
+from index.helpers import generate_relation_provenance_weights,\
+    generate_relation_to_provenances
 import os, gzip
 from knowledge_base.neomemstore import NeoMemStore
 from _collections import defaultdict
 
+def generate_relation_values(sources):
+    relation2prov = generate_relation_provenance_weights(sources)
+    with gzip.open(
+        os.path.join(paths.RELATION_PROVENANCES_PATH, 
+                     "provenances.tsv.gz"), "wb") as f_out:
+        for relation, prov_weight in relation2prov.items():
+            f_out.write("\n".join("\t".join( [str(relation), str(prov_weight)])))
+        _missing, _processed, _out = generate_relation_to_provenances(
+                                                sources, relation2prov, f_out)
+    f_out.close()
+
+def make_relation_list(relations):
+    """
+    Creates a mapping of token: set of relations.
+        Example:
+            Paul: set( (house, close to), (ball, related to), ...)
+    """
+    
+    relation_lines = []
+    relation_dictionary = defaultdict(lambda: set())
+    for (expression, related_to, other_expression), weight in relations:
+        relation_lines.append(
+            "\t".join(
+                [str(x) for x in [(expression, 
+                                   related_to, 
+                                   other_expression), weight]
+                 ]
+                ))
+        relation_dictionary[expression].add( (other_expression, weight) )
+        relation_dictionary[other_expression].add( (expression, weight) )
+    with gzip.open(
+            os.path.join(paths.RELATIONS_PATH, "relations.tsv.gz"), "wb") as f:
+        f.write("\n".join(relation_lines).encode())
+    f.close()
+
+def index_step_experimental():
+    memstore = NeoMemStore()
+    memstore.import_memstore(paths.MEMSTORE_PATH_EXPERIMENTAL)
+    make_relation_list(memstore.corpus.items())
+    
 
 def index_step():
     """
     Prepares the data for querying.
+    
+    QUERYSTEP LOADS:
+    - expressionsets, in querystep
+    - suids, in queryresult constructor. but NOT with load_suids, straight 
+        from the file
+        WHY
+        DOES
+        LOAD
+        SUIDS
+        CHANGE
+        THE
+        FORMAT
+    - provenances, in populate_dictionaries
     
     Detailed explanation:
         1) Load the memstore from knowledge_base_compute().
@@ -118,7 +173,6 @@ def index_step():
     
     memstore = NeoMemStore()
     memstore.import_memstore(paths.MEMSTORE_PATH_EXPERIMENTAL)
-    i = 0
     suid_lines = []
     
     # this can probably be a list?
@@ -129,7 +183,6 @@ def index_step():
     #
     for (expression, related_to, other_expression), weight in list(memstore.corpus.items()):
         suid_lines.append("\t".join([str(x) for x in [(expression, related_to, other_expression), expression, related_to, other_expression, weight]]))
-        i += 1
         expression_dictionary[expression].add((other_expression, weight))
         expression_dictionary[other_expression].add((expression, weight))
     with gzip.open(os.path.join(paths.SUIDS_PATH_EXPERIMENTAL, "suids.tsv.gz"), "wb") as f:
@@ -169,4 +222,5 @@ def index_step():
     ### TODO: map suid_lines to provenance, see below gen_cooc_suid2puid
 
 if __name__ == "__main__":
+    #index_step_experimental()
     index_step()
