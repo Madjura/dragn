@@ -9,33 +9,33 @@ def gen_cooc_suid2puid_exp(sources, stmt2suid):
     ### stmt2suid:  6    startle    close to    destine    0.26632781872686007
     dictionary = defaultdict(lambda:list())
     for expression, p, other_expression, provenance in sources:
-        w = sources[(expression, p, other_expression, provenance)]
+        # this is the closeness.closeness value
+        closeness = sources[(expression, p, other_expression, provenance)]
         try:
             suid = stmt2suid[(expression, p, other_expression)][0]
         except KeyError:
             suid = None
             print("ERROR FOR : ", expression, p , other_expression)
-        dictionary[suid].append((provenance, w))
+        dictionary[suid].append((provenance, closeness))
     return dictionary
 
-def gen_sim_suid2puid_exp(stmt2suid, suid2puid, out_file=None):
-    # process the stmt2suid, creating the dictionary mapping subjects to 
+def gen_sim_suid2puid_exp(suids, suid2puid, out_file=None):
+    # process the suids, creating the dictionary mapping subjects to 
     # (related_to,object_) tuples, and also generating a list of similarity
     # relationship statements together with their SUIDs and weights
     print("  - building the auxiliary dictionaries")
     s2po = defaultdict(lambda: set())
     sim_stmts = {}
-    for expression, related_to, object_ in stmt2suid:
+    for expression, related_to, object_ in suids:
         s2po[expression].add( (related_to, object_) )
         if related_to == "related to":
-            sim_stmts[ (expression, object_) ] = stmt2suid[ (expression, related_to, object_ )]
+            sim_stmts[ (expression, object_) ] = suids[ (expression, "related to", object_ )]
     # process all the similarity statements, determining the co-occurrence
     # statements that led to them as an intersection of the (related_to,object_)
     # tuple sets corresponding to the similar arguments
     print("  - processing the similarity statements")
     missing = 0
     processed = 0
-    out_lines = []
     i = 0
     for expression, object_ in sim_stmts:
         i += 1
@@ -44,13 +44,18 @@ def gen_sim_suid2puid_exp(stmt2suid, suid2puid, out_file=None):
         puid2weight = defaultdict(lambda: list())
         # processing the shared statements
         for p_prov, o_prov in s2po[expression] & s2po[object_]:
-            prov_suid1 = stmt2suid[(expression, p_prov, o_prov)][0]
-            prov_suid2 = stmt2suid[(object_, p_prov, o_prov)][0]
+            _foo = s2po[expression]
+            _foo2 = s2po[object_]
+            prov_suid1 = suids[(expression, p_prov, o_prov)][0]
+            prov_suid2 = suids[(object_, p_prov, o_prov)][0]
             l = []
             if prov_suid1 in suid2puid:
                 l += suid2puid[prov_suid1]
             if prov_suid2 in suid2puid:
                 l += suid2puid[prov_suid2]
+            
+            # oh my god he uses extend above
+            # holy shit why
             for puid, w in l:
                 puid2weight[puid].append(w)
         if not len(puid2weight):
@@ -65,9 +70,8 @@ def gen_sim_suid2puid_exp(stmt2suid, suid2puid, out_file=None):
             if out_file is not None:
                 line = "\n" + "\t".join([str(sim_suid), puid, str(prov_w)])
                 out_file.write(str.encode(line))
-            out_lines.append('\t'.join([str(sim_suid),str(puid),str(prov_w)]))
             processed += 1
-    return missing, processed, out_lines
+    return missing, processed
 
 def load_suids(fname):
     # load the mapping of the statements to their IDs
