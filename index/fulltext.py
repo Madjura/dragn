@@ -30,6 +30,7 @@ def gen_sim_suid2puid_exp(suids, suid2puid, out_file=None):
         s2po[expression].add( (related_to, object_) )
         if related_to == "related to":
             sim_stmts[ (expression, object_) ] = suids[ (expression, "related to", object_ )]
+            #a = suids[(expression, "related to", object_)]
     # process all the similarity statements, determining the co-occurrence
     # statements that led to them as an intersection of the (related_to,object_)
     # tuple sets corresponding to the similar arguments
@@ -40,9 +41,13 @@ def gen_sim_suid2puid_exp(suids, suid2puid, out_file=None):
     for expression, object_ in sim_stmts:
         i += 1
         print("    ...", i, "out of", len(sim_stmts))
+        # sim_w is relation tuple, sim_w is just the weight
         sim_suid, sim_w = sim_stmts[ (expression, object_ )]
         puid2weight = defaultdict(lambda: list())
         # processing the shared statements
+        combined = s2po[expression] & s2po[object_]
+        if combined:
+            print("foo")
         for p_prov, o_prov in s2po[expression] & s2po[object_]:
             _foo = s2po[expression]
             _foo2 = s2po[object_]

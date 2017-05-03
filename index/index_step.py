@@ -7,15 +7,19 @@ import os, gzip
 from knowledge_base.neomemstore import NeoMemStore
 from _collections import defaultdict
 
-def generate_relation_values(sources):
+def generate_relation_values(sources, relations):
     relation2prov = generate_relation_provenance_weights(sources)
     with gzip.open(
         os.path.join(paths.RELATION_PROVENANCES_PATH, 
-                     "provenances.tsv.gz"), "wb") as f_out:
+                     "provenances.tsv.gz"), "w") as f_out:
+        lines = []
         for relation, prov_weight in relation2prov.items():
-            f_out.write("\n".join("\t".join( [str(relation), str(prov_weight)])))
-        _missing, _processed, _out = generate_relation_to_provenances(
-                                                sources, relation2prov, f_out)
+                lines.append("\t".join( [str(relation), str(prov_weight)] ))
+        f_out.write(("\n".join(lines)).encode())
+        _missing, _processed = generate_relation_to_provenances(relations, 
+                                                relation2prov, 
+                                                f_out)
+        print(_missing, _processed)
     f_out.close()
 
 def make_relation_list(relations):
@@ -46,6 +50,7 @@ def index_step_experimental():
     memstore = NeoMemStore()
     memstore.import_memstore(paths.MEMSTORE_PATH_EXPERIMENTAL)
     make_relation_list(memstore.corpus.items())
+    generate_relation_values(memstore.sources, memstore.corpus)
     
 
 def index_step():
@@ -213,8 +218,8 @@ def index_step():
             for puid, w in suid2puid[suid]:
                 lines.append("\t".join( [str(suid), str(puid), str(w)] ))
         f_out.write(("\n".join(lines)).encode())
-        _missing, _processed, _out = gen_sim_suid2puid_exp(suids, suid2puid, out_file=f_out)
-        print(_missing, _processed)
+        _missing, _processed = gen_sim_suid2puid_exp(suids, suid2puid, out_file=f_out)
+        print(_missing, _processed, "FOO")
     f_out.close()
     ### out:  '8033\ta.txt_14\t0.19269787540304012',
     ### suids:  ('young_man', 'related to', 'time_strength_sowing_wild_oat'): (24355, 0.4987936888425189),
