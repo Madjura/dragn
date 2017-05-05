@@ -43,9 +43,10 @@ def generate_relation_to_provenances(sources: "suids",
         for provenance in prov2weight:
             prov_weight = max(prov2weight[provenance]) * weight
             if out_file is not None:
-                line = "\n\t".join([str( (token, related_to, token2) ), 
+                line = "\t".join([str( (token, related_to, token2) ), 
                                    provenance, 
                                    str(prov_weight)])
                 out_file.write(str.encode(line))
+                out_file.write(str.encode("\n"))
             processed += 1
     return missing, processed

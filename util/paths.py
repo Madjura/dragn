@@ -30,6 +30,8 @@ RELATION_EXPRESSIONS_PATH = MAIN_FOLDER + "/relations/expressions"
 
 RELATION_PROVENANCES_PATH = MAIN_FOLDER + "/relations/provenances"
 
+RELATIONS_WITH_PROVENANCES_PATH = MAIN_FOLDER + "/relations/provenances"
+
 ALL = [
     MAIN_FOLDER,
     TEXT_PATH,

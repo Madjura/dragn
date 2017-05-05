@@ -54,7 +54,7 @@ def png_query():
     
 if __name__ == "__main__":
     #png_query()
-    query(["feel", "feeling"])
+    query(["ron", "dumbledore"])
     
 """
 NOTES:

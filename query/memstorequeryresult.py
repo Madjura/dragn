@@ -42,6 +42,9 @@ class MemStoreQueryResult:
         
         # store index for generating the statements and provenances
         # the TUIDs that were queried for (for filtering the relevant statements)
+        
+        ### suid2stmt maps tuple to tuple + weight
+        ### tuid2suid is token: [other_token, relation, other_token2]
         self.suid2stmt, self.tuid2suid = self.load_suid2stmt()
         self.queried = queried
         
@@ -77,6 +80,8 @@ class MemStoreQueryResult:
         for tuid in self.tuid_set.cut(self.min_w):
             self.tuid_cut[tuid] = self.tuid_set[tuid]
         print("----INIT TUID CUT ", len(self.tuid_cut))
+        
+        ###### UP TO HERE 
         
         self.suid_set = FuzzySet()  # fuzzy statement ID set
         self.puid_set = FuzzySet()  # fuzzy provenance ID set

@@ -13,14 +13,30 @@ def generate_relation_values(sources, relations):
         os.path.join(paths.RELATION_PROVENANCES_PATH, 
                      "provenances.tsv.gz"), "w") as f_out:
         lines = []
-        for relation, prov_weight in relation2prov.items():
-                lines.append("\t".join( [str(relation), str(prov_weight)] ))
+        for relation, prov_weights in relation2prov.items():
+                lines.append("\t".join( [str(relation), str(prov_weights)] ))
         f_out.write(("\n".join(lines)).encode())
+    f_out.close()
+
+    with gzip.open(
+            os.path.join(
+                paths.RELATIONS_WITH_PROVENANCES_PATH, 
+                   "relations_w_provenances.tsv.gz"), "w") as f_out:
+    
         _missing, _processed = generate_relation_to_provenances(relations, 
                                                 relation2prov, 
                                                 f_out)
-        print(_missing, _processed)
     f_out.close()
+
+def make_expression_sets(relation_dictionary):
+    term_lines = []
+    for expression1, related_set in list(relation_dictionary.items()):
+        for expression2, weight in related_set:
+            term_lines.append("\t".join([str(x) for x in [expression1, expression2, weight]]))
+    with gzip.open(os.path.join(paths.EXPRESSION_SET_PATH_EXPERIMENTAL, "relationsets.tsv.gz"), "wb") as f:
+        f.write(("\n".join(term_lines)).encode())
+    f.close()
+    
 
 def make_relation_list(relations):
     """
@@ -45,11 +61,13 @@ def make_relation_list(relations):
             os.path.join(paths.RELATIONS_PATH, "relations.tsv.gz"), "wb") as f:
         f.write("\n".join(relation_lines).encode())
     f.close()
+    return relation_dictionary
 
 def index_step_experimental():
     memstore = NeoMemStore()
     memstore.import_memstore(paths.MEMSTORE_PATH_EXPERIMENTAL)
-    make_relation_list(memstore.corpus.items())
+    relation_dictionary = make_relation_list(memstore.corpus.items())
+    make_expression_sets(relation_dictionary)
     generate_relation_values(memstore.sources, memstore.corpus)
     
 
