@@ -442,10 +442,10 @@ class MemStoreQueryResult:
                 edge_wgh = str(int(w * 10000))
                 edge = None
                 if len(edge_label):
-                    edge = pydot.Edge(nodes[s], nodes[o], color=edge_col, weight=edge_wgh, \
+                    edge = pydot.Edge(graph_nodes[s], graph_nodes[o], color=edge_col, weight=edge_wgh, \
                       label=edge_label)
                 else:
-                    edge = pydot.Edge(nodes[s], nodes[o], color=edge_col, weight=edge_wgh)
+                    edge = pydot.Edge(graph_nodes[s], graph_nodes[o], color=edge_col, weight=edge_wgh)
                 self.visualization_dictionary['STMTS'].add_edge(edge)
                 graph_edge = Edge(graph_nodes[s], graph_nodes[o], color=edge_col)
                 graph_nodes[s].add_edge_object(graph_edge)

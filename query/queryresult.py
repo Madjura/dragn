@@ -5,6 +5,10 @@ from ast import literal_eval
 from _collections import defaultdict
 from query.fuzzyset import FuzzySet
 from itertools import combinations
+from graph.node import CytoNode
+from graph.edge import Edge
+from graph.graph import Graph
+from math import log
 
 class QueryResult(object):
     
@@ -45,8 +49,6 @@ class QueryResult(object):
         query_relevant = FuzzySet()
         for term in query:
             query_relevant = query_relevant | FuzzySet([x for x in self.expressionsets[term]])
-        for a, b in query_relevant.items():
-            print(a, b)
         return query_relevant
     
     def filter_relevant(self, relevant):
@@ -119,7 +121,47 @@ class QueryResult(object):
         self.puid_set = self.generate_fuzzy_set(self.puid_dict)
         print("PUID DICT LENGTH OLD: ", len(self.puid_dict))
         print("PUID SET LENGTH OLD: ", len(self.puid_set))
-                
+    
+    def generate_statement_nodes(self, max_nodes):
+        token_list = list(self.tuid_dict.items())
+        token_list.sort(key=lambda x: x[1], reverse=True)
+        tokens = [x[0] for x in token_list[:max_nodes]]
+        token_weight = dict([(x, self.tuid_dict[x]) for x in tokens])
+        norm = 1.0
+        graph_nodes = {}
+        if token_weight:
+            norm = min(token_weight.values())
+        for token in token_weight:
+            token_weight[token] /= norm
+        for token in tokens:
+            node_width = log(self.visualization_parameters["node width"] * token_weight[token], 10)
+            if node_width < 0.4:
+                node_width = 0.4
+            font_size = int(24 * node_width)
+            node_color = self.visualization_parameters["node color"]
+            if token in self.queried:
+                node_color = "green"
+            graph_nodes[token] = CytoNode(name=token, color=node_color,
+                                         width=node_width, label_size=font_size)
+        return graph_nodes
+    
+    def generate_statement_graph(self, max_nodes, max_edges):
+        nodes = self.generate_statement_nodes(max_nodes)
+        token_list = list(self.suid_set.items())
+        edge_count = 0
+        token_list.sort(key=lambda x: x[1], reverse=True)
+        for relation_tuple, _ in token_list:
+            if edge_count >= max_edges:
+                break
+            token, related_to, token2 = relation_tuple
+            if token in nodes and token2 in nodes:
+                if related_to in self.visualization_parameters["edge color"]:
+                    edge_color = self.visualization_parameters["edge color"][related_to]
+                graph_edge = Edge(nodes[token], nodes[token2], color=edge_color)
+                nodes[token].add_edge_object(graph_edge)
+        print("RETURNING GRAPH")
+        return Graph(nodes.values())
+    
     def load_suid2stmt(self):
         tuid2suid = {}
         path = os.path.join(paths.RELATIONS_PATH, "relations.tsv.gz")
@@ -143,6 +185,18 @@ class QueryResult(object):
             f.close()
         return tuid2suid
     
+    def load_parameters(self):
+        parameters = {
+            "node width": 0.25,
+            "node color": "#6699CC",
+            "max label length": 50,
+            "edge color": {
+                "related to": "red",
+                "close to": "blue"
+                }
+            }
+        return parameters
+    
     def __init__(self, queried=None, min_weight=0.5):
         self.relations = self.load_relations()
         self.relation2prov = self.load_relation2prov()
@@ -157,7 +211,9 @@ class QueryResult(object):
         self.min_weight = min_weight
         self.relevant_cut = self.filter_relevant(self.prepare_for_query(queried))
         self.tuid2suid = self.load_suid2stmt()
+        self.visualization_parameters = self.load_parameters()
         
 if __name__ == "__main__":
     foo = QueryResult(["ron", "dumbledore"])
     foo.populate_dictionaries()
+    foo.generate_statement_graph(50, 100)

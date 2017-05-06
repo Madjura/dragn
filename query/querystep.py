@@ -5,9 +5,14 @@ from util import paths
 from query.fuzzyset import FuzzySet
 from query.termsets import load_tuid2relt
 from query.memstorequeryresult import MemStoreQueryResult
+from query.queryresult import QueryResult
 
 
 def query(query=[], queryname=None, max_nodes=25, max_edges=50):
+    foo = QueryResult(query)
+    foo.populate_dictionaries()
+    return foo.generate_statement_graph(max_nodes, max_edges)
+    
     if not queryname:
         queryname = str(uuid.uuid4())
     if not query:
