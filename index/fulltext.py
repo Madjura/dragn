@@ -46,9 +46,7 @@ def gen_sim_suid2puid_exp(suids, suid2puid, out_file=None):
         puid2weight = defaultdict(lambda: list())
         # processing the shared statements
         combined = s2po[expression] & s2po[object_]
-        if combined:
-            print("foo")
-        for p_prov, o_prov in s2po[expression] & s2po[object_]:
+        for p_prov, o_prov in combined:
             _foo = s2po[expression]
             _foo2 = s2po[object_]
             prov_suid1 = suids[(expression, p_prov, o_prov)][0]

@@ -45,7 +45,7 @@ class MemStoreQueryResult:
         
         ### suid2stmt maps tuple to tuple + weight
         ### tuid2suid is token: [other_token, relation, other_token2]
-        self.suid2stmt, self.tuid2suid = self.load_suid2stmt()
+        self.suid2stmt, self.tuid2suid = self.load_token2related()
         self.queried = queried
         
         # result name and filenames for its storage
@@ -134,7 +134,7 @@ class MemStoreQueryResult:
               }
             }
 
-    def load_suid2stmt(self):
+    def load_token2related(self):
         """
         # TODO: write up what this is
         """

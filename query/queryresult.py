@@ -11,11 +11,50 @@ from graph.graph import Graph
 from math import log
 
 class QueryResult(object):
+    """
+    Wrapper over the processed text files to produce a graph in JSON
+    format that can be displayed to the user.
+    """
     
     def load_relations(self, 
                        path=os.path.join(
                            paths.RELATIONS_WITH_PROVENANCES_PATH, 
                            "relations_w_provenances.tsv.gz")):
+        """
+        Loads all the relation statements from the processed texts.
+        The relation statements are format:
+            ( (token, relation, token2), provenance, weight )
+        
+            Args:
+                path: Optional. Default: paths.RELATIONS_WITH_PROVENANCES_PATH.
+                    The path to the file of relation statements, as created
+                    in index_step.
+            Returns:
+                A list of relation statement tuples, with provenance and
+                weight.
+        """
+        
+        #======================================================================
+        # relations = defaultdict(lambda: [])
+        #  
+        # with gzip.open(path, "rb") as f:
+        #     for line in f.read().decode().split("\n"):
+        #         line_split = line.split("\t")
+        #         try:
+        #             relation_tuple = literal_eval(line_split[0])
+        #         except SyntaxError:
+        #             # in case of invalid format, stop
+        #             break
+        #         token, _, token2 = relation_tuple
+        #         provenance = line_split[1]
+        #         weight = float(line_split[2])
+        #         relations[token].append( (relation_tuple, provenance, weight) )
+        #         relations[token2].append( (relation_tuple, provenance, weight) )
+        # print(len(relations))
+        # return relations
+        #======================================================================
+    
+    
         relations = []
         with gzip.open(path, "rb") as f:
             for line in f.read().decode().split("\n"):
@@ -23,9 +62,9 @@ class QueryResult(object):
                 try:
                     relation_tuple = literal_eval(line_split[0])
                 except SyntaxError:
+                    # in case of invalid format, stop
                     break
-                provenance = line_split[1]
-                weight = float(line_split[2])
+                provenance, weight = literal_eval(line_split[1])
                 relations.append((relation_tuple, provenance, weight))
         return relations
     
@@ -33,14 +72,29 @@ class QueryResult(object):
                          path=os.path.join(
                              paths.RELATION_PROVENANCES_PATH,
                              "provenances.tsv.gz")):
+        """
+        Loads the mapping of relation tuples to the provenances.
+        The format is:
+            (token, related_to, token2): [ (provenance, weight), ...]
+        
+            Args:
+                path: Optional. Default: paths.RELATION_PROVENANCES_PATH.
+                    The path to the file of tuple -> provennces mapping, as
+                    created in index_step.
+            Returns:
+                A dictionary of relation tuple -> provenance mappings.
+        """
+        
         relation2prov = defaultdict(lambda: list())
         with gzip.open(path, "r") as f:
             for line in f.read().decode().split("\n"):
                 line_split = line.split("\t")
                 try:
+                    # (token, related_to, token2)
                     relation_tuple = literal_eval(line_split[0])
                 except SyntaxError:
                     break
+                # (provenance, weight)
                 provenances = literal_eval(line_split[1])
                 relation2prov[relation_tuple].append(provenances)
         return relation2prov
@@ -48,29 +102,48 @@ class QueryResult(object):
     def prepare_for_query(self, query):
         query_relevant = FuzzySet()
         for term in query:
-            query_relevant = query_relevant | FuzzySet([x for x in self.expressionsets[term]])
+            query_relevant = query_relevant | FuzzySet([x for x in self.relation_sets[term]])
         return query_relevant
     
-    def filter_relevant(self, relevant):
+    def filter_relevant(self, relevant: FuzzySet):
+        """
+        Filters the relation tuples by the min_weight specified.
+        Relation tuples that are below the specified value will be excluded
+        from the result.
+            
+            Args:
+                relevant: A FuzzySet containing the (token, weight) tuples
+                    for the query terms.
+            Returns:
+                A FuzzySet with the values that were below the min_weight
+                threshhold.
+        """
+        
         relevant_cut = FuzzySet()
         for token in relevant.cut(self.min_weight):
             relevant_cut[token] = relevant[token]
         return relevant_cut
     
-    def load_expression_set(self):
-        tuid2relt = defaultdict(lambda: list())
+    def load_relation_sets(self,
+                             path=paths.EXPRESSION_SET_PATH_EXPERIMENTAL):
+        """
+        Loads the processed relationsets from index_step.
+        Returns a dictionary mapping tokens to a list of tuples in the format:
+            token: [ (token2, weight), ... ]
+        This dictionary can be used to access the tokens that are related to
+        another token by accessing the dictionary by key.
+        """
+        
+        relations = defaultdict(lambda: list())
         with gzip.open(
-            os.path.join(paths.EXPRESSION_SET_PATH_EXPERIMENTAL, 
-                         "relationsets.tsv.gz"), "rb") as f:
+            os.path.join(path, "relationsets.tsv.gz"), "rb") as f:
             lines = f.read().decode()
-            for line in lines.split('\n'):
-                spl = line.split('\t')
-                if len(spl) != 3:
-                    continue
-                key = spl[0]
-                value = (spl[1], float(spl[2]))
-                tuid2relt[key].append(value)
-        return tuid2relt
+            for line in lines.split("\n"):
+                line_split = line.split("\t")
+                key = line_split[0]
+                value = (line_split[1], float(line_split[2]))
+                relations[key].append(value)
+        return relations
     
     def generate_fuzzy_set(self, dct, agg=max):
         # generates a fuzzy set from a member->weight dictionary, normalising the
@@ -95,25 +168,27 @@ class QueryResult(object):
         return fset
     
     def populate_dictionaries(self):
+        
+        # iterate over the tokens relevant to the query
         for original_token in self.relevant_cut:
-            tuid_weight = self.relevant_cut[original_token]
+            relation_weight = self.relevant_cut[original_token]
             for relation_tuple in self.tuid2suid[original_token]:
                 (token, related_to, token2), suid_weight = relation_tuple
                 if not (token in self.queried or token2 in self.queried):
                     continue
-                self.suid_dict[(token, related_to, token2)] += tuid_weight * suid_weight
-                self.tuid_dict[original_token] += tuid_weight * suid_weight
+                self.suid_dict[(token, related_to, token2)] += relation_weight * suid_weight
+                self.tuid_dict[original_token] += relation_weight * suid_weight
                 if token != original_token:
-                    self.tuid_dict[token] += tuid_weight * suid_weight
+                    self.tuid_dict[token] += relation_weight * suid_weight
                 if token2 != original_token:
-                    self.tuid_dict[token2] += tuid_weight * suid_weight
+                    self.tuid_dict[token2] += relation_weight * suid_weight
                 
                 p = self.relation2prov[(token, related_to, token2)]
                 for prov_tuple in p:
                     for provenance, prov_weight in prov_tuple:
-                        self.puid_dict[provenance] += tuid_weight * suid_weight * prov_weight
+                        self.puid_dict[provenance] += relation_weight * suid_weight * prov_weight
                     for (prov1, w1), (prov2, w2) in combinations(self.relation2prov[(token, related_to, token2)], 2):
-                        w = tuid_weight * suid_weight * (w1 + w2) / 2
+                        w = relation_weight * suid_weight * (w1 + w2) / 2
                         self.prov_rels[(prov2, prov1)] += w
         self.suid_set = self.generate_fuzzy_set(self.suid_dict)
         print("SUID DICT LENGTH OLD: ", len(self.suid_dict))
@@ -162,7 +237,7 @@ class QueryResult(object):
         print("RETURNING GRAPH")
         return Graph(nodes.values())
     
-    def load_suid2stmt(self):
+    def load_token2related(self):
         tuid2suid = {}
         path = os.path.join(paths.RELATIONS_PATH, "relations.tsv.gz")
         with gzip.open(path, "rb") as f:
@@ -183,9 +258,14 @@ class QueryResult(object):
                     tuid2suid[relation_tuple[2]] = []
                 tuid2suid[relation_tuple[2]].append((relation_tuple, weight))
             f.close()
+        print("LEN tuid2suid ", len(tuid2suid))
         return tuid2suid
     
     def load_parameters(self):
+        """
+        Returns a dictionary of visualization parameters used for the graph.
+        """
+        
         parameters = {
             "node width": 0.25,
             "node color": "#6699CC",
@@ -200,7 +280,7 @@ class QueryResult(object):
     def __init__(self, queried=None, min_weight=0.5):
         self.relations = self.load_relations()
         self.relation2prov = self.load_relation2prov()
-        self.expressionsets = self.load_expression_set()
+        self.relation_sets = self.load_relation_sets()
         self.queried = queried
         self.suid_dict = defaultdict(int)  # statement -> overall combined relevance weight
         self.tuid_dict = defaultdict(int)
@@ -208,9 +288,11 @@ class QueryResult(object):
         self.prov_rels = defaultdict(float)
         self.suid_set = FuzzySet()  # fuzzy statement ID set
         self.puid_set = FuzzySet()  # fuzzy provenance ID set
+        
+        # minimum weight that relations must have to be considered
         self.min_weight = min_weight
         self.relevant_cut = self.filter_relevant(self.prepare_for_query(queried))
-        self.tuid2suid = self.load_suid2stmt()
+        self.tuid2suid = self.load_token2related()
         self.visualization_parameters = self.load_parameters()
         
 if __name__ == "__main__":

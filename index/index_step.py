@@ -9,23 +9,32 @@ from _collections import defaultdict
 
 def generate_relation_values(sources, relations):
     relation2prov = generate_relation_provenance_weights(sources)
+    print(len(relation2prov))
+    
+    # relation2prov len: 396403
+    # LEN SUIDS:  416247
+    # LEN SUID2PUID:  396403
+
+    # LINES:  483484 <-- from below
     with gzip.open(
         os.path.join(paths.RELATION_PROVENANCES_PATH, 
                      "provenances.tsv.gz"), "w") as f_out:
-        lines = []
         for relation, prov_weights in relation2prov.items():
-                lines.append("\t".join( [str(relation), str(prov_weights)] ))
-        f_out.write(("\n".join(lines)).encode())
+            line = "\t".join( [str( (relation) ), str(prov_weights) ] )
+            f_out.write(str.encode(line))
+            f_out.write(str.encode("\n"))
     f_out.close()
-
+ 
     with gzip.open(
             os.path.join(
                 paths.RELATIONS_WITH_PROVENANCES_PATH, 
                    "relations_w_provenances.tsv.gz"), "w") as f_out:
-    
+     
         _missing, _processed = generate_relation_to_provenances(relations, 
                                                 relation2prov, 
                                                 f_out)
+        print(_missing, _processed)
+        # len of processed is the same length
     f_out.close()
 
 def make_expression_sets(relation_dictionary):
@@ -230,12 +239,15 @@ def index_step():
     # I MEAN JUST WHY WOULD YOU DO THAT
     suids = load_suids(paths.SUIDS_PATH_EXPERIMENTAL + "/suids.tsv.gz")
     suid2puid = gen_cooc_suid2puid_exp(memstore.sources, suids) # TODO: RENAME
+    print("LEN SUIDS: ", len(suids))
+    print("LEN SUID2PUID: ", len(suid2puid))
     lines = []
     with gzip.open(os.path.join(paths.INDEX_PATH_EXPERIMENTAL, "provenances.tsv.gz"), "wb") as f_out:
         for suid in suid2puid:
             for puid, w in suid2puid[suid]:
                 lines.append("\t".join( [str(suid), str(puid), str(w)] ))
         f_out.write(("\n".join(lines)).encode())
+        print("LINES: ", len(lines))
         _missing, _processed = gen_sim_suid2puid_exp(suids, suid2puid, out_file=f_out)
         print(_missing, _processed, "FOO")
     f_out.close()
@@ -245,5 +257,5 @@ def index_step():
     ### TODO: map suid_lines to provenance, see below gen_cooc_suid2puid
 
 if __name__ == "__main__":
-    #index_step_experimental()
-    index_step()
+    index_step_experimental()
+    #index_step()

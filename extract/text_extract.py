@@ -81,11 +81,12 @@ def parse_pos(sentences: [Sentence]) -> {int, (str, str)}:
     Parses a POS-tagged file and return a dictionary of sentence number -> list 
     of (token,POS-tag) tuples.
     
-    Args:
-        sentences: A list of Sentence objects.
-    Returns:
-        A dictionary where the keys are the id of a sentence and the values a 
-        a list of tuples, with the tuples in the format of (token, POS-tag).
+        Args:
+            sentences: A list of Sentence objects.
+        Returns:
+            A dictionary where the keys are the id of a sentence and the values
+            are a list of tuples, with the tuples in the 
+            format of (token, POS-tag).
     """
 
     dictionary = {}
