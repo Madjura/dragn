@@ -44,8 +44,8 @@ class MemStoreQueryResult:
         # the TUIDs that were queried for (for filtering the relevant statements)
         
         ### suid2stmt maps tuple to tuple + weight
-        ### tuid2suid is token: [other_token, relation, other_token2]
-        self.suid2stmt, self.tuid2suid = self.load_token2related()
+        ### relations is token: [other_token, relation, other_token2]
+        self.suid2stmt, self.relations = self.load_token2related()
         self.queried = queried
         
         # result name and filenames for its storage
@@ -83,11 +83,11 @@ class MemStoreQueryResult:
         
         ###### UP TO HERE 
         
-        self.suid_set = FuzzySet()  # fuzzy statement ID set
-        self.puid_set = FuzzySet()  # fuzzy provenance ID set
+        self.relation_set = FuzzySet()  # fuzzy statement ID set
+        self.provenance_set = FuzzySet()  # fuzzy provenance ID set
         
-        self.suid_dict = defaultdict(int)  # statement -> overall combined relevance weight
-        self.tuid_dict = defaultdict(int)  # term -> combined weight based on connected statements
+        self.relation_dict = defaultdict(int)  # statement -> overall combined relevance weight
+        self.tokens2weights = defaultdict(int)  # term -> combined weight based on connected statements
         self.puid_dict = defaultdict(int)  # provenance -> overall combined relevance weight
         self.prov_rels = defaultdict(float)  # edges between provenances and their weights
         
@@ -196,8 +196,8 @@ class MemStoreQueryResult:
             # the degree of membership of the term in the result
             tuid_weight = self.tuid_cut[tuid]
             
-            ### his tuid2suid dict: {0: [73, 163, 297, 382, 409, 427, 504, 586, 617, 663,
-            for suid in self.tuid2suid[tuid]:
+            ### his relations dict: {0: [73, 163, 297, 382, 409, 427, 504, 586, 617, 663,
+            for suid in self.relations[tuid]:
                 # original statement
                 
                 ### his suid2sttmt dict: {0: (304, 1, 170, 0.24094163517471326), 1: (981, 1, 972, 0.39100798646527024),
@@ -210,17 +210,16 @@ class MemStoreQueryResult:
                     # don't process statements that are not related to the queried terms
                     continue
                 # updating the result statement dict with the combined tuid/suid weight
-                self.suid_dict[suid] += tuid_weight * suid_weight
+                self.relation_dict[suid] += tuid_weight * suid_weight
                 # updating the term weight based on statements connected to it
-                self.tuid_dict[tuid] += self.suid_dict[suid]
+                self.tokens2weights[tuid] += self.relation_dict[suid]
                 # adding also the statement subject and object to the dictionary
                 if s != tuid:
-                    self.tuid_dict[s] += self.suid_dict[suid]
+                    self.tokens2weights[s] += self.relation_dict[suid]
                 if o != tuid:
-                    self.tuid_dict[o] += self.suid_dict[suid]
+                    self.tokens2weights[o] += self.relation_dict[suid]
                 # updating the result provenance dict with the combined tuid/suid/puid
                 # weight
-                
                 for puid, puid_weight in suid2prov[suid]:
                     self.puid_dict[puid] += tuid_weight * suid_weight * puid_weight
                 # updating the self.prov_rels dictionary
@@ -230,12 +229,12 @@ class MemStoreQueryResult:
                     self.prov_rels[(puid2, puid1)] += w
         # generating the statement and provenance result fuzzy sets from the
         # dictionaries
-        self.suid_set = self._generate_fuzzy_set(self.suid_dict)
-        print("SUID DICT LENGTH OLD: ", len(self.suid_dict))
-        print("SUID SET LENGTH OLD: ", len(self.suid_set))
-        self.puid_set = self._generate_fuzzy_set(self.puid_dict)
+        self.relation_set = self._generate_fuzzy_set(self.relation_dict)
+        print("SUID DICT LENGTH OLD: ", len(self.relation_dict))
+        print("SUID SET LENGTH OLD: ", len(self.relation_set))
+        self.provenance_set = self._generate_fuzzy_set(self.puid_dict)
         print("PUID DICT LENGTH OLD: ", len(self.puid_dict))
-        print("PUID SET LENGTH OLD: ", len(self.puid_set))
+        print("PUID SET LENGTH OLD: ", len(self.provenance_set))
     
     def _generate_fuzzy_set(self, dct, agg=max):
         # generates a fuzzy set from a member->weight dictionary, normalising the
@@ -278,7 +277,7 @@ class MemStoreQueryResult:
         
         
         # getting the scale factors for the size of each term node
-        tuid2scale = dict([(x, self.tuid_dict[x]) for x in tuids])
+        tuid2scale = dict([(x, self.tokens2weights[x]) for x in tuids])
         norm_const = 1.0
         if len(tuid2scale):
             norm_const = min(tuid2scale.values())
@@ -321,7 +320,7 @@ class MemStoreQueryResult:
         for node in list(nodes.values()):
             self.visualization_dictionary['TERMS'].add_node(node)
         # constructing the edges (limited by max_edges)
-        suid_list = list(self.suid_set.items())
+        suid_list = list(self.relation_set.items())
         num_edges =  0
         suid_list.sort(key=lambda x: x[1], reverse=True)
         for suid, w in suid_list:
@@ -360,11 +359,11 @@ class MemStoreQueryResult:
     
     def generate_statement_nodes(self, max_nodes):
         # getting the relevant term IDs
-        tuid_list = list(self.tuid_dict.items())
+        tuid_list = list(self.tokens2weights.items())
         tuid_list.sort(key=lambda x: x[1], reverse=True)
         tuids = [x[0] for x in tuid_list[:max_nodes]]
         # getting the scale factors for the size of each term node
-        tuid2scale = dict([(x, self.tuid_dict[x]) for x in tuids])
+        tuid2scale = dict([(x, self.tokens2weights[x]) for x in tuids])
         norm_const = 1.0
         if len(tuid2scale):
             norm_const = min(tuid2scale.values())
@@ -420,7 +419,7 @@ class MemStoreQueryResult:
         
         nodes, graph_nodes = self.generate_statement_nodes(max_nodes)
         # constructing the edges (limited by max_edges)
-        tuid_list, num_edges = list(self.suid_set.items()), 0
+        tuid_list, num_edges = list(self.relation_set.items()), 0
         tuid_list.sort(key=lambda x: x[1], reverse=True)
         for suid, w in tuid_list:
             if num_edges > max_edges:
@@ -464,7 +463,7 @@ class MemStoreQueryResult:
         # otherwise numbers are being used
 
         # getting the relevant provenance IDs
-        puids = [x[0] for x in self.puid_set.sort(reverse=True, limit=max_nodes)]
+        puids = [x[0] for x in self.provenance_set.sort(reverse=True, limit=max_nodes)]
         # getting the scale factors for the size of each term node
         puid2scale = dict([(x, self.puid_dict[x]) for x in puids])
         norm_const = 1.0
@@ -555,7 +554,7 @@ class MemStoreQueryResult:
             lines.append('  * weight: ' + str(w))
         lines += [str(limit) + ' MOST RELEVANT STATEMENTS:']
         i = 0
-        for suid, w in self.suid_set.sort(reverse=True, limit=limit):
+        for suid, w in self.relation_set.sort(reverse=True, limit=limit):
             i += 1
             s, p, o, _corp_w = self.suid2stmt[suid]
             lines.append('RANK ' + str(i) + '.')
@@ -565,7 +564,7 @@ class MemStoreQueryResult:
             lines.append('  * weight  : ' + str(w))
         lines += [str(limit) + ' MOST RELEVANT PROVENANCE SOURCES:']
         i = 0
-        for puid, w in self.puid_set.sort(reverse=True, limit=limit):
+        for puid, w in self.provenance_set.sort(reverse=True, limit=limit):
             i += 1
             prov_meta = {}
             if puid in self.index.puid2meta:

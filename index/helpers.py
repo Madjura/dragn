@@ -43,8 +43,10 @@ def generate_relation_to_provenances(sources: "suids",
         for provenance in prov2weight:
             prov_weight = max(prov2weight[provenance]) * weight
             if out_file is not None:
+                # other: ('obscurity', 'close to', 'ancient_inscription')    [('call_of_cthulhu.txt_3', 0.5)]
+                # this: str: ('punch', 'related to', 'favorite_punching_bag')    [('harrypotter.txt_127', 0.3080712829341244)]
                 line = "\t".join([str( (token, related_to, token2) ), 
-                                   str( (provenance, prov_weight) ) ])
+                                   str( [(provenance, prov_weight)] ) ])
                 out_file.write(str.encode(line))
                 out_file.write(str.encode("\n"))
             processed += 1

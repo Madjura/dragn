@@ -71,6 +71,7 @@ def gen_sim_suid2puid_exp(suids, suid2puid, out_file=None):
             
             # writing the provenance line to the out-file
             if out_file is not None:
+                # ('side', 'related to', 'small_window_in_downstairs_bathroom')    harrypotter2.txt_729    0.08104891902666886
                 line = "\n" + "\t".join([str(sim_suid), puid, str(prov_w)])
                 out_file.write(str.encode(line))
             processed += 1

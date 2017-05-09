@@ -20,21 +20,13 @@ def generate_relation_values(sources, relations):
         os.path.join(paths.RELATION_PROVENANCES_PATH, 
                      "provenances.tsv.gz"), "w") as f_out:
         for relation, prov_weights in relation2prov.items():
-            line = "\t".join( [str( (relation) ), str(prov_weights) ] )
+            line = "\t".join( [str( relation ), str(prov_weights) ] )
             f_out.write(str.encode(line))
             f_out.write(str.encode("\n"))
-    f_out.close()
- 
-    with gzip.open(
-            os.path.join(
-                paths.RELATIONS_WITH_PROVENANCES_PATH, 
-                   "relations_w_provenances.tsv.gz"), "w") as f_out:
-     
         _missing, _processed = generate_relation_to_provenances(relations, 
                                                 relation2prov, 
                                                 f_out)
         print(_missing, _processed)
-        # len of processed is the same length
     f_out.close()
 
 def make_expression_sets(relation_dictionary):
@@ -245,7 +237,9 @@ def index_step():
     with gzip.open(os.path.join(paths.INDEX_PATH_EXPERIMENTAL, "provenances.tsv.gz"), "wb") as f_out:
         for suid in suid2puid:
             for puid, w in suid2puid[suid]:
-                lines.append("\t".join( [str(suid), str(puid), str(w)] ))
+                # ('something', 'close to', 'hermione')    harrypotter2.txt_1302    0.5
+                line = "\t".join( [str(suid), str(puid), str(w)] )
+                lines.append(line)
         f_out.write(("\n".join(lines)).encode())
         print("LINES: ", len(lines))
         _missing, _processed = gen_sim_suid2puid_exp(suids, suid2puid, out_file=f_out)
@@ -257,5 +251,5 @@ def index_step():
     ### TODO: map suid_lines to provenance, see below gen_cooc_suid2puid
 
 if __name__ == "__main__":
-    index_step_experimental()
-    #index_step()
+    #index_step_experimental()
+    index_step()
