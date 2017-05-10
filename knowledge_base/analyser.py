@@ -8,10 +8,13 @@ class Analyser:
       - learning of rules from the perspective and its compressed counterpart
     """
 
-    def __init__(self, store: NeoMemStore, ptype: str, compute=True, mem=True, trace=False):
-        """
-        Initialising the class with an input matrix to be analysed.
-        """
+    def __init__(self, 
+                 store: NeoMemStore,
+                 ptype: str,
+                 compute=True,
+                 mem=True,
+                 trace=False):
+        """Initialising the class with an input matrix to be analysed."""
     
         self.trace = trace
         self.store = store
@@ -21,27 +24,27 @@ class Analyser:
         if compute:
             self.matrix = self.store.computePerspective(self.ptype)
             
-        # <expression>: {(close to, <expression2>): value}
+        # <token>: {(close to, <token2>): value}
         self.sparse = None
         
-        # (close to, <expression>): [<expressions>], essentially the reverse of self.sparse
+        # (close to, <token>): [<tokens>], essentially the reverse of self.sparse
         self.col2row = None
         # get an in-memory representation of the matrix
         if mem and trace:
             print("DEBUG - getting the sparse in-memory matrix")
             self.sparse, self.col2row = self.matrix.get_sparse_dict()
 
-    def similar_to(self, entity: str, top=100, minsim=0.001, sims2src={}):
+    def similar_to(self, token: str, top=100, minsim=0.001):
         """
-        Generates a list of (similar_entity,similarity) tuples for an input entity.
+        Generates a list of (similar_entity,similarity) tuples for an input token.
         sims2src is for storage of mapping pairs of similar things (or rather 
         their IDs) to the statements that were used for computing their similarity.
         """
     
-        if entity == None or not entity in self.sparse:
+        if token == None or not token in self.sparse:
             return []
         # the row vector of the sparse matrix (a column_index:weight dictionary)
-        row = self.sparse[entity]
+        row = self.sparse[token]
         un = math.sqrt(sum([row[expression]**2 for expression in row]))
         
         # promising holds all expressions that are possibly relevant
@@ -49,15 +52,15 @@ class Analyser:
         for col in row:
             promising |= self.col2row[col]
         if self.trace:
-            print("DEBUG@similar_to() - entity vector size        :", len(row))
+            print("DEBUG@similar_to() - token vector size        :", len(row))
             print("DEBUG@similar_to() - number of possibly similar:", len(promising))
         sim_vec = []
 
         # now check all possibly relevant expressions for actual relevancy
-        for possible_expression in promising:
+        for possible in promising:
             
             # ignore same, no reason to check
-            if possible_expression == entity:
+            if possible == token:
                 continue
             
             # container for statements that lead to particular similarities
@@ -67,26 +70,26 @@ class Analyser:
             this has the format:
                 ("close to / relevant to", <expression>): value
             """
-            compared_row = self.sparse[possible_expression]
+            compared_row = self.sparse[possible]
             # computing the actual similarity
             uv = 0.0
             vn = 0.0
             for expression in compared_row:
                 if expression in row:
-                    tmp = row[expression]*compared_row[expression]
+                    tmp = row[expression] * compared_row[expression]
                     uv += tmp
+                related_to, token2 = expression
                 # updating the statements used information
                 if self.ptype == 'LAxLIRA':
-                    statements_used.add((entity, expression[0], expression[1]))
-                    statements_used.add((possible_expression, expression[0], expression[1]))
+                    statements_used.add( (token, related_to, token2) )
+                    statements_used.add( (possible, related_to, token2) )
                 vn += compared_row[expression]**2
             vn = math.sqrt(vn)
             sim = float(uv)/(un*vn)
             if math.fabs(sim) >= minsim:
                 # add only if similarity crosses the threshold (adding code 
                 # translated from the sparse representation row index)
-                sim_vec.append((sim, possible_expression))
-                sims2src[(entity, possible_expression)] = statements_used
+                sim_vec.append((sim, possible))
         if self.trace:
             print("DEBUG@similar_to() - number of actually similar:", len(sim_vec))
             print("DEBUG@similar_to() - sorting and converting the results now")

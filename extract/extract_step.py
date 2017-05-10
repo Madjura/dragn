@@ -107,10 +107,10 @@ def extract_step(text_path: str = paths.TEXT_PATH):
                 ### {'study': {0}, 'temperament': {0}}
                 text2sentence = text2cooc(pos_tagged_parsed)
                                 
-                closeness_list = generate_source(text2sentence, text + "_" + str(count))
+                closeness_list = generate_source(
+                    text2sentence, 
+                    paragraph_id = "{}_{}".format(text, count))
                 closeness.append(closeness_list)
-                pickle.dump(text2sentence, open(paths.TOKEN_TO_SENTENCE_PATH + "/" \
-                            + str(new_paragraph.paragraph_id) + text + ".t2s", "wb"))
             
             pickle.dump(paragraph_list, open(paths.POS_PATH + "/" + text + ".p", "wb"))
     pickle.dump(closeness, open(paths.CLOSENESS_PATH + "/" + "closeness.p", "wb"))         

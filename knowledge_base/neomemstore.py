@@ -34,15 +34,11 @@ class NeoMemStore(object):
         self.lexicon = defaultdict(int)
         
         # <Expression> close to <Expression2>, ParagraphID: Closeness value
-        ### apparently this requires a fourth-dimensional matrix
-        ### essentially what a rank 4 tensor is
-        self.sources = Tensor(rank=4)
+        self.relations = Tensor(rank=4)
         
         # <Expression> close to <Expression2>: Value
-        ### rank 3 is essentially a 3d matrix
         self.corpus = Tensor(rank=3)
         
-        ### rank 2 is just a matrix
         self.perspectives = dict([(x, Tensor(rank=2)) for x in PERSP_TYPES])
 
     def incorporate(self, closenesses: ["Closeness"]):
@@ -62,7 +58,7 @@ class NeoMemStore(object):
                                 closeness.paragraph_id]
                 key = (closeness.term, "close to", closeness.close_to, 
                        closeness.paragraph_id)
-                self.sources[key] = closeness.closeness
+                self.relations[key] = closeness.closeness
         self.update_lexicon(expressions)
                 
     def update_lexicon(self, items: [str]):
@@ -79,55 +75,58 @@ class NeoMemStore(object):
                 items: A list of expressions the lexicon is being updated with.
         """
         
-        if type(items) is str:
-            items = list(items)
         for item in items:
             self.lexicon[item] += 1
             
     def compute_corpus(self):
+        """
+        Computes the corpus based on the relation tuples.
+        The corpus is a dictionary mapping the relation tuples to their mutual
+        information score, multiplied by their joint frequency.
+        """
         
         # a list of tuples in the format (token, close to, other, paragraph)
-        relation_tuples = self.sources.keys()
+        relation_tuples = self.relations.keys()
         
         # required for the mutual information score
         relation_count = len(relation_tuples)
         
-        # x -> number of independednt occurences in the store
+        # x -> number of independant occurences
         indep_freq = defaultdict(int)
         
-        # (x,y) -> number of joint occurences in the store
+        # (x, y) -> number of joint occurences
         joint_freq = defaultdict(int)
         
-        # (subject,predicate,objecT) -> (provenance, relevance)
-        # subject, predicate, object mapped to provenance, relevance
-        spo2pr = defaultdict(lambda: [])
+        # (token,related_to,token2) -> (provenance, relevance)
+        # token, related_to, object mapped to provenance, relevance
+        relation2provs = defaultdict(lambda: [])
         
-        # going through all the statements in the sources
-        for subject, predicate, objecT, paragraph_id in relation_tuples:
-            indep_freq[subject] += 1
-            indep_freq[objecT] += 1
-            joint_freq[(subject, objecT)] += 1
-            spo2pr[(subject, predicate, objecT)].append(
-                (paragraph_id, 
-                 self.sources[(subject, predicate, objecT, paragraph_id)]
+        # going through all the statements in the relations
+        for token, related_to, token2, provenance in relation_tuples:
+            indep_freq[token] += 1
+            indep_freq[token2] += 1
+            joint_freq[(token, token2)] += 1
+            relation2provs[(token, related_to, token2)].append(
+                (provenance, 
+                 self.relations[(token, related_to, token2, provenance)]
                  ))
         # going only through the unique triples now regardless of their provenance
-        for subject, predicate, objecT in spo2pr:
-            # get the relevances for subject, predicate, object tuples
+        for token, related_to, token2 in relation2provs:
+            # get the relevances for token, related_to, object tuples
             # this is the Closeness.closeness value
-            relevancy = [x[1] for x in spo2pr[(subject,predicate,objecT)]]
-            # get the joint frequency of subject and object
-            joint = joint_freq[(subject, objecT)]
+            relevancy = [x[1] for x in relation2provs[(token,related_to,token2)]]
+            # get the joint frequency of token and object
+            joint = joint_freq[(token, token2)]
             
             # also get the joint frequency for the other way around
-            if (objecT, subject) in joint_freq:
-                joint += joint_freq[(objecT, subject)]
+            if (token2, token) in joint_freq:
+                joint += joint_freq[(token2, token)]
                 
             # frequency times mutual information score
-            fMI = joint_freq[(subject, objecT)] * log(float(relation_count * joint) / (indep_freq[subject] * indep_freq[objecT]), 2)
+            fMI = joint_freq[(token, token2)] * log(float(relation_count * joint) / (indep_freq[token] * indep_freq[token2]), 2)
 
             # setting the corpus tensor value
-            self.corpus[(subject, predicate, objecT)] = fMI * (float(sum(relevancy))/len(relevancy))
+            self.corpus[(token, related_to, token2)] = fMI * (float(sum(relevancy))/len(relevancy))
             
     def normalise_corpus(self, cut_off=0.95, min_quo=0.1):
         """
@@ -174,14 +173,14 @@ class NeoMemStore(object):
             self.corpus[key] = w
             
     def export(self, path=paths.MEMSTORE_PATH_EXPERIMENTAL):
-        """Exports the lexicon, sources and corpus and writes them to disk."""
+        """Exports the lexicon, relations and corpus and writes them to disk."""
         
         with (gzip.open(path + "/lexicon.tsv.gz" , "w")) as lex_f:
                 self.lexicon_to_file(lex_f)
         lex_f.close()
         
-        with (gzip.open(path + "/sources.tsv.gz", "w")) as src_f:
-            self.sources.to_file(src_f)
+        with (gzip.open(path + "/relations.tsv.gz", "w")) as src_f:
+            self.relations.to_file(src_f)
         src_f.close()
         
         with (gzip.open(path + "/corpus.tsv.gz", "w")) as crp_f:
@@ -189,14 +188,14 @@ class NeoMemStore(object):
         crp_f.close()
         
     def import_memstore(self, path=paths.MEMSTORE_PATH_EXPERIMENTAL):
-        """Imports the lexicon, sources and corpus from disk."""
+        """Imports the lexicon, relations and corpus from disk."""
         
-        with (gzip.open(path + "/lexicon.tsv.gz", "rb")) as lexicon_file:
+        with (gzip.open(path + "/lexicon.tsv.gz", "r")) as lexicon_file:
             self.lexicon_from_file(lexicon_file)
         lexicon_file.close()
         
-        with (gzip.open(path + "/sources.tsv.gz", "rb")) as sources_file:
-            self.sources.from_file(sources_file)
+        with (gzip.open(path + "/relations.tsv.gz", "rb")) as sources_file:
+            self.relations.from_file(sources_file)
         sources_file.close()
         
         with (gzip.open(path + "/corpus.tsv.gz", "rb")) as corpus_file:
@@ -204,30 +203,35 @@ class NeoMemStore(object):
         corpus_file.close()
         
     def lexicon_to_file(self, out_file):
-        # exporting a lexicon - inverse to import
-        for phrase, frequency in self.lexicon.items():
-            line = '\t'.join( [ phrase, str(frequency)] ) + '\n'
-            out_file.write(str.encode(line))
-        out_file.flush()
-        os.fsync(out_file.fileno())
+        """
+        Writes the lexicon dictionary to a file in the format:
+            token\tfrequency\n
+            
+            Args:
+                out_file: The file that is being written to.
+        """
         
-    def lexicon_from_file(self, filename):
-        # import a lexicon from a tab-separated file (including the index mapping
-        # and frequency of the token); expected format: token index frequency
-        # assuming a file object
+        for token, frequency in self.lexicon.items():
+            line = "\t".join([token, str(frequency)])
+            out_file.write(str.encode(line))
+            out_file.write(str.encode("\n"))
+        
+    def lexicon_from_file(self, lexicon_file):
+        """
+        Loads the lexicon from a file.
+        
+            Args:
+                lexicon_file: The file that is being loaded in.
+        """
+        
         weird_lines = []
-        tmp = str(filename.read())
-        tmp = tmp.replace("\\t", "\t")
-        tmp = tmp.split("\\n")
-        lines = tmp
-        for line in lines:
-            separated = line.split("\t")
-            if len(separated) != 2:
+        for line in lexicon_file.read().decode().split("\n"):
+            line_split = line.split("\t")
+            if len(line_split) != 2:
                 weird_lines.append(line)
                 continue
-            expression = separated[0]
-            frequency = int(separated[1])
-            self.lexicon[expression] = frequency
+            expression, frequency = line_split
+            self.lexicon[expression] = int(frequency)
         print("NUMBER OF WEIRD LINES: ", len(weird_lines), weird_lines)
         
     def sorted(self, ignored=None, limit=0):

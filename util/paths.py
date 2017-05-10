@@ -9,9 +9,6 @@ PARAGRAPHS_PATH = MAIN_FOLDER + "/paragraphs"
 # Path to where the POS tagged text / sentence chunks are
 POS_PATH = MAIN_FOLDER + "/pos"
 
-# Path to the token -> sentence id mapping
-TOKEN_TO_SENTENCE_PATH = MAIN_FOLDER + "/term2sentence"
-
 # Path the closeness file
 # Pickled list of a list of Closeness objects
 CLOSENESS_PATH = MAIN_FOLDER + "/closeness"
@@ -37,7 +34,6 @@ ALL = [
     TEXT_PATH,
     PARAGRAPHS_PATH,
     POS_PATH,
-    TOKEN_TO_SENTENCE_PATH,
     CLOSENESS_PATH,
     MEMSTORE_PATH_EXPERIMENTAL,
     SUIDS_PATH_EXPERIMENTAL,

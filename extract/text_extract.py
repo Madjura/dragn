@@ -49,7 +49,6 @@ def split_paragraphs(text: str) -> [str]:
     # get the final paragraph
     if current_paragraph:
         paragraphs.append(" ".join(current_paragraph))
-        
     return paragraphs
 
 
@@ -125,23 +124,20 @@ def text2cooc(pos_dictionary: {int, (str, str)}, add_verbs=True) -> {str, list}:
         try:
             tree = parser_cmp.parse(pos_dictionary[sentence_id])
         except ValueError:
-            # TODO: logging
-            print("Strange line detected - omitting")
             continue
         # getting the top-level tree triples and decomposing the NPs
         cmp_triples, simple_trees = get_cooc([tree], stoplist=False)
         smp_triples, _ = get_cooc(simple_trees, stoplist=True)
         
         # updating the inverse occurrence index with NPs 
-        for subject, _, objecT in cmp_triples + smp_triples:
-            if subject.lower() not in term2sentence_id:
-                term2sentence_id[subject.lower()] = set()
-            if objecT.lower() not in term2sentence_id:
-                term2sentence_id[objecT.lower()] = set()
+        for token, _, token2 in cmp_triples + smp_triples:
+            if token.lower() not in term2sentence_id:
+                term2sentence_id[token.lower()] = set()
+            if token2.lower() not in term2sentence_id:
+                term2sentence_id[token2.lower()] = set()
                 
-            term2sentence_id[subject.lower()].add(sentence_id)
-            term2sentence_id[objecT.lower()].add(sentence_id)
-            
+            term2sentence_id[token.lower()].add(sentence_id)
+            term2sentence_id[token2.lower()].add(sentence_id)
     return term2sentence_id
     
 
@@ -151,7 +147,8 @@ def get_cooc(chunk_trees, stoplist=True):
     
         Args:
             chunk_trees: Tree from the NLTK RegexParser.
-            stoplist: Whether or not stopwords are to be removed.
+            stoplist: Optional. Default: True.
+                Whether or not stopwords are to be removed.
     """
     
     triples = []
@@ -168,8 +165,6 @@ def get_cooc(chunk_trees, stoplist=True):
                 simple_trees.append(parser_simple.parse(chunk.leaves()))
                 words = []
                 for word, tag in chunk:
-                    # stem/discard elements and construct an argument
-                    # old:  (len([x for x in word if x.isalnum()]) == 0)
                     if (stoplist and word in stopwords.words("english")) or \
                         (not any(char.isalnum() for char in word)):
                         # do not process stopwords for simple trees, do not process purely 
@@ -189,7 +184,10 @@ def get_cooc(chunk_trees, stoplist=True):
     return triples, simple_trees
 
 
-def generate_source(token2sentences, paragraph_id: int, distance_threshhold=5, \
+def generate_source(token2sentences,
+                    *,
+                    paragraph_id: int = None, 
+                    distance_threshhold=5,
                     weight_threshold = 1/3) -> [Closeness]:
     """
     Generates source/statement (srcstm) for following steps.

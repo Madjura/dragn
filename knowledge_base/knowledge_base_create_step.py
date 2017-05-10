@@ -72,8 +72,7 @@ def knowledge_base_create():
                     value from 4).
                 3.5.3) If the new weight is greater or equal 1, set it to 1.0.
                 3.5.4) Replace the old weight with the new one from step 5.
-        4) Then write the memstore object to the disk.
-                    
+        4) Then write the memstore object to the disk.            
     """
     
     memstore = NeoMemStore()

@@ -69,7 +69,7 @@ def index_step_experimental():
     memstore.import_memstore(paths.MEMSTORE_PATH_EXPERIMENTAL)
     relation_dictionary = make_relation_list(memstore.corpus.items())
     make_expression_sets(relation_dictionary)
-    generate_relation_values(memstore.sources, memstore.corpus)
+    generate_relation_values(memstore.relations, memstore.corpus)
     
 
 def index_step():
@@ -107,7 +107,7 @@ def index_step():
                     format:
                         token, token2, weight
         5) Take the result of 3) and process it as follows:
-            5.1) Iterate over memstore.sources.
+            5.1) Iterate over memstore.relations.
                 Format is:
                     {(token, relation, other_token, provenance): 
                         Closeness.closeness, ...}
@@ -230,7 +230,7 @@ def index_step():
     # WHY
     # I MEAN JUST WHY WOULD YOU DO THAT
     suids = load_suids(paths.SUIDS_PATH_EXPERIMENTAL + "/suids.tsv.gz")
-    suid2puid = gen_cooc_suid2puid_exp(memstore.sources, suids) # TODO: RENAME
+    suid2puid = gen_cooc_suid2puid_exp(memstore.relations, suids) # TODO: RENAME
     print("LEN SUIDS: ", len(suids))
     print("LEN SUID2PUID: ", len(suid2puid))
     lines = []

@@ -11,6 +11,7 @@ class Paragraph(object):
             paragraph_id: The id (position) of the paragraph in the text.
             sentences: A list of sentences in the paragraph.
         """
+        
         self.paragraph_id = paragraph_id
         self.sentences = sentences
         self.text = text

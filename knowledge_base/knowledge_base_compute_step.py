@@ -2,7 +2,7 @@ from util import paths
 from knowledge_base.analyser import Analyser
 from knowledge_base.neomemstore import NeoMemStore
  
-def knowledge_base_compute():
+def knowledge_base_compute(top=10):
     """
     In this step, expressions related to other expressions are identified and 
     stored in the NeoMemStore.
@@ -72,30 +72,24 @@ def knowledge_base_compute():
             to the disk.
     """
     
-    #STEP 3
-    ### NEW AND EXPERIMENTAL
     memstore = NeoMemStore()
     memstore.import_memstore(paths.MEMSTORE_PATH_EXPERIMENTAL)
     memstore.computePerspective("LAxLIRA")
     analyser = Analyser(memstore, "LAxLIRA", compute=False, trace=True)
-    SIM_LIM = 10
     
     tokens = [x for x in memstore.sorted(ignored=".*_[0-9]+$|related to|close to")]
     
     # holds similarity statements - <expression> related to <expression2>: value
-    similarity_dictionary = {}
     ###top_value = (0, 0, 0)
+    similarity_dictionary = {}
     for i, token1 in enumerate(tokens):
         print(i , " out of ", len(tokens))
-        sims2src = {} ### THIS SEEMS SUPER USELESS - does nothing in the original either!
-        similar = analyser.similar_to(token1, top=SIM_LIM, sims2src=sims2src)
-        for token2, s in similar:
-            if not ((token1, "related to", token2) in similarity_dictionary or (token2, "related to", token1) in similarity_dictionary): ### fix here april4, token1 was token2 in second block
-                similarity_dictionary[(token1, "related to", token2)] = s
-            #==================================================================
-            # if s > top_value[0]:
-            #     top_value = (s, token1, token2)
-            #==================================================================
+        similar = analyser.similar_to(token1, top=top)
+        for token2, weight in similar:
+            relation1 = (token1, "related to", token2)
+            relation2 = (token2, "related to", token1)
+            if not any(r in similarity_dictionary for r in [relation1, relation2]):
+                similarity_dictionary[(token1, "related to", token2)] = weight
     for key, value in similarity_dictionary.items():
         memstore.corpus[key] = value
     memstore.export(paths.MEMSTORE_PATH_EXPERIMENTAL + "/")
