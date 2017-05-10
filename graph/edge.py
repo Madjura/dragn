@@ -2,11 +2,13 @@ from graph.exceptions import MissingSourceEndError
 
 
 class Edge(object):
-    """
-    Edges of a graph.
-    """
+    """Edges of a graph."""
     
-    def __init__(self, start: int = None, end: int = None, val: int = 0,
+    def __init__(self,
+                 *,
+                 start: int = None, 
+                 end: int = None, 
+                 val: int = 0,
                  color=None):
         """
         Constructor

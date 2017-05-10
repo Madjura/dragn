@@ -446,11 +446,12 @@ class MemStoreQueryResult:
                 else:
                     edge = pydot.Edge(graph_nodes[s], graph_nodes[o], color=edge_col, weight=edge_wgh)
                 self.visualization_dictionary['STMTS'].add_edge(edge)
-                graph_edge = Edge(graph_nodes[s], graph_nodes[o], color=edge_col)
+                graph_edge = Edge(start=graph_nodes[s], end=graph_nodes[o],
+                                  color=edge_col)
                 graph_nodes[s].add_edge_object(graph_edge)
                 num_edges += 1
                 
-        return Graph(graph_nodes.values())
+        return Graph(nodes=graph_nodes.values())
         # print 'DEBUG -- number of STMTS graph nodes:', \
         #  len(self.visualization_dictionary['STMTS'].get_node_list())
         # print 'DEBUG -- number of TERMS graph edges:', \

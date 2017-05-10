@@ -4,11 +4,7 @@ import json
 class Graph(object):
     """Simple graph with nodes and edges."""
 
-    def __init__(self, nodes: ["Node"] = None):
-        '''
-        Constructor
-        '''
-        
+    def __init__(self, *, nodes: ["Node"] = None):
         if nodes is not None:
             self.nodes = nodes
         else:

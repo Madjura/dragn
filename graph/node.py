@@ -2,12 +2,15 @@ from graph.edge import Edge
 from graph.exceptions import DuplicateEdgeError
 
 class Node(object):
-    """
-    Node of a graph.
-    """
+    """Node of a graph."""
 
-    def __init__(self, name: str, edges: [Edge] = None, color = None,
-                 width = None, label_size = None):
+    def __init__(self, 
+                 name: str, 
+                 *, 
+                 edges: [Edge] = None, 
+                 color = None,
+                 width = None, 
+                 label_size = None):
         """
         Constructor
         
@@ -33,24 +36,10 @@ class Node(object):
         self.width = width
         self.label_size = label_size
         
-    def add_edge(self, end: int = None, val: int = 0):
-        """
-        Adds an edge to this node.
-            
-            Args:
-                end: The end node.
-                val: The value of the edge. Default: 0.
-        """
-        
-        if end is None:
-            return "End must be set"
-        
-        self.edges.append(Edge(self, end, val))
-        
     def add_edge_object(self, edge: Edge):
         self.edges.append(edge)
         
-    def get_edge(self, end: int = None):
+    def get_edge(self, *, end: int = None):
         """
         Returns the edge from this node to the target node.
         
@@ -81,7 +70,7 @@ class CytoNode(Node):
     overlap.
     """
     
-    def add_edge_object(self, edge:Edge):
+    def add_edge_object(self, edge: Edge):
         """
         Adds an edge to the node.
         This function checks whether a duplicate edge already exists. This
@@ -98,10 +87,10 @@ class CytoNode(Node):
                     the edges.
         """
         
-        duplicate = self.get_edge(edge.end)
+        duplicate = self.get_edge(end=edge.end)
         back_edge = False
         if not duplicate:
-            duplicate = edge.end.get_edge(self)
+            duplicate = edge.end.get_edge(end=self)
             back_edge = True
         if duplicate:
             if duplicate.color != edge.color:

@@ -215,8 +215,10 @@ class QueryResult(object):
             node_color = self.visualization_parameters["node color"]
             if token in self.queried:
                 node_color = "green"
-            graph_nodes[token] = CytoNode(name=token, color=node_color,
-                                         width=node_width, label_size=font_size)
+            graph_nodes[token] = CytoNode(name=token, 
+                                          color=node_color,
+                                          width=node_width,
+                                          label_size=font_size)
         return graph_nodes
     
     def generate_statement_graph(self, max_nodes, max_edges):
@@ -241,10 +243,11 @@ class QueryResult(object):
             if token in nodes and token2 in nodes:
                 if related_to in self.visualization_parameters["edge color"]:
                     edge_color = self.visualization_parameters["edge color"][related_to]
-                graph_edge = Edge(nodes[token], nodes[token2], color=edge_color)
+                graph_edge = Edge(start=nodes[token], end=nodes[token2],
+                                  color=edge_color)
                 nodes[token].add_edge_object(graph_edge)
         print("RETURNING GRAPH")
-        return Graph(nodes.values())
+        return Graph(nodes=nodes.values())
     
     def load_token2related(self):
         """Loads the mapping of tokens to the related tokens."""
