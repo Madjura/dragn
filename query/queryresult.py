@@ -45,15 +45,28 @@ class QueryResult(object):
         return relation2prov
     
     def prepare_for_query(self):
-        """Returns a FuzzySet containing tokens relevant to the query."""
+        """Returns original FuzzySet containing tokens relevant to the query."""
         
+        import time
+        start = time.time()
         relation_sets = self.load_relation_sets()
-        #self.queried = [x for x in relation_sets.keys() if any(y in x for y in query)]
+        for token in relation_sets.keys():
+            original = self.check_query_relevance(token)
+            if original:
+                # tokens are other tokens that contain a queryterm
+                # original is a set from self.queried, of the queryterms that are contained in token
+                self.queried_combined[token].update(original)
+                for original_term in original:
+                    self.aliases[original_term].add(token)
         query_relevant = FuzzySet()
+        loose_relevant = FuzzySet()
         for term in self.queried:
             # x are tuples of (token2, weight)
             query_relevant = query_relevant | FuzzySet([x for x in relation_sets[term]])
-        return query_relevant
+        for term in self.queried_combined.keys():
+            loose_relevant = loose_relevant | FuzzySet([x for x in relation_sets[term]])
+        print("prepare for query took {}".format(time.time() - start))
+        return query_relevant, loose_relevant
     
     def filter_relevant(self, relevant: FuzzySet):
         """
@@ -137,8 +150,9 @@ class QueryResult(object):
         provenance_relations = defaultdict(float)
         
         # all relation tuples containing query terms, with weight above threshhold
-        relevant_cut = self.filter_relevant(self.prepare_for_query())
-
+        _query_relevant, loose_relevant = self.prepare_for_query()
+        #relevant_cut = self.filter_relevant(query_relevant)
+        relevant_cut = self.filter_relevant(loose_relevant)
         # iterate over the tokens relevant to the query
         for possibly_related in relevant_cut:
             
@@ -148,6 +162,8 @@ class QueryResult(object):
                 
                 # find the relation tuples that contain "possibly_related" and
                 # a term from the query
+                ### TODO: change back to .queried
+                #if not (token in self.queried_combined or token2 in self.queried_combined):
                 if not (token in self.queried or token2 in self.queried):
                     # random relation that does not have any relevance to the query
                     continue
@@ -194,7 +210,6 @@ class QueryResult(object):
             Args:
                 max_nodes: The maximum number of nodes.
         """
-        
         # get and sort the relevant tokens by weight
         token_list = list(self.tokens2weights.items())
         token_list.sort(key=lambda x: x[1], reverse=True)
@@ -213,8 +228,25 @@ class QueryResult(object):
                 node_width = 0.4
             font_size = int(24 * node_width)
             node_color = self.visualization_parameters["node color"]
+            #if token in self.queried_combined:
             if token in self.queried:
                 node_color = "green"
+                # all the query terms relevant to this token
+                #==============================================================
+                # original_query_terms = self.queried_combined[token]
+                # if not DEBUG:
+                #     continue
+                # for original in original_query_terms:
+                #     if original in graph_nodes:
+                #         # TODO: use @property to prevent giga width
+                #         graph_nodes[original].width += node_width
+                #         continue
+                #     graph_nodes[original] = CytoNode(name=original, 
+                #                           color=node_color,
+                #                           width=node_width,
+                #                           label_size=font_size)
+                #==============================================================
+            #token = self.check_alias(token)
             graph_nodes[token] = CytoNode(name=token, 
                                           color=node_color,
                                           width=node_width,
@@ -243,9 +275,12 @@ class QueryResult(object):
             if token in nodes and token2 in nodes:
                 if related_to in self.visualization_parameters["edge color"]:
                     edge_color = self.visualization_parameters["edge color"][related_to]
+                #token = self.check_alias(token)
+                #token2 = self.check_alias(token2)
                 graph_edge = Edge(start=nodes[token], end=nodes[token2],
                                   color=edge_color)
                 nodes[token].add_edge_object(graph_edge)
+                edge_count += 2
         print("RETURNING GRAPH")
         return Graph(nodes=nodes.values())
     
@@ -286,8 +321,23 @@ class QueryResult(object):
             }
         return parameters
     
+    def check_query_relevance(self, token):
+        expanded_relevancy = set()
+        for check in self.queried:
+            if check in token:
+                expanded_relevancy.add(check)
+        return expanded_relevancy
+    
+    def check_alias(self, token):
+        for alias in self.aliases.keys():
+            if token in self.aliases[alias]:
+                return alias
+        return token
+    
     def __init__(self, queried=None, min_weight=0.5):
         self.queried = queried
+        self.queried_combined = defaultdict(lambda: set())
+        self.aliases = defaultdict(lambda: set())
         self.tokens2weights = defaultdict(int)
         self.relation_set = FuzzySet()
         self.provenance_set = FuzzySet()
