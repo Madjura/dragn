@@ -9,9 +9,10 @@ from query.queryresult import QueryResult
 
 
 def query(query=[], queryname=None, max_nodes=25, max_edges=50):
-    foo = QueryResult(query)
+    foo = QueryResult()
+    foo.query = query
     foo.populate_dictionaries()
-    return foo.generate_statement_graph(max_nodes, max_edges)
+    return foo
     
     if not queryname:
         queryname = str(uuid.uuid4())

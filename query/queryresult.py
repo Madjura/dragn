@@ -10,11 +10,24 @@ from graph.edge import Edge
 from graph.graph import Graph
 from math import log
 
+
 class QueryResult(object):
     """
     Wrapper over the processed text files to produce a graph in JSON
     format that can be displayed to the user.
     """
+    
+    def __init__(self, min_weight=0.5):
+        self.query = None
+        self.queried_combined = defaultdict(lambda: set())
+        self.aliases = defaultdict(lambda: set())
+        self.tokens2weights = defaultdict(int)
+        self.relation_set = FuzzySet()
+        self.provenance_set = FuzzySet()
+        # minimum weight that relations must have to be considered
+        self.min_weight = min_weight
+        self.relations = self.load_token2related()
+        self.visualization_parameters = self.load_parameters()
     
     def load_relation2prov(self,
                          path=os.path.join(
@@ -54,13 +67,13 @@ class QueryResult(object):
             original = self.check_query_relevance(token)
             if original:
                 # tokens are other tokens that contain a queryterm
-                # original is a set from self.queried, of the queryterms that are contained in token
+                # original is a set from self.query, of the queryterms that are contained in token
                 self.queried_combined[token].update(original)
                 for original_term in original:
                     self.aliases[original_term].add(token)
         query_relevant = FuzzySet()
         loose_relevant = FuzzySet()
-        for term in self.queried:
+        for term in self.query:
             # x are tuples of (token2, weight)
             query_relevant = query_relevant | FuzzySet([x for x in relation_sets[term]])
         for term in self.queried_combined.keys():
@@ -108,27 +121,6 @@ class QueryResult(object):
                 relations[token].append(relation_tuple)
         return relations
     
-    def generate_fuzzy_set(self, dictionary):
-        """
-        Generates a FuzzySet from a dictionary.
-        CURRENTLY UNUSED. POSSIBLY USELESS.
-        """
-        
-        fuzzy_set = FuzzySet()
-        if len(dictionary) == 0:
-            return fuzzy_set
-        norm_const = max(list(dictionary.values()))
-        if norm_const <= 0:
-            norm_const = 1.0
-        for member, weight in list(dictionary.items()):
-            w = float(weight) / norm_const
-            if w > 1:
-                w = 1
-            if w < 0:
-                w = 0
-            fuzzy_set[member] = w
-        return fuzzy_set
-    
     def populate_dictionaries(self):
         """
         Prepares the ranking of tokens / relations for use with the graph.
@@ -150,9 +142,9 @@ class QueryResult(object):
         provenance_relations = defaultdict(float)
         
         # all relation tuples containing query terms, with weight above threshhold
-        _query_relevant, loose_relevant = self.prepare_for_query()
+        _query_relevant, _loose_relevant = self.prepare_for_query()
         #relevant_cut = self.filter_relevant(query_relevant)
-        relevant_cut = self.filter_relevant(loose_relevant)
+        relevant_cut = self.filter_relevant(_query_relevant)
         # iterate over the tokens relevant to the query
         for possibly_related in relevant_cut:
             
@@ -162,9 +154,9 @@ class QueryResult(object):
                 
                 # find the relation tuples that contain "possibly_related" and
                 # a term from the query
-                ### TODO: change back to .queried
+                ### TODO: change back to .query
                 #if not (token in self.queried_combined or token2 in self.queried_combined):
-                if not (token in self.queried or token2 in self.queried):
+                if not (token in self.query or token2 in self.query):
                     # random relation that does not have any relevance to the query
                     continue
                 
@@ -193,13 +185,13 @@ class QueryResult(object):
                     for (prov1, w1), (prov2, w2) in combinations(prov_tuple, 2):
                         w = membership * relation_weight * (w1 + w2) / 2
                         provenance_relations[(prov2, prov1)] += w
-        #self.relation_set = self.generate_fuzzy_set(relation_dict)
+        #self.relation_set = self.from_dictionary(relation_dict)
         self.relation_set = relation_dict
         print("SUID DICT LENGTH OLD: ", len(relation_dict))
         print("SUID SET LENGTH OLD: ", len(self.relation_set))
         
         # UNUSED CURRENTLY
-        self.provenance_set = self.generate_fuzzy_set(provenance_dict)
+        self.provenance_set = FuzzySet.from_dictionary(provenance_dict)
         print("PUID DICT LENGTH OLD: ", len(provenance_dict))
         print("PUID SET LENGTH OLD: ", len(self.provenance_set))
     
@@ -229,7 +221,7 @@ class QueryResult(object):
             font_size = int(24 * node_width)
             node_color = self.visualization_parameters["node color"]
             #if token in self.queried_combined:
-            if token in self.queried:
+            if token in self.query:
                 node_color = "green"
                 # all the query terms relevant to this token
                 #==============================================================
@@ -323,7 +315,7 @@ class QueryResult(object):
     
     def check_query_relevance(self, token):
         expanded_relevancy = set()
-        for check in self.queried:
+        for check in self.query:
             if check in token:
                 expanded_relevancy.add(check)
         return expanded_relevancy
@@ -334,19 +326,15 @@ class QueryResult(object):
                 return alias
         return token
     
-    def __init__(self, queried=None, min_weight=0.5):
-        self.queried = queried
-        self.queried_combined = defaultdict(lambda: set())
-        self.aliases = defaultdict(lambda: set())
-        self.tokens2weights = defaultdict(int)
-        self.relation_set = FuzzySet()
-        self.provenance_set = FuzzySet()
-        # minimum weight that relations must have to be considered
-        self.min_weight = min_weight
-        self.relations = self.load_token2related()
-        self.visualization_parameters = self.load_parameters()
+    def get_top_provenances(self, top=10):
+        tops = []
+        for item in self.provenance_set.sort(reverse=True, limit=top):
+            tops.append(item)
+        return tops
         
 if __name__ == "__main__":
-    foo = QueryResult(["ron", "dumbledore"])
+    foo = QueryResult()
+    foo.query = ["harry",]
     foo.populate_dictionaries()
     foo.generate_statement_graph(50, 100)
+    foo.get_top_provenances()

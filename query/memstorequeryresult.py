@@ -31,7 +31,7 @@ class MemStoreQueryResult:
             Args:
                 name: The name of this object. Used when writing to disk.
                 tuid_set: TODO
-                queried: The query terms.
+                query: The query terms.
                     Default: Empty set.
                 fname_prefix: The prefix for all files written to the disk from
                     this object.
@@ -41,12 +41,12 @@ class MemStoreQueryResult:
         """
         
         # store index for generating the statements and provenances
-        # the TUIDs that were queried for (for filtering the relevant statements)
+        # the TUIDs that were query for (for filtering the relevant statements)
         
         ### suid2stmt maps tuple to tuple + weight
         ### relations is token: [other_token, relation, other_token2]
         self.suid2stmt, self.relations = self.load_token2related()
-        self.queried = queried
+        self.query = queried
         
         # result name and filenames for its storage
         self.name = name
@@ -206,8 +206,8 @@ class MemStoreQueryResult:
                 except KeyError:
                     print("KEYERROR")
                     continue ### TODO: investigate why this happens
-                if not (s in self.queried or o in self.queried):
-                    # don't process statements that are not related to the queried terms
+                if not (s in self.query or o in self.query):
+                    # don't process statements that are not related to the query terms
                     continue
                 # updating the result statement dict with the combined tuid/suid weight
                 self.relation_dict[suid] += tuid_weight * suid_weight
@@ -399,7 +399,7 @@ class MemStoreQueryResult:
               fontsize=str(font_size), \
               fixedsize=self.visualization_parameters['FIXED_SIZE']\
             )
-            if tuid in self.queried:
+            if tuid in self.query:
                 node_col = "green"
             graph_nodes[tuid] = CytoNode(name=tuid, color=node_col, 
                                      width=node_width, label_size=font_size)

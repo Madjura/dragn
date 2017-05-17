@@ -6,6 +6,8 @@ TEXT_PATH = MAIN_FOLDER + "/texts"
 # Path to where the paragraph files will be placed
 PARAGRAPHS_PATH = MAIN_FOLDER + "/paragraphs"
 
+PARAGRAPH_CONTENT_PATH = MAIN_FOLDER + "/paragraphs/contents"
+
 # Path to where the POS tagged text / sentence chunks are
 POS_PATH = MAIN_FOLDER + "/pos"
 

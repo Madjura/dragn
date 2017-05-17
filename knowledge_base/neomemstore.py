@@ -1,7 +1,6 @@
 from _collections import defaultdict
 from knowledge_base.tensor import Tensor
 from math import log
-import os
 import gzip
 import operator
 from util import paths

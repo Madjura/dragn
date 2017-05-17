@@ -1,4 +1,5 @@
 import sys
+from _decimal import Decimal
 
 ### TODO: modify this, currently 100% copy
 class FuzzySet:
@@ -154,3 +155,28 @@ class FuzzySet:
         for member in set(self.members.keys()) | set(other.members.keys()):
             result[member] = max(self.__getitem__(member),other[member])
         return result
+    
+    @staticmethod
+    def from_dictionary(dictionary):
+        """
+        Generates a FuzzySet from a dictionary.
+            
+            Args:
+                dictionary: A dictionary in which the values are numerical.
+            Returns:
+                A FuzzySet object with normalised weights based on the input
+                dictionary.
+        """
+        
+        membership = FuzzySet()
+        normalisation = Decimal(max(dictionary.values()))
+        if normalisation <= 0:
+            normalisation = Decimal(1)
+        for key, value in dictionary.items():
+            normalised = Decimal(value) / normalisation
+            if normalised > 1:
+                normalised = 1
+            if normalised < 0:
+                normalised = 0
+            membership[key] = value
+        return membership

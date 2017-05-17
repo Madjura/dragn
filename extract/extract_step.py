@@ -111,6 +111,9 @@ def extract_step(text_path: str = paths.TEXT_PATH):
                     text2sentence, 
                     paragraph_id = "{}_{}".format(text, count))
                 closeness.append(closeness_list)
+                
+                with open(paths.PARAGRAPH_CONTENT_PATH + "/{}_{}".format(text, count), "w", encoding="utf8") as content_file:
+                    content_file.write(paragraph)
             
             pickle.dump(paragraph_list, open(paths.POS_PATH + "/" + text + ".p", "wb"))
     pickle.dump(closeness, open(paths.CLOSENESS_PATH + "/" + "closeness.p", "wb"))         
