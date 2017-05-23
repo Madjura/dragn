@@ -3,6 +3,8 @@ MAIN_FOLDER = "../data"
 # Path to where the texts are placed
 TEXT_PATH = MAIN_FOLDER + "/texts"
 
+TEXT_META_PATH = MAIN_FOLDER + "/texts/meta"
+
 # Path to where the paragraph files will be placed
 PARAGRAPHS_PATH = MAIN_FOLDER + "/paragraphs"
 
@@ -34,7 +36,9 @@ RELATIONS_WITH_PROVENANCES_PATH = MAIN_FOLDER + "/relations/provenances"
 ALL = [
     MAIN_FOLDER,
     TEXT_PATH,
+    TEXT_META_PATH,
     PARAGRAPHS_PATH,
+    PARAGRAPH_CONTENT_PATH,
     POS_PATH,
     CLOSENESS_PATH,
     MEMSTORE_PATH_EXPERIMENTAL,

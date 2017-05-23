@@ -1,7 +1,8 @@
 from util import paths
 from knowledge_base.analyser import Analyser
 from knowledge_base.neomemstore import NeoMemStore
- 
+import pprint
+
 def knowledge_base_compute(top=10):
     """
     In this step, expressions related to other expressions are identified and 
@@ -82,6 +83,9 @@ def knowledge_base_compute(top=10):
     # holds similarity statements - <expression> related to <expression2>: value
     ###top_value = (0, 0, 0)
     similarity_dictionary = {}
+    foo = {}
+    similar = None
+    similar2similar = None
     for i, token1 in enumerate(tokens):
         print(i , " out of ", len(tokens))
         similar = analyser.similar_to(token1, top=top)
@@ -92,6 +96,25 @@ def knowledge_base_compute(top=10):
                 similarity_dictionary[(token1, "related to", token2)] = weight
     for key, value in similarity_dictionary.items():
         memstore.corpus[key] = value
+    
+    print("DONE WITH FIRST LOOP")
+    ### problem here is: similar is updated each iteration
+    ### mostly useless to do this here
+    ### better to do it in index/querystep
+    ### get the top N for query
+    ### for those top N, get the top relations too
+    ### then add them as a "bonus" with different color?
+    ### for each node after initial query, add the top 5 edges
+    ### then add the top 5 from those maybe? and so on
+    ### based on user input
+    for token1, _weight in similar:
+        similar2similar = analyser.similar_to(token1, top=top)
+        for token2, weight in similar2similar:
+            r1 = (token1, "related to", token2)
+            r2 = (token2, "related to", token1)
+            if not any (r in foo for r in [r1, r2]):
+                foo[(token1, "related to", token2)] = weight
+    pprint.pprint(foo)
     memstore.export(paths.MEMSTORE_PATH_EXPERIMENTAL + "/")
 
 

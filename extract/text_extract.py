@@ -94,7 +94,9 @@ def parse_pos(sentences: [Sentence]) -> {int, (str, str)}:
     return dictionary
 
 
-def text2cooc(pos_dictionary: {int, (str, str)}, add_verbs=True) -> {str, list}:
+def text2cooc(pos_dictionary: {int, (str, str)}, 
+              add_verbs=True,
+              language="english") -> {str, list}:
     """
     Processes the input dictionary in the format:
         {sentence_id: [(Token, POS-tag),}
@@ -115,7 +117,7 @@ def text2cooc(pos_dictionary: {int, (str, str)}, add_verbs=True) -> {str, list}:
                 # for more details see https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
                 if tag.startswith("VB"):
                     verb = lemmatizer.lemmatize(token, "v").lower()
-                    if verb not in stopwords.words("english"):
+                    if verb not in stopwords.words(language):
                         if verb not in term2sentence_id:
                             term2sentence_id[verb] = set()
                         term2sentence_id[verb].add(sentence_id)
@@ -126,8 +128,10 @@ def text2cooc(pos_dictionary: {int, (str, str)}, add_verbs=True) -> {str, list}:
         except ValueError:
             continue
         # getting the top-level tree triples and decomposing the NPs
-        cmp_triples, simple_trees = get_cooc([tree], stoplist=False)
-        smp_triples, _ = get_cooc(simple_trees, stoplist=True)
+        cmp_triples, simple_trees = get_cooc([tree], stoplist=False,
+                                             language=language)
+        smp_triples, _ = get_cooc(simple_trees, stoplist=True,
+                                  language=language)
         
         # updating the inverse occurrence index with NPs 
         for token, _, token2 in cmp_triples + smp_triples:
@@ -141,7 +145,7 @@ def text2cooc(pos_dictionary: {int, (str, str)}, add_verbs=True) -> {str, list}:
     return term2sentence_id
     
 
-def get_cooc(chunk_trees, stoplist=True):
+def get_cooc(chunk_trees, stoplist=True, language="english"):
     """
     Parses a chunk tree and gets co-occurance of terms.
     
@@ -165,7 +169,7 @@ def get_cooc(chunk_trees, stoplist=True):
                 simple_trees.append(parser_simple.parse(chunk.leaves()))
                 words = []
                 for word, tag in chunk:
-                    if (stoplist and word in stopwords.words("english")) or \
+                    if (stoplist and word in stopwords.words(language)) or \
                         (not any(char.isalnum() for char in word)):
                         # do not process stopwords for simple trees, do not process purely 
                         # non alphanumeric characters

@@ -10,8 +10,8 @@ function updateCy(elements) {
 	var cy = cytoscape({
 		  container: $("#cy"),
 		  boxSelectionEnabled: true,
-		  zoomingEnabled: false,
-		  userZoomingEnabled: false,
+		  zoomingEnabled: true,
+		  userZoomingEnabled: true,
 		  style: [
 		    {
 		      selector: 'node',

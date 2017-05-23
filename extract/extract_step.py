@@ -93,6 +93,9 @@ def extract_step(text_path: str = paths.TEXT_PATH):
             
             # take each paragraph, pos tag each paragraph content
             paragraph_list = []
+            with open(paths.TEXT_META_PATH + "/{}_meta".format(text), "w", 
+                      encoding="utf8") as metafile:
+                metafile.write("PARAGRAPHS: {}".format(len(paragraphs)))
             bar = progressbar.ProgressBar(max_value=len(paragraphs))
             for count, paragraph in enumerate(paragraphs):
                 bar.update(count)
@@ -112,11 +115,14 @@ def extract_step(text_path: str = paths.TEXT_PATH):
                     paragraph_id = "{}_{}".format(text, count))
                 closeness.append(closeness_list)
                 
-                with open(paths.PARAGRAPH_CONTENT_PATH + "/{}_{}".format(text, count), "w", encoding="utf8") as content_file:
+                with open(paths.PARAGRAPH_CONTENT_PATH + "/{}_{}".format(
+                        text, count), "w", encoding="utf8") as content_file:
                     content_file.write(paragraph)
             
-            pickle.dump(paragraph_list, open(paths.POS_PATH + "/" + text + ".p", "wb"))
-    pickle.dump(closeness, open(paths.CLOSENESS_PATH + "/" + "closeness.p", "wb"))         
+            pickle.dump(paragraph_list, 
+                        open(paths.POS_PATH + "/" + text + ".p", "wb"))
+    pickle.dump(closeness, 
+                open(paths.CLOSENESS_PATH + "/" + "closeness.p", "wb"))         
             
 if __name__ == "__main__":
     make_folders()

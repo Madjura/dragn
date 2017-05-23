@@ -49,7 +49,6 @@ class NeoMemStore(object):
         """
         
         expressions = []
-        
         # first pass: update lexicon with terms
         for paragraph_closeness in closenesses:
             for closeness in paragraph_closeness:
@@ -59,7 +58,8 @@ class NeoMemStore(object):
                        closeness.paragraph_id)
                 self.relations[key] = closeness.closeness
         self.update_lexicon(expressions)
-                
+            
+    
     def update_lexicon(self, items: [str]):
         """
         Helper function to fill the lexicon with how often each expression 

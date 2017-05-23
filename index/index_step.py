@@ -251,5 +251,5 @@ def index_step():
     ### TODO: map suid_lines to provenance, see below gen_cooc_suid2puid
 
 if __name__ == "__main__":
-    #index_step_experimental()
-    index_step()
+    index_step_experimental()
+    #index_step()
