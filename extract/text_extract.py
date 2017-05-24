@@ -182,6 +182,9 @@ def get_cooc(chunk_trees, stoplist=True, language="english"):
                         words.append(word)
                 if len(words) > 0:
                     entities.append("_".join(words))
+                    ### experimental
+                    entities.extend(words)
+                    print("EXTENDING WITH {}".format(words))
         for e1, e2 in combinations(entities, 2):
             triples.append((e1, "close to", e2))
             triples.append((e2, "close to", e1))

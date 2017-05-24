@@ -85,7 +85,7 @@ def extract_step(text_path: str = paths.TEXT_PATH):
         if not text.endswith(".txt"):
             # support different file types here
             continue
-        with (open(paths.TEXT_PATH + "/" + text, "r", encoding="utf8")) as current_text:
+        with (open(paths.TEXT_PATH + "/" + text, "r", encoding="ISO-8859-1")) as current_text:
             text_content = current_text.read()
             
             # split the text into paragraphs first
@@ -100,7 +100,8 @@ def extract_step(text_path: str = paths.TEXT_PATH):
             for count, paragraph in enumerate(paragraphs):
                 bar.update(count)
                 # make new paragraph, with pos-tagged sentence list
-                new_paragraph = Paragraph(count, pos_tag(paragraph), text)
+                pos = pos_tag(paragraph)
+                new_paragraph = Paragraph(count, pos, text)
                 paragraph_list.append(new_paragraph)
                 
                 # parse the pos-tagged sentences into the dictionary format
@@ -108,7 +109,8 @@ def extract_step(text_path: str = paths.TEXT_PATH):
                 pos_tagged_parsed = parse_pos(new_paragraph.sentences)
                 
                 ### {'study': {0}, 'temperament': {0}}
-                text2sentence = text2cooc(pos_tagged_parsed)
+                ### use this for index? TODO: investigate
+                text2sentence = text2cooc(pos_tagged_parsed, language="german")
                                 
                 closeness_list = generate_source(
                     text2sentence, 
