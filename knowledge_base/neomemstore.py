@@ -84,7 +84,7 @@ class NeoMemStore(object):
         information score, multiplied by their joint frequency.
         """
         
-        # a list of tuples in the format (token, close to, other, paragraph)
+        # a list of tuples in the format (subject, close to, other, paragraph)
         relation_tuples = self.relations.keys()
         
         # required for the mutual information score
@@ -96,36 +96,37 @@ class NeoMemStore(object):
         # (x, y) -> number of joint occurences
         joint_freq = defaultdict(int)
         
-        # (token,related_to,token2) -> (provenance, relevance)
-        # token, related_to, object mapped to provenance, relevance
+        # (subject,predicate,objecT) -> (provenance, relevance)
+        # subject, predicate, object mapped to provenance, relevance
         relation2provs = defaultdict(lambda: [])
         
         # going through all the statements in the relations
-        for token, related_to, token2, provenance in relation_tuples:
-            indep_freq[token] += 1
-            indep_freq[token2] += 1
-            joint_freq[(token, token2)] += 1
-            relation2provs[(token, related_to, token2)].append(
+        for subject, predicate, objecT, provenance in relation_tuples:
+            indep_freq[subject] += 1
+            indep_freq[objecT] += 1
+            joint_freq[(subject, objecT)] += 1
+            relation2provs[(subject, predicate, objecT)].append(
                 (provenance, 
-                 self.relations[(token, related_to, token2, provenance)]
+                 self.relations[(subject, predicate, objecT, provenance)]
                  ))
         # going only through the unique triples now regardless of their provenance
-        for token, related_to, token2 in relation2provs:
-            # get the relevances for token, related_to, object tuples
+        for subject, predicate, objecT in relation2provs:
+            # get the relevances for subject, predicate, object tuples
             # this is the Closeness.closeness value
-            relevancy = [x[1] for x in relation2provs[(token,related_to,token2)]]
-            # get the joint frequency of token and object
-            joint = joint_freq[(token, token2)]
+            relevancy = [x[1] for x in relation2provs[
+                (subject, predicate, objecT)]]
+            # get the joint frequency of subject and object
+            joint = joint_freq[(subject, objecT)]
             
             # also get the joint frequency for the other way around
-            if (token2, token) in joint_freq:
-                joint += joint_freq[(token2, token)]
+            if (objecT, subject) in joint_freq:
+                joint += joint_freq[(objecT, subject)]
                 
             # frequency times mutual information score
-            fMI = joint_freq[(token, token2)] * log(float(relation_count * joint) / (indep_freq[token] * indep_freq[token2]), 2)
+            fMI = joint_freq[(subject, objecT)] * log(float(relation_count * joint) / (indep_freq[subject] * indep_freq[objecT]), 2)
 
             # setting the corpus tensor value
-            self.corpus[(token, related_to, token2)] = fMI * (float(sum(relevancy))/len(relevancy))
+            self.corpus[(subject, predicate, objecT)] = fMI * (float(sum(relevancy))/len(relevancy))
             
     def normalise_corpus(self, cut_off=0.95, min_quo=0.1):
         """
@@ -162,7 +163,10 @@ class NeoMemStore(object):
         norm_cons = weights[int(cut_off * len(weights)):][0]
         
         # get the lowest positive value and multiply by min_quo
-        min_norm = min([x for x in weights if x > 0]) * min_quo
+        try:
+            min_norm = min([x for x in weights if x > 0]) * min_quo
+        except ValueError:
+            min_norm = min_quo
         for key in self.corpus:
             w = self.corpus[key]/norm_cons
             if w < 0:

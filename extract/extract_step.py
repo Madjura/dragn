@@ -16,7 +16,7 @@ def make_folders():
         if not os.path.exists(path):
             os.makedirs(path)
 
-def extract_step(text_path: str = paths.TEXT_PATH):
+def extract_step(text_path: str = paths.TEXT_PATH, language="english"):
     """
     Processes all files in a given folder.
     The process is as follows:
@@ -43,7 +43,7 @@ def extract_step(text_path: str = paths.TEXT_PATH):
                     - Check the distance (math.abs()) of the distances
                     - If it is below the threshhold (default 5), add 
                         the following to the current weight:
-                        1 + 1/(1 + distance)
+                        1/(1 + distance)
                         
                         Example for "Paul" and "the":
                             Position "0" from "Paul" and "0" from "the"
@@ -53,7 +53,8 @@ def extract_step(text_path: str = paths.TEXT_PATH):
                             Position "0" from "Paul" and "1" from "the"
                             abs(0 - 1) = 1 < 5
                             w += 1/(1+1) = 1.5
-                            
+                        Therefore "Paul" and "the" are on average 1.5 sentences
+                        apart.
                             
                     - If it is above the threshhold, continue with the next 
                         position
@@ -85,7 +86,7 @@ def extract_step(text_path: str = paths.TEXT_PATH):
         if not text.endswith(".txt"):
             # support different file types here
             continue
-        with (open(paths.TEXT_PATH + "/" + text, "r", encoding="ISO-8859-1")) as current_text:
+        with (open(paths.TEXT_PATH + "/" + text, "r", encoding="utf-8")) as current_text:
             text_content = current_text.read()
             
             # split the text into paragraphs first
@@ -96,6 +97,7 @@ def extract_step(text_path: str = paths.TEXT_PATH):
             with open(paths.TEXT_META_PATH + "/{}_meta".format(text), "w", 
                       encoding="utf8") as metafile:
                 metafile.write("PARAGRAPHS: {}".format(len(paragraphs)))
+            print("Current text: {}".format(text))
             bar = progressbar.ProgressBar(max_value=len(paragraphs))
             for count, paragraph in enumerate(paragraphs):
                 bar.update(count)
@@ -110,7 +112,7 @@ def extract_step(text_path: str = paths.TEXT_PATH):
                 
                 ### {'study': {0}, 'temperament': {0}}
                 ### use this for index? TODO: investigate
-                text2sentence = text2cooc(pos_tagged_parsed, language="german")
+                text2sentence = text2cooc(pos_tagged_parsed, language)
                                 
                 closeness_list = generate_source(
                     text2sentence, 
@@ -128,4 +130,4 @@ def extract_step(text_path: str = paths.TEXT_PATH):
             
 if __name__ == "__main__":
     make_folders()
-    extract_step()
+    extract_step(language="english")

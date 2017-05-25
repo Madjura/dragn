@@ -110,13 +110,13 @@ def text2cooc(pos_dictionary: {int, (str, str)},
     for sentence_id, pos_tagged_tokens in pos_dictionary.items():
         if add_verbs:
             # updating the inverse occurrence index with verbs
-            for token, tag in pos_tagged_tokens:
+            for subject, tag in pos_tagged_tokens:
                 
-                # check if token is tagged as a verb
+                # check if subject is tagged as a verb
                 # Penn Treebank uses VB for all verbs
                 # for more details see https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
                 if tag.startswith("VB"):
-                    verb = lemmatizer.lemmatize(token, "v").lower()
+                    verb = lemmatizer.lemmatize(subject, "v").lower()
                     if verb not in stopwords.words(language):
                         if verb not in term2sentence_id:
                             term2sentence_id[verb] = set()
@@ -134,14 +134,14 @@ def text2cooc(pos_dictionary: {int, (str, str)},
                                   language=language)
         
         # updating the inverse occurrence index with NPs 
-        for token, _, token2 in cmp_triples + smp_triples:
-            if token.lower() not in term2sentence_id:
-                term2sentence_id[token.lower()] = set()
-            if token2.lower() not in term2sentence_id:
-                term2sentence_id[token2.lower()] = set()
+        for subject, _, objecT in cmp_triples + smp_triples:
+            if subject.lower() not in term2sentence_id:
+                term2sentence_id[subject.lower()] = set()
+            if objecT.lower() not in term2sentence_id:
+                term2sentence_id[objecT.lower()] = set()
                 
-            term2sentence_id[token.lower()].add(sentence_id)
-            term2sentence_id[token2.lower()].add(sentence_id)
+            term2sentence_id[subject.lower()].add(sentence_id)
+            term2sentence_id[objecT.lower()].add(sentence_id)
     return term2sentence_id
     
 
@@ -184,7 +184,6 @@ def get_cooc(chunk_trees, stoplist=True, language="english"):
                     entities.append("_".join(words))
                     ### experimental
                     entities.extend(words)
-                    print("EXTENDING WITH {}".format(words))
         for e1, e2 in combinations(entities, 2):
             triples.append((e1, "close to", e2))
             triples.append((e2, "close to", e1))

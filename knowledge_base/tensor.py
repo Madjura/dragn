@@ -361,14 +361,20 @@ class Tensor:
         return '\n'.join(['\t'.join([str(elem) for elem in key])+' -> '+\
                           str(self.base_dict[key]) for key in self.base_dict])
 
-    def tab_separated(self):
+    def tab_separated(self, split_into=3, last_done=0):
         """
         Generates a string with tab-separated values representing the tensor.
         """
         
-        tsv = '\n'.join(['\t'.join([str(elem) for elem in key]+\
-          [str(self.base_dict[key])]) for key in self.base_dict])
-        return tsv
+        try:
+            tsv = '\n'.join(['\t'.join([str(elem) for elem in key]+\
+                                       [str(self.base_dict[key])]) for key in self.base_dict])
+        except MemoryError:
+            upper_limit = (last_done + 1) * len(self.base_dict)/split_into
+            lower_limit = last_done * len(self.base_dict)/split_into
+            tsv = dict(self.base_dict.items()[lower_limit:upper_limit])
+            last_done += 1
+        return tsv, last_done
 
     def to_file(self, filename):
         """
@@ -376,9 +382,13 @@ class Tensor:
         values).
         """
         
-        filename.write(self.tab_separated().encode())
+        content, last_done = self.tab_separated()
+        filename.write(content.encode())
         filename.flush()
-
+        while last_done > 0 and last_done < 3:
+            content, last_done = self.tab_separated(last_done=last_done)
+            filename.write(content.encode())
+            filename.flush()
 
     def from_file(self,filename):
         """

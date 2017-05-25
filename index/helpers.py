@@ -18,18 +18,16 @@ def generate_relation_to_provenances(sources: "suids",
     relations = defaultdict(lambda: set())
     missing = 0
     processed = 0
-    
-    
-    for (token, related_to, token2), weight in sources.items():
-        relations[token].add( (related_to, token2))
-        if related_to == "related to":
-            related_statements.append( ((token, related_to, token2), weight) )
-    for (token, related_to, token2), weight in related_statements:
-        combined_relations = relations[token] & relations[token2]
+    for (subject, predicate, objecT), weight in sources.items():
+        relations[subject].add( (predicate, objecT))
+        if predicate == "related to":
+            related_statements.append( ((subject, predicate, objecT), weight) )
+    for (subject, predicate, objecT), weight in related_statements:
+        combined_relations = relations[subject] & relations[objecT]
         prov2weight = defaultdict(lambda: list())
-        for related_relation, related_token in combined_relations:
-            relation_tuple1 = (token, related_relation, related_token)
-            relation_tuple2 = (token2, related_relation, related_token)
+        for related_relation, related in combined_relations:
+            relation_tuple1 = (subject, related_relation, related)
+            relation_tuple2 = (objecT, related_relation, related)
             tmp = []
             if relation_tuple1 in relation2prov:
                 tmp.extend(relation2prov[relation_tuple1])
@@ -45,7 +43,7 @@ def generate_relation_to_provenances(sources: "suids",
             if out_file is not None:
                 # other: ('obscurity', 'close to', 'ancient_inscription')    [('call_of_cthulhu.txt_3', 0.5)]
                 # this: str: ('punch', 'related to', 'favorite_punching_bag')    [('harrypotter.txt_127', 0.3080712829341244)]
-                line = "\t".join([str( (token, related_to, token2) ), 
+                line = "\t".join([str( (subject, predicate, objecT) ), 
                                    str( [(provenance, prov_weight)] ) ])
                 out_file.write(str.encode(line))
                 out_file.write(str.encode("\n"))

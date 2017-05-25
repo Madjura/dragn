@@ -3,7 +3,7 @@ from knowledge_base.analyser import Analyser
 from knowledge_base.neomemstore import NeoMemStore
 import pprint
 
-def knowledge_base_compute(top=10):
+def knowledge_base_compute(top=100):
     """
     In this step, expressions related to other expressions are identified and 
     stored in the NeoMemStore.
@@ -76,12 +76,10 @@ def knowledge_base_compute(top=10):
     memstore = NeoMemStore()
     memstore.import_memstore(paths.MEMSTORE_PATH_EXPERIMENTAL)
     memstore.computePerspective("LAxLIRA")
-    analyser = Analyser(memstore, "LAxLIRA", compute=False, trace=True)
+    analyser = Analyser(memstore, "LAxLIRA", trace=True)
     
     tokens = [x for x in memstore.sorted(ignored=".*_[0-9]+$|related to|close to")]
     
-    # holds similarity statements - <expression> related to <expression2>: value
-    ###top_value = (0, 0, 0)
     similarity_dictionary = {}
     foo = {}
     similar = None
