@@ -1,4 +1,5 @@
 from _collections import defaultdict
+from util.load_prov import load_prov
 
 def generate_relation_provenance_weights(sources):
     """
@@ -7,9 +8,12 @@ def generate_relation_provenance_weights(sources):
     """
     
     dictionary = defaultdict(lambda: list())
+    inverse = defaultdict(lambda: set())
     for (token, relation, token2, provenance), closeness in sources.items():
         dictionary[(token, relation, token2)].append((provenance, closeness))
-    return dictionary
+        inverse[token].add(provenance)
+        inverse[token2].add(provenance)
+    return dictionary, inverse
 
 def generate_relation_to_provenances(sources: "suids", 
                                      relation2prov: "suid2puid", 
@@ -49,3 +53,15 @@ def generate_relation_to_provenances(sources: "suids",
                 out_file.write(str.encode("\n"))
             processed += 1
     return missing, processed
+
+def index_to_db(index):
+
+    
+    bulk = []
+    for term, provs in index.items():
+        bulk.extend([InverseIndex(term=term, index=prov) for prov in provs])
+    try:
+        InverseIndex.objects.bulk_create(bulk)
+    except:
+        pass
+    print("MADE {} INDEX OBJECTS".format(len(bulk)))

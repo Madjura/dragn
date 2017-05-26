@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
-from django.conf.global_settings import MEDIA_ROOT
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -41,6 +40,7 @@ INSTALLED_APPS = [
     "text_app",
     "queryapp",
     "uploadapp",
+    "dataapp",
 ]
 
 MIDDLEWARE = [

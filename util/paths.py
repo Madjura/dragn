@@ -33,6 +33,8 @@ RELATION_PROVENANCES_PATH = MAIN_FOLDER + "/relations/provenances"
 
 RELATIONS_WITH_PROVENANCES_PATH = MAIN_FOLDER + "/relations/provenances"
 
+INVERSE_PATH = MAIN_FOLDER + "/inverse"
+
 ALL = [
     MAIN_FOLDER,
     TEXT_PATH,

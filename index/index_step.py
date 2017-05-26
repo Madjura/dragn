@@ -2,14 +2,21 @@ from util import paths
 from index.fulltext import load_suids, gen_cooc_suid2puid_exp,\
     gen_sim_suid2puid_exp
 from index.helpers import generate_relation_provenance_weights,\
-    generate_relation_to_provenances
+    generate_relation_to_provenances, index_to_db
 import os, gzip
 from knowledge_base.neomemstore import NeoMemStore
 from _collections import defaultdict
 
 def generate_relation_values(sources, relations):
-    relation2prov = generate_relation_provenance_weights(sources)
-    print(len(relation2prov))
+    relation2prov, index = generate_relation_provenance_weights(sources)
+    
+    index_to_db(index)
+    
+    #==========================================================================
+    # with gzip.open(os.path.join(paths.INVERSE_PATH, "inverse.tsv.gz"), "w") as f_out:
+    #     for term, provenance in index.items():
+    #         f_out.write("\t".join([term, provenance]) + "\n")
+    #==========================================================================
     
     # relation2prov len: 396403
     # LEN SUIDS:  416247
@@ -33,8 +40,10 @@ def make_expression_sets(relation_dictionary):
     term_lines = []
     for expression1, related_set in list(relation_dictionary.items()):
         for expression2, weight in related_set:
-            term_lines.append("\t".join([str(x) for x in [expression1, expression2, weight]]))
-    with gzip.open(os.path.join(paths.EXPRESSION_SET_PATH_EXPERIMENTAL, "relationsets.tsv.gz"), "wb") as f:
+            term_lines.append("\t".join([str(x) 
+                                for x in [expression1, expression2, weight]]))
+    with gzip.open(os.path.join(paths.EXPRESSION_SET_PATH_EXPERIMENTAL, 
+                                "relationsets.tsv.gz"), "wb") as f:
         f.write(("\n".join(term_lines)).encode())
     f.close()
     
@@ -48,16 +57,14 @@ def make_relation_list(relations):
     
     relation_lines = []
     relation_dictionary = defaultdict(lambda: set())
-    for (expression, related_to, other_expression), weight in relations:
+    for (subject, predicate, objecT), weight in relations:
         relation_lines.append(
             "\t".join(
-                [str(x) for x in [(expression, 
-                                   related_to, 
-                                   other_expression), weight]
-                 ]
-                ))
-        relation_dictionary[expression].add( (other_expression, weight) )
-        relation_dictionary[other_expression].add( (expression, weight) )
+                    [str(x) for x in [(subject, predicate, objecT), weight]]
+                )
+        )
+        relation_dictionary[subject].add( (objecT, weight) )
+        relation_dictionary[objecT].add( (subject, weight) )
     with gzip.open(
             os.path.join(paths.RELATIONS_PATH, "relations.tsv.gz"), "wb") as f:
         f.write("\n".join(relation_lines).encode())
@@ -205,10 +212,15 @@ def index_step():
     #
     # WRITE EXPRESSION AND HOW THEY ARE RELATED AS SUIDS
     #
-    for (expression, related_to, other_expression), weight in list(memstore.corpus.items()):
-        suid_lines.append("\t".join([str(x) for x in [(expression, related_to, other_expression), expression, related_to, other_expression, weight]]))
-        expression_dictionary[expression].add((other_expression, weight))
-        expression_dictionary[other_expression].add((expression, weight))
+    for (subject, predicate, objecT), weight in list(memstore.corpus.items()):
+        suid_lines.append("\t".join([str(x) 
+                for x in [(subject, predicate, objecT), 
+                          subject, 
+                          predicate, 
+                          objecT, 
+                          weight]]))
+        expression_dictionary[subject].add((objecT, weight))
+        expression_dictionary[objecT].add((subject, weight))
     with gzip.open(os.path.join(paths.SUIDS_PATH_EXPERIMENTAL, "suids.tsv.gz"), "wb") as f:
         f.write("\n".join(suid_lines).encode())
     f.close()

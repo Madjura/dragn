@@ -123,10 +123,8 @@ def text2cooc(pos_dictionary: {int, (str, str)},
                         term2sentence_id[verb].add(sentence_id)
                         
         # trying to parse the sentence_id into a top-level chunk tree
-        try:
-            tree = parser_cmp.parse(pos_dictionary[sentence_id])
-        except ValueError:
-            continue
+        tree = parser_cmp.parse(pos_dictionary[sentence_id])
+
         # getting the top-level tree triples and decomposing the NPs
         cmp_triples, simple_trees = get_cooc([tree], stoplist=False,
                                              language=language)

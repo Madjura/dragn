@@ -191,7 +191,8 @@ class QueryResult(object):
         print("SUID SET LENGTH OLD: ", len(self.relation_set))
         
         # UNUSED CURRENTLY
-        self.provenance_set = FuzzySet.from_dictionary(provenance_dict)
+        if provenance_dict:
+            self.provenance_set = FuzzySet.from_dictionary(provenance_dict)
         print("PUID DICT LENGTH OLD: ", len(provenance_dict))
         print("PUID SET LENGTH OLD: ", len(self.provenance_set))
     
