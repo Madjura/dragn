@@ -5,7 +5,6 @@ from extract.text_extract import split_paragraphs, pos_tag, parse_pos, text2cooc
 from text.paragraph import Paragraph
 from util import paths
 import progressbar
-from _sqlite3 import IntegrityError
 
 def make_folders():
     """
@@ -16,26 +15,6 @@ def make_folders():
     for path in paths.ALL:
         if not os.path.exists(path):
             os.makedirs(path)
-            
-def make_index(terms, provenance):
-    import django
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "skimmr_django.settings")
-    django.setup()
-    from dataapp.models import Provenance, InverseIndex
-    
-    prov = Provenance(title=provenance)
-    try:
-        prov.save()
-    except IntegrityError:
-        prov = Provenance.objects.get_queryset().filter(title=provenance)[0]
-
-    for term in terms:
-        term_object = InverseIndex(term=term)
-        try:
-            term_object.save()
-        except IntegrityError:
-            pass
-        term_object.index.add(prov)
         
 def extract_step(text_path: str = paths.TEXT_PATH, language="english"):
     """
@@ -136,7 +115,6 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english"):
                 text2sentence = text2cooc(pos_tagged_parsed, language)
                 
                 #terms = text2sentence.keys()
-                #make_index(terms, "{}_[}".format(text, count))
                 closeness_list = generate_source(
                     text2sentence, 
                     paragraph_id = "{}_{}".format(text, count))

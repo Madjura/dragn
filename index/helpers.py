@@ -1,5 +1,4 @@
 from _collections import defaultdict
-from util.load_prov import load_prov
 
 def generate_relation_provenance_weights(sources):
     """
@@ -55,7 +54,9 @@ def generate_relation_to_provenances(sources: "suids",
     return missing, processed
 
 def index_to_db(index):
-
+    import django    
+    django.setup()
+    from dataapp.models import InverseIndex
     
     bulk = []
     for term, provs in index.items():
