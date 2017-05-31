@@ -469,4 +469,7 @@ $( document ).ready(function() {
 	     } 
 	});
 	updateCy();
+	$("#text-samples").getWordByEvent('click', function(event, word) {
+		$("#id_query").val($("#id_query").val() + "," + word);
+	});
 });
