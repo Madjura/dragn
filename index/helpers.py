@@ -64,5 +64,6 @@ def index_to_db(index):
     try:
         InverseIndex.objects.bulk_create(bulk)
     except:
-        pass
+        print("DUPLICATE INDEX DETECTED. TEXT(S) ALREADY INDEXED.")
+        return
     print("MADE {} INDEX OBJECTS".format(len(bulk)))

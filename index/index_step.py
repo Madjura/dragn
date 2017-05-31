@@ -1,6 +1,4 @@
 from util import paths
-from index.fulltext import load_suids, gen_cooc_suid2puid_exp,\
-    gen_sim_suid2puid_exp
 from index.helpers import generate_relation_provenance_weights,\
     generate_relation_to_provenances, index_to_db
 import os, gzip
@@ -9,20 +7,7 @@ from _collections import defaultdict
 
 def generate_relation_values(sources, relations):
     relation2prov, index = generate_relation_provenance_weights(sources)
-    
     index_to_db(index)
-    
-    #==========================================================================
-    # with gzip.open(os.path.join(paths.INVERSE_PATH, "inverse.tsv.gz"), "w") as f_out:
-    #     for term, provenance in index.items():
-    #         f_out.write("\t".join([term, provenance]) + "\n")
-    #==========================================================================
-    
-    # relation2prov len: 396403
-    # LEN SUIDS:  416247
-    # LEN SUID2PUID:  396403
-
-    # LINES:  483484 <-- from below
     with gzip.open(
         os.path.join(paths.RELATION_PROVENANCES_PATH, 
                      "provenances.tsv.gz"), "w") as f_out:
@@ -71,7 +56,7 @@ def make_relation_list(relations):
     f.close()
     return relation_dictionary
 
-def index_step_experimental():
+def index_step():
     memstore = NeoMemStore()
     memstore.import_memstore(paths.MEMSTORE_PATH_EXPERIMENTAL)
     relation_dictionary = make_relation_list(memstore.corpus.items())
@@ -79,22 +64,11 @@ def index_step_experimental():
     generate_relation_values(memstore.relations, memstore.corpus)
     
 
-def index_step():
+def index_step_old():
     """
-    Prepares the data for querying.
+    OLD STUFF IS GONE
     
-    QUERYSTEP LOADS:
-    - expressionsets, in querystep
-    - suids, in queryresult constructor. but NOT with load_suids, straight 
-        from the file
-        WHY
-        DOES
-        LOAD
-        SUIDS
-        CHANGE
-        THE
-        FORMAT
-    - provenances, in populate_dictionaries
+    Prepares the data for querying.
     
     Detailed explanation:
         1) Load the memstore from knowledge_base_compute().
@@ -201,67 +175,6 @@ def index_step():
                 - IN SHORT:
                     write to a file how "related to" two tokens are in a given provenance
     """
-    
-    memstore = NeoMemStore()
-    memstore.import_memstore(paths.MEMSTORE_PATH_EXPERIMENTAL)
-    suid_lines = []
-    
-    # this can probably be a list?
-    expression_dictionary = defaultdict(lambda: set())
-     
-    #
-    # WRITE EXPRESSION AND HOW THEY ARE RELATED AS SUIDS
-    #
-    for (subject, predicate, objecT), weight in list(memstore.corpus.items()):
-        suid_lines.append("\t".join([str(x) 
-                for x in [(subject, predicate, objecT), 
-                          subject, 
-                          predicate, 
-                          objecT, 
-                          weight]]))
-        expression_dictionary[subject].add((objecT, weight))
-        expression_dictionary[objecT].add((subject, weight))
-    with gzip.open(os.path.join(paths.SUIDS_PATH_EXPERIMENTAL, "suids.tsv.gz"), "wb") as f:
-        f.write("\n".join(suid_lines).encode())
-    f.close()
-     
-    #
-    # WRITE EXPRESSION SET
-    #
-    ### equivalent: termsets
-    term_lines = []
-    for expression1, related_set in list(expression_dictionary.items()):
-        for expression2, weight in related_set:
-            term_lines.append("\t".join([str(x) for x in [expression1, expression2, weight]]))
-    with gzip.open(os.path.join(paths.EXPRESSION_SET_PATH_EXPERIMENTAL, "expressionsets.tsv.gz"), "wb") as f:
-        f.write(("\n".join(term_lines)).encode())
-    f.close()
-    
-     
-    # this method is from hell, it CHANGES THE FORMAT
-    # WHY
-    # I MEAN JUST WHY WOULD YOU DO THAT
-    suids = load_suids(paths.SUIDS_PATH_EXPERIMENTAL + "/suids.tsv.gz")
-    suid2puid = gen_cooc_suid2puid_exp(memstore.relations, suids) # TODO: RENAME
-    print("LEN SUIDS: ", len(suids))
-    print("LEN SUID2PUID: ", len(suid2puid))
-    lines = []
-    with gzip.open(os.path.join(paths.INDEX_PATH_EXPERIMENTAL, "provenances.tsv.gz"), "wb") as f_out:
-        for suid in suid2puid:
-            for puid, w in suid2puid[suid]:
-                # ('something', 'close to', 'hermione')    harrypotter2.txt_1302    0.5
-                line = "\t".join( [str(suid), str(puid), str(w)] )
-                lines.append(line)
-        f_out.write(("\n".join(lines)).encode())
-        print("LINES: ", len(lines))
-        _missing, _processed = gen_sim_suid2puid_exp(suids, suid2puid, out_file=f_out)
-        print(_missing, _processed, "FOO")
-    f_out.close()
-    ### out:  '8033\ta.txt_14\t0.19269787540304012',
-    ### suids:  ('young_man', 'related to', 'time_strength_sowing_wild_oat'): (24355, 0.4987936888425189),
-    ### suid2puid: 29465: [('a.txt_13', 1.0)], <--- irrelevant it seems
-    ### TODO: map suid_lines to provenance, see below gen_cooc_suid2puid
 
 if __name__ == "__main__":
-    index_step_experimental()
-    #index_step()
+    index_step()

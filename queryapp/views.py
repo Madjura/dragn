@@ -35,7 +35,8 @@ def query(request):
 def load_samples(tops):
     texts = []
     for name, weight in tops:
-        with open(paths.PARAGRAPH_CONTENT_PATH + "/{}".format(name), "r") as text:
+        with open(paths.PARAGRAPH_CONTENT_PATH + "/{}".format(name), "r", 
+                  encoding="utf8") as text:
             texts.append((name, weight, text.read()))
     return texts
 

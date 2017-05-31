@@ -1,5 +1,5 @@
 #cy {
-	/*position: absolute*/;
+	position: absolute;
 	left: 0;
 	top: 150px;
 	bottom: 0;
@@ -10,6 +10,7 @@
 }
 
 #cy-context-menus-cxt-menu {
+	top: 100px;
     display:none;
     z-index:1000;
     position:absolute;
@@ -60,4 +61,8 @@
 
 .cy-context-menus-divider {
   border-bottom:1px solid #A0A0A0;
+}
+
+#text-samples {
+	margin-top:1000px;
 }

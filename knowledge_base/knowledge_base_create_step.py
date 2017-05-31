@@ -74,7 +74,6 @@ def knowledge_base_create():
                 3.5.4) Replace the old weight with the new one from step 5.
         4) Then write the memstore object to the disk.            
     """
-    
     memstore = NeoMemStore()
     
     # closenesses are calculcated in extract_step

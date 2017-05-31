@@ -1,7 +1,7 @@
 from extract.extract_step import extract_step, make_folders
 from knowledge_base.knowledge_base_create_step import knowledge_base_create
 from knowledge_base.knowledge_base_compute_step import knowledge_base_compute
-from index.index_step import index_step_experimental
+from index.index_step import index_step
 
 def all_steps():
     print("MAKING FOLDERS")
@@ -13,7 +13,7 @@ def all_steps():
     print("KB CREATE DONE, KB COMPUTE")
     knowledge_base_compute()
     print("KB COMPUTE DONE, INDEX")
-    index_step_experimental()
+    index_step()
     print("INDEX DONE")
     
 if __name__ == "__main__":

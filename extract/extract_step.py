@@ -11,7 +11,6 @@ def make_folders():
     Creates the folders required for using the system.
     The path to the folders can be found in the "util" package.
     """
-    
     for path in paths.ALL:
         if not os.path.exists(path):
             os.makedirs(path)
@@ -78,7 +77,6 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english"):
                 The default path is specified in util.paths.
                     
     """
-    
     # iterate over texts
     closeness = []
     files = os.listdir(text_path)
@@ -86,7 +84,8 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english"):
         if not text.endswith(".txt"):
             # support different file types here
             continue
-        with (open(paths.TEXT_PATH + "/" + text, "r", encoding="utf-8")) as current_text:
+        with (open(paths.TEXT_PATH + "/" + text, "r", 
+                   encoding="utf-8")) as current_text:
             text_content = current_text.read()
             
             # split the text into paragraphs first
@@ -111,13 +110,13 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english"):
                 pos_tagged_parsed = parse_pos(new_paragraph.sentences)
                 
                 ### {'study': {0}, 'temperament': {0}}
-                ### use this for index? TODO: investigate
                 text2sentence = text2cooc(pos_tagged_parsed, language)
                 
                 #terms = text2sentence.keys()
                 closeness_list = generate_source(
                     text2sentence, 
-                    paragraph_id = "{}_{}".format(text, count))
+                    paragraph_id = "{}_{}".format(text, count)
+                    )
                 closeness.append(closeness_list)
                 
                 with open(paths.PARAGRAPH_CONTENT_PATH + "/{}_{}".format(
@@ -127,7 +126,8 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english"):
             pickle.dump(paragraph_list, 
                         open(paths.POS_PATH + "/" + text + ".p", "wb"))
             
-    with open(paths.TEXT_META_PATH + "/all_meta", "w", encoding="utf8") as metafile:
+    with open(paths.TEXT_META_PATH + "/all_meta", "w", 
+              encoding="utf8") as metafile:
         metafile.write(",".join([x for x in files if x.endswith(".txt")]))
     pickle.dump(closeness, 
                 open(paths.CLOSENESS_PATH + "/" + "closeness.p", "wb"))         

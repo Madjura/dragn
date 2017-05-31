@@ -30,7 +30,6 @@ def split_paragraphs(text: str) -> [str]:
             A list of strings, where each element is a paragraph of the original
             text.
     """
-    
     lines = text.split("\n")
     current_paragraph = []
     paragraphs = []
@@ -38,14 +37,13 @@ def split_paragraphs(text: str) -> [str]:
     # iterate over each line of the text, with .strip() applied to remove
     # trailing whitespace
     for line in map(lambda x: x.strip(), lines):
-        if (len(line) > 0):
+        if len(line) > 0:
             # the line is NOT a paragraph if there is something there
             current_paragraph.append(line)
         elif current_paragraph:
             # line IS a paragraph
             paragraphs.append(" ".join(current_paragraph))
             current_paragraph.clear()
-    
     # get the final paragraph
     if current_paragraph:
         paragraphs.append(" ".join(current_paragraph))
@@ -61,15 +59,12 @@ def pos_tag(text: str) -> [Sentence]:
         Returns:
             A list of Sentence objects.
     """
-    
     sentences = []
     for count, sentence in enumerate(nltk.sent_tokenize(text)):
         tokens = OrderedDict()
-        
         # get the tokens and POS tags
         for word, tag in nltk.pos_tag(nltk.word_tokenize(sentence)):
             tokens[word] = tag 
-        
         # sentence is now tokenized and tokens have POS tags
         sentences.append(Sentence(count, tokens))
     return sentences
@@ -87,10 +82,10 @@ def parse_pos(sentences: [Sentence]) -> {int, (str, str)}:
             are a list of tuples, with the tuples in the 
             format of (token, POS-tag).
     """
-
     dictionary = {}
     for sentence in sentences:
-        dictionary[sentence.sentence_id] = [(token, tag) for token, tag in sentence.tokens.items()]
+        dictionary[sentence.sentence_id] = [(token, tag) 
+                                            for token, tag in sentence.tokens.items()]
     return dictionary
 
 
@@ -100,9 +95,9 @@ def text2cooc(pos_dictionary: {int, (str, str)},
     """
     Processes the input dictionary in the format:
         {sentence_id: [(Token, POS-tag),}
-    and returns a dictionary mapping tokens to ID of the sentence they appear in.
+    and returns a dictionary mapping tokens to ID of the sentence they appear 
+    in.
     """
-    
     parser_cmp = RegexpParser(NP_GRAMMAR_COMPOUND)
     term2sentence_id = {}
     lemmatizer = WordNetLemmatizer()
@@ -111,7 +106,6 @@ def text2cooc(pos_dictionary: {int, (str, str)},
         if add_verbs:
             # updating the inverse occurrence index with verbs
             for subject, tag in pos_tagged_tokens:
-                
                 # check if subject is tagged as a verb
                 # Penn Treebank uses VB for all verbs
                 # for more details see https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
@@ -120,24 +114,20 @@ def text2cooc(pos_dictionary: {int, (str, str)},
                     if verb not in stopwords.words(language):
                         if verb not in term2sentence_id:
                             term2sentence_id[verb] = set()
-                        term2sentence_id[verb].add(sentence_id)
-                        
+                        term2sentence_id[verb].add(sentence_id)    
         # trying to parse the sentence_id into a top-level chunk tree
         tree = parser_cmp.parse(pos_dictionary[sentence_id])
-
         # getting the top-level tree triples and decomposing the NPs
         cmp_triples, simple_trees = get_cooc([tree], stoplist=False,
                                              language=language)
         smp_triples, _ = get_cooc(simple_trees, stoplist=True,
                                   language=language)
-        
         # updating the inverse occurrence index with NPs 
         for subject, _, objecT in cmp_triples + smp_triples:
             if subject.lower() not in term2sentence_id:
                 term2sentence_id[subject.lower()] = set()
             if objecT.lower() not in term2sentence_id:
                 term2sentence_id[objecT.lower()] = set()
-                
             term2sentence_id[subject.lower()].add(sentence_id)
             term2sentence_id[objecT.lower()].add(sentence_id)
     return term2sentence_id
@@ -152,12 +142,10 @@ def get_cooc(chunk_trees, stoplist=True, language="english"):
             stoplist: Optional. Default: True.
                 Whether or not stopwords are to be removed.
     """
-    
     triples = []
     simple_trees = []
     lemmatizer = WordNetLemmatizer() # from nltk
     parser_simple = RegexpParser(NP_GRAMMAR_SIMPLE) # from nltk
-    
     for t in chunk_trees:
         entities = []
         for chunk in t:

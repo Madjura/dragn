@@ -23,12 +23,12 @@
 	    <input type="submit" class="ajax" value="Search" name="search">
 	</form>
 </div>
-<div id="text samples">
+<div id="cy"></div>
+<div id="text-samples">
     {% for provenance, weight, content in samples %}
         {{ provenance }}, {{ weight }}}<br>
         {{ content|safe|escape }}
         <hr>
     {% endfor %}
 </div>
-<div id="cy"></div>
 {% endblock %}

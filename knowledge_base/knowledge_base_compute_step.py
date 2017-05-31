@@ -1,7 +1,6 @@
 from util import paths
 from knowledge_base.analyser import Analyser
 from knowledge_base.neomemstore import NeoMemStore
-import pprint
 
 def knowledge_base_compute(top=100):
     """
@@ -72,50 +71,28 @@ def knowledge_base_compute(top=100):
         6) Write the memstore, now containing the "related to" relations,
             to the disk.
     """
-    
     memstore = NeoMemStore()
     memstore.import_memstore(paths.MEMSTORE_PATH_EXPERIMENTAL)
-    memstore.computePerspective("LAxLIRA")
-    analyser = Analyser(memstore, "LAxLIRA", trace=True)
+    matrix = memstore.corpus.matricise(0)
+    analyser = Analyser(memstore, matrix=matrix, trace=True)
     
-    tokens = [x for x in memstore.sorted(ignored=".*_[0-9]+$|related to|close to")]
+    tokens = [x for x in memstore.sorted(
+        ignored=".*_[0-9]+$|related to|close to")]
     
     similarity_dictionary = {}
-    foo = {}
     similar = None
-    similar2similar = None
-    for i, token1 in enumerate(tokens):
+    for i, subject in enumerate(tokens):
         print(i , " out of ", len(tokens))
-        similar = analyser.similar_to(token1, top=top)
-        for token2, weight in similar:
-            relation1 = (token1, "related to", token2)
-            relation2 = (token2, "related to", token1)
-            if not any(r in similarity_dictionary for r in [relation1, relation2]):
-                similarity_dictionary[(token1, "related to", token2)] = weight
+        similar = analyser.similar_to(subject, top=top)
+        for objecT, weight in similar:
+            triple1 = (subject, "related to", objecT)
+            triple2 = (objecT, "related to", subject)
+            if not any(triple in similarity_dictionary for triple in [triple1, triple2]):
+                similarity_dictionary[(subject, "related to", objecT)] = weight
     for key, value in similarity_dictionary.items():
         memstore.corpus[key] = value
-    
-    print("DONE WITH FIRST LOOP")
-    ### problem here is: similar is updated each iteration
-    ### mostly useless to do this here
-    ### better to do it in index/querystep
-    ### get the top N for query
-    ### for those top N, get the top relations too
-    ### then add them as a "bonus" with different color?
-    ### for each node after initial query, add the top 5 edges
-    ### then add the top 5 from those maybe? and so on
-    ### based on user input
-    for token1, _weight in similar:
-        similar2similar = analyser.similar_to(token1, top=top)
-        for token2, weight in similar2similar:
-            r1 = (token1, "related to", token2)
-            r2 = (token2, "related to", token1)
-            if not any (r in foo for r in [r1, r2]):
-                foo[(token1, "related to", token2)] = weight
-    pprint.pprint(foo)
     memstore.export(paths.MEMSTORE_PATH_EXPERIMENTAL + "/")
 
 
 if __name__ == "__main__":
     knowledge_base_compute()
-    ### checked april3, looks fine

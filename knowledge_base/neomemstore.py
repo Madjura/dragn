@@ -6,27 +6,15 @@ import operator
 from util import paths
 import re
 
-PERSP_TYPES = ['LAxLIRA','LIxLARA','RAxLALI','LIRAxLA','LARAxLI','LALIxRA',\
-'LAxLIRA_COMPRESSED','LIxLARA_COMPRESSED','RAxLALI_COMPRESSED',\
-'LIRAxLA_COMPRESSED','LARAxLI_COMPRESSED','LALIxRA_COMPRESSED']
-
-# pivot dimensions to 'lock' when computing a perspective matricisation
-PERSP2PIVDIM = {
-  'LAxLIRA' : 0,
-  'LIxLARA' : 1,
-  'RAxLALI' : 2,
-  'LIRAxLA' : (1,2),
-  'LARAxLI' : (0,2),
-  'LALIxRA' : (0,1)
-}
+PERSP_TYPES = ['LAxLIRA']
 
 
 class NeoMemStore(object):
     """
-    Used to store / hold relevant "metadata": Which expressions exist, how often
-    they appear in the texts, weighted expressions for further processing.
+    Used to store / hold relevant "metadata": Which expressions exist, how 
+    often they appear in the texts, weighted expressions for further 
+    processing.
     """
-    
     
     def __init__(self):
         # holds token: frequency
@@ -38,16 +26,16 @@ class NeoMemStore(object):
         # <Expression> close to <Expression2>: Value
         self.corpus = Tensor(rank=3)
         
-        self.perspectives = dict([(x, Tensor(rank=2)) for x in PERSP_TYPES])
+        self.matrix = None
 
     def incorporate(self, closenesses: ["Closeness"]):
         """
         Incorporates Closeness objects into this NeoMemStore.
             
             Args:
-                closenesses: A list of Closeness objects, as created in extract_step.
+                closenesses: A list of Closeness objects, as created in 
+                    extract_step.
         """
-        
         expressions = []
         # first pass: update lexicon with terms
         for paragraph_closeness in closenesses:
@@ -73,7 +61,6 @@ class NeoMemStore(object):
             Args:
                 items: A list of expressions the lexicon is being updated with.
         """
-        
         for item in items:
             self.lexicon[item] += 1
             
@@ -83,7 +70,6 @@ class NeoMemStore(object):
         The corpus is a dictionary mapping the relation tuples to their mutual
         information score, multiplied by their joint frequency.
         """
-        
         # a list of tuples in the format (subject, close to, other, paragraph)
         relation_tuples = self.relations.keys()
         
@@ -155,7 +141,6 @@ class NeoMemStore(object):
                 min_quo: Optional. Default: 0.1. The normalization factor for
                     the weights that are negative.
         """
-        
         # get all the values from previous step
         weights = sorted(self.corpus.values())
         
@@ -176,8 +161,10 @@ class NeoMemStore(object):
             self.corpus[key] = w
             
     def export(self, path=paths.MEMSTORE_PATH_EXPERIMENTAL):
-        """Exports the lexicon, relations and corpus and writes them to disk."""
-        
+        """
+        Exports the lexicon, relations and corpus and writes them to 
+        disk.
+        """
         with (gzip.open(path + "/lexicon.tsv.gz" , "w")) as lex_f:
                 self.lexicon_to_file(lex_f)
         lex_f.close()
@@ -226,20 +213,21 @@ class NeoMemStore(object):
             Args:
                 lexicon_file: The file that is being loaded in.
         """
-        
         weird_lines = []
         for line in lexicon_file.read().decode().split("\n"):
             line_split = line.split("\t")
             if len(line_split) != 2:
                 weird_lines.append(line)
                 continue
-            expression, frequency = line_split
-            self.lexicon[expression] = int(frequency)
+            token, frequency = line_split
+            self.lexicon[token] = int(frequency)
         print("NUMBER OF WEIRD LINES: ", len(weird_lines), weird_lines)
         
     def sorted(self, ignored=None, limit=0):
         # format is [(expression, frequency), (expression2, frequency2), ...]
-        sorted_by_value = [x for x in sorted(self.lexicon.items(), key=operator.itemgetter(1), reverse=True)]
+        sorted_by_value = [x for x in sorted(self.lexicon.items(), 
+                                             key=operator.itemgetter(1), 
+                                             reverse=True)]
         
         if limit > 0:
             sorted_by_value = sorted_by_value[:limit] # from 0 to limit
@@ -251,6 +239,3 @@ class NeoMemStore(object):
             avg = sum(x[1] for x in sorted_by_value_with_limit) / float(len(sorted_by_value_with_limit))
             sorted_by_value = [x[0] for x in sorted_by_value_with_limit if x[1] >= avg]
         return sorted_by_value
-
-    def computePerspective(self, ptype):
-        self.perspectives[ptype] = self.corpus.matricise(PERSP2PIVDIM[ptype])
