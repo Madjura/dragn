@@ -176,7 +176,7 @@ class FuzzySet:
             normalised = Decimal(value) / normalisation
             if normalised > 1:
                 normalised = 1
-            if normalised < 0:
+            elif normalised < 0:
                 normalised = 0
-            membership[key] = value
+            membership[key] = normalised
         return membership
