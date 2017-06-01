@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-    {% block title %}Default query page{% endblock %}
     {% load static %}
     <script>
         var graphElements = {{ graph_elements|safe }};
@@ -13,22 +12,20 @@
     <script src="{% static 'queryapp/js/result.js' %}"></script>
     <script src="{% static 'queryapp/js/jquery.get-word-by-event.js' %}"></script>
     <link rel="stylesheet" type="text/css" href="{% static 'queryapp/css/result.css' %}"/>
-
-    <div id="form">
-        <form action="{% url 'query' %}" method="post" id="query-form">
-            {% csrf_token %}
-
-            {% for field in queryform %}
-                <label for="{{ field.auto_id }}">{{ field.label }}</label> {{ field }}
-            {% endfor %}
-            <input type="submit" class="ajax" value="Search" name="search">
-        </form>
-    </div>
     <div id="cy"></div>
     <div id="text-samples">
-        {% for provenance, weight, content in samples %}
-            {{ provenance }}, {{ weight }}}<br>
-            {{ content|safe|escape }}
+        {% for provenance, weight, content, matches in samples %}
+            <div class="text-match-wrapper">
+                <h3>{{ provenance }}, {{ weight }}}</h3>
+	            <div class="text">
+	                {{ content|safe|escape }}
+	            </div>
+	            <div class="match">
+	               {% for match in matches %}
+	                   {{ match }}<br/>
+	               {% endfor %}
+	            </div>
+	        </div>
             <hr>
         {% endfor %}
     </div>

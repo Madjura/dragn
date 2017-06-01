@@ -52,11 +52,13 @@ def markup_samples(samples, nodes):
     updated_samples = []
     print(normalized)
     for provenance, weight, content in samples:
+        matches = set()
         for n in normalized:
             match = re.findall("\\b{}\\b".format(n), content, re.IGNORECASE)
             if match:
                 content = re.sub("\\b{}\\b".format(n), "<b>{}</b>".format(match[0]), content, flags=re.IGNORECASE)
-        updated_samples.append((provenance, weight, content))
+                matches |= set(match)
+        updated_samples.append((provenance, weight, content, matches))
     print(updated_samples)
     return updated_samples
 
