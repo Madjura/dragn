@@ -1,14 +1,15 @@
 import gzip
-from util import paths
 import os
-from ast import literal_eval
 from _collections import defaultdict
-from query.fuzzyset import FuzzySet
+from ast import literal_eval
 from itertools import combinations
-from graph.node import CytoNode
+from math import log
+
 from graph.edge import Edge
 from graph.graph import Graph
-from math import log
+from graph.node import CytoNode
+from query.fuzzyset import FuzzySet
+from util import paths
 
 
 class QueryResult(object):
@@ -16,6 +17,7 @@ class QueryResult(object):
     Wrapper over the processed text files to produce a graph in JSON
     format that can be displayed to the user.
     """
+
     def __init__(self, min_weight=0.5):
         self.query = None
         self.queried_combined = defaultdict(lambda: set())
@@ -27,9 +29,9 @@ class QueryResult(object):
         self.min_weight = min_weight
         self.relations = self.load_token2related()
         self.visualization_parameters = self.load_parameters()
-    
+
     def load_relation2prov(self, path=os.path.join(
-            paths.RELATION_PROVENANCES_PATH, "provenances.tsv.gz")):
+        paths.RELATION_PROVENANCES_PATH, "provenances.tsv.gz")):
         """
         Loads the mapping of relation tuples to the provenances.
         The format is:
@@ -53,7 +55,7 @@ class QueryResult(object):
                 provenances = literal_eval(line_split[1])
                 relation2prov[relation_tuple].append(provenances)
         return relation2prov
-    
+
     def prepare_for_query(self):
         """
         Returns original FuzzySet containing tokens relevant to the 
@@ -65,11 +67,11 @@ class QueryResult(object):
         query_relevant = FuzzySet()
         for term in self.query:
             # x are tuples of (token, weight)
-            query_relevant = query_relevant | FuzzySet([x 
-                                                for x in relation_sets[term]])
+            query_relevant = query_relevant | FuzzySet([x
+                                                        for x in relation_sets[term]])
         print("prepare for query took {}".format(time.time() - start))
         return query_relevant
-    
+
     def filter_relevant(self, relevant: FuzzySet):
         """
         Filters the relation tuples by the min_weight specified.
@@ -87,7 +89,7 @@ class QueryResult(object):
         for token in relevant.cut(self.min_weight):
             relevant_cut[token] = relevant[token]
         return relevant_cut
-    
+
     def load_relation_sets(self,
                            path=paths.EXPRESSION_SET_PATH_EXPERIMENTAL):
         """
@@ -99,7 +101,7 @@ class QueryResult(object):
         """
         relations = defaultdict(lambda: list())
         with gzip.open(
-            os.path.join(path, "relationsets.tsv.gz"), "rb") as f:
+                os.path.join(path, "relationsets.tsv.gz"), "rb") as f:
             lines = f.read().decode()
             for line in lines.split("\n"):
                 line_split = line.split("\t")
@@ -107,43 +109,43 @@ class QueryResult(object):
                 relation_tuple = (token2, float(weight))
                 relations[token].append(relation_tuple)
         return relations
-    
+
     def populate_dictionaries(self):
         """
         Prepares the ranking of tokens / relations for use with the graph.
         """
         # { relation_triple: [(provenance, weight), ...] }
         relation2prov = self.load_relation2prov()
-        
+
         # { relation_triple: calculated weight }
         # used to rank / limit the graph nodes by top values
         relation_dict = defaultdict(int)
-        
+
         # { provenance: calculated weight }
         # indicates how "related" a provenance is to the query
         provenance_dict = defaultdict(int)
-        
+
         # { (prov1, prov2): weight }
         # indicates how "related" two provenances are
         provenance_relations = defaultdict(float)
-        
+
         # all relation tuples containing query terms, with weight above threshhold
         query_relevant = self.prepare_for_query()
-        #relevant_cut = self.filter_relevant(query_relevant)
+        # relevant_cut = self.filter_relevant(query_relevant)
         relevant_cut = self.filter_relevant(query_relevant)
         # iterate over the tokens relevant to the query
         for possibly_related in relevant_cut:
-            
+
             # get all relation tuples in which "possibly_related" appears
             for relation_triple in self.relations[possibly_related]:
                 (subject, predicate, objecT), relation_weight = relation_triple
-                
+
                 # find the relation tuples that contain "possibly_related" and
                 # a term from the query
                 if not (subject in self.query or objecT in self.query):
                     # random relation that does not have any relevance
                     continue
-                
+
                 # get the membership degree of "possibly related" to the query             
                 """
                 makes fuzzyset of all (subject, weight) tuples 
@@ -154,7 +156,7 @@ class QueryResult(object):
                 keeps higher of close to / related to
                 """
                 membership = relevant_cut[possibly_related]
-                
+
                 calculated_relation_weight = membership * relation_weight
                 relation_dict[(subject, predicate, objecT)] += calculated_relation_weight
                 self.tokens2weights[possibly_related] += calculated_relation_weight
@@ -162,7 +164,7 @@ class QueryResult(object):
                     self.tokens2weights[subject] += calculated_relation_weight
                 elif objecT != possibly_related:
                     self.tokens2weights[objecT] += calculated_relation_weight
-                
+
                 for prov_tuple in relation2prov[(subject, predicate, objecT)]:
                     for provenance, prov_weight in prov_tuple:
                         provenance_dict[provenance] += membership * relation_weight * prov_weight
@@ -172,7 +174,7 @@ class QueryResult(object):
         self.relation_set = relation_dict
         if provenance_dict:
             self.provenance_set = FuzzySet.from_dictionary(provenance_dict)
-    
+
     def generate_statement_nodes(self, max_nodes):
         """
         Generates the nodes that exist in the query-graph.
@@ -198,15 +200,15 @@ class QueryResult(object):
                 node_width = 0.4
             font_size = int(24 * node_width)
             node_color = self.visualization_parameters["node color"]
-            #if token in self.queried_combined:
+            # if token in self.queried_combined:
             if token in self.query:
                 node_color = "green"
-            graph_nodes[token] = CytoNode(name=token, 
+            graph_nodes[token] = CytoNode(name=token,
                                           color=node_color,
                                           width=node_width,
                                           label_size=font_size)
         return graph_nodes
-    
+
     def generate_statement_graph(self, max_nodes, max_edges):
         """
         Generates the graph object for the query.
@@ -228,15 +230,15 @@ class QueryResult(object):
             if token in nodes and token2 in nodes:
                 if related_to in self.visualization_parameters["edge color"]:
                     edge_color = self.visualization_parameters["edge color"][related_to]
-                #token = self.check_alias(token)
-                #token2 = self.check_alias(token2)
+                # token = self.check_alias(token)
+                # token2 = self.check_alias(token2)
                 graph_edge = Edge(start=nodes[token], end=nodes[token2],
                                   color=edge_color)
                 nodes[token].add_edge_object(graph_edge)
                 edge_count += 2
         print("RETURNING GRAPH")
         return Graph(nodes=nodes.values())
-    
+
     def load_token2related(self):
         """Loads the mapping of tokens to the related tokens."""
         token2related = defaultdict(lambda: list())
@@ -255,7 +257,7 @@ class QueryResult(object):
             f.close()
         print("LEN relations ", len(token2related))
         return token2related
-    
+
     def load_parameters(self):
         """
         Returns a dictionary of visualization parameters used for the graph.
@@ -268,35 +270,37 @@ class QueryResult(object):
             "edge color": {
                 "related to": "red",
                 "close to": "blue"
-                }
             }
+        }
         return parameters
-    
+
     def check_query_relevance(self, token):
         expanded_relevancy = set()
         for check in self.query:
             if check in token:
                 expanded_relevancy.add(check)
         return expanded_relevancy
-    
+
     def check_alias(self, token):
         for alias in self.aliases.keys():
             if token in self.aliases[alias]:
                 return alias
         return token
-    
+
     def get_top_provenances(self, top=10):
         tops = []
         for item in self.provenance_set.sort(reverse=True, limit=top):
             tops.append(item)
         return tops
-        
+
+
 if __name__ == "__main__":
     import time
+
     start = time.time()
     foo = QueryResult()
     print("INIT TOOK: ", time.time() - start)
-    foo.query = ["cult",]
+    foo.query = ["cult", ]
     start = time.time()
     foo.populate_dictionaries()
     print("POPULTATE TOOK: ", time.time() - start)

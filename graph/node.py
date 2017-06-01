@@ -1,16 +1,17 @@
 from graph.edge import Edge
 from graph.exceptions import DuplicateEdgeError
 
+
 class Node(object):
     """Node of a graph."""
 
-    def __init__(self, 
-                 name: str, 
-                 *, 
-                 edges: [Edge] = None, 
-                 color = None,
-                 width = None, 
-                 label_size = None):
+    def __init__(self,
+                 name: str,
+                 *,
+                 edges: [Edge] = None,
+                 color=None,
+                 width=None,
+                 label_size=None):
         """
         Constructor
         
@@ -26,7 +27,7 @@ class Node(object):
                 width: Optional. The width of the node.
                 label_size: Optional. The size of the label.
         """
-        
+
         self.name = name
         if edges is None:
             self.edges = []
@@ -35,10 +36,10 @@ class Node(object):
         self.color = color
         self.width = width
         self.label_size = label_size
-        
+
     def add_edge_object(self, edge: Edge):
         self.edges.append(edge)
-        
+
     def get_edge(self, *, end: int = None):
         """
         Returns the edge from this node to the target node.
@@ -49,19 +50,19 @@ class Node(object):
                 The edge from this node to the target node, or None if no such
                 edge exists.
         """
-        
+
         if end is None:
             return "End must be set"
-        
+
         for edge in self.edges:
             if edge.end == end:
                 return edge
         return None
-    
+
     def __str__(self, *args, **kwargs):
         return "(Node: {} | # of edges: {})".format(self.name, len(self.edges))
-    
-    
+
+
 class CytoNode(Node):
     """
     Special node that checks for duplicate edges when adding an edge.
@@ -69,7 +70,7 @@ class CytoNode(Node):
     This is required because otherwise the "related to" and "close to" edges
     overlap.
     """
-    
+
     def add_edge_object(self, edge: Edge):
         """
         Adds an edge to the node.
@@ -86,7 +87,7 @@ class CytoNode(Node):
                     twice. The duplicity is checked by comparing the color of
                     the edges.
         """
-        
+
         duplicate = self.get_edge(end=edge.end)
         back_edge = False
         if not duplicate:

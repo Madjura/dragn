@@ -1,6 +1,8 @@
 from django.core.files.storage import FileSystemStorage
-from uploadapp.forms import UploadForm
 from django.views.generic.edit import FormView
+
+from uploadapp.forms import UploadForm
+
 
 # Create your views here.
 class UploadView(FormView):

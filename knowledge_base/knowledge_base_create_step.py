@@ -1,7 +1,8 @@
-from util import paths
 import pickle
+
 from knowledge_base.neomemstore import NeoMemStore
-  
+from util import paths
+
 
 def knowledge_base_create():
     """
@@ -75,13 +76,14 @@ def knowledge_base_create():
         4) Then write the memstore object to the disk.            
     """
     memstore = NeoMemStore()
-    
+
     # closenesses are calculcated in extract_step
     closenesses = pickle.load(open(paths.CLOSENESS_PATH + "/closeness.p", "rb"))
     memstore.incorporate(closenesses)
     memstore.compute_corpus()
     memstore.normalise_corpus()
     memstore.export(paths.MEMSTORE_PATH_EXPERIMENTAL + "/")
+
 
 if __name__ == "__main__":
     knowledge_base_create()

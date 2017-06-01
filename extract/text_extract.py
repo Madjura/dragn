@@ -1,6 +1,6 @@
+import math
 from _collections import OrderedDict, defaultdict
 from itertools import combinations
-import math
 
 import nltk
 from nltk.chunk.regexp import RegexpParser
@@ -8,8 +8,8 @@ from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.tree import Tree
 
-from text.sentence import Sentence
 from text.closeness import Closeness
+from text.sentence import Sentence
 
 NP_GRAMMAR_COMPOUND = """
 NP: {<JJ.*>*(<N.*>|<JJ.*>)+((<IN>|<TO>)?<JJ.*>*(<N.*>|<JJ.*>)+)*((<CC>|,)<JJ.*>*(<N.*>|<JJ.*>)+((<IN>|<TO>)?<JJ.*>*(<N.*>|<JJ.*>)+)*)*}
@@ -33,7 +33,7 @@ def split_paragraphs(text: str) -> [str]:
     lines = text.split("\n")
     current_paragraph = []
     paragraphs = []
-    
+
     # iterate over each line of the text, with .strip() applied to remove
     # trailing whitespace
     for line in map(lambda x: x.strip(), lines):
@@ -64,8 +64,8 @@ def pos_tag(text: str) -> [Sentence]:
         tokens = OrderedDict()
         # get the tokens and POS tags
         for word, tag in nltk.pos_tag(nltk.word_tokenize(sentence)):
-            tokens[word] = tag 
-        # sentence is now tokenized and tokens have POS tags
+            tokens[word] = tag
+            # sentence is now tokenized and tokens have POS tags
         sentences.append(Sentence(count, tokens))
     return sentences
 
@@ -84,12 +84,12 @@ def parse_pos(sentences: [Sentence]) -> {int, (str, str)}:
     """
     dictionary = {}
     for sentence in sentences:
-        dictionary[sentence.sentence_id] = [(token, tag) 
+        dictionary[sentence.sentence_id] = [(token, tag)
                                             for token, tag in sentence.tokens.items()]
     return dictionary
 
 
-def text2cooc(pos_dictionary: {int, (str, str)}, 
+def text2cooc(pos_dictionary: {int, (str, str)},
               add_verbs=True,
               language="english") -> {str, list}:
     """
@@ -101,7 +101,7 @@ def text2cooc(pos_dictionary: {int, (str, str)},
     parser_cmp = RegexpParser(NP_GRAMMAR_COMPOUND)
     term2sentence_id = {}
     lemmatizer = WordNetLemmatizer()
-    
+
     for sentence_id, pos_tagged_tokens in pos_dictionary.items():
         if add_verbs:
             # updating the inverse occurrence index with verbs
@@ -114,8 +114,8 @@ def text2cooc(pos_dictionary: {int, (str, str)},
                     if verb not in stopwords.words(language):
                         if verb not in term2sentence_id:
                             term2sentence_id[verb] = set()
-                        term2sentence_id[verb].add(sentence_id)    
-        # trying to parse the sentence_id into a top-level chunk tree
+                        term2sentence_id[verb].add(sentence_id)
+                        # trying to parse the sentence_id into a top-level chunk tree
         tree = parser_cmp.parse(pos_dictionary[sentence_id])
         # getting the top-level tree triples and decomposing the NPs
         cmp_triples, simple_trees = get_cooc([tree], stoplist=False,
@@ -131,7 +131,7 @@ def text2cooc(pos_dictionary: {int, (str, str)},
             term2sentence_id[subject.lower()].add(sentence_id)
             term2sentence_id[objecT.lower()].add(sentence_id)
     return term2sentence_id
-    
+
 
 def get_cooc(chunk_trees, stoplist=True, language="english"):
     """
@@ -144,8 +144,8 @@ def get_cooc(chunk_trees, stoplist=True, language="english"):
     """
     triples = []
     simple_trees = []
-    lemmatizer = WordNetLemmatizer() # from nltk
-    parser_simple = RegexpParser(NP_GRAMMAR_SIMPLE) # from nltk
+    lemmatizer = WordNetLemmatizer()  # from nltk
+    parser_simple = RegexpParser(NP_GRAMMAR_SIMPLE)  # from nltk
     for t in chunk_trees:
         entities = []
         for chunk in t:
@@ -156,14 +156,14 @@ def get_cooc(chunk_trees, stoplist=True, language="english"):
                 words = []
                 for word, tag in chunk:
                     if (stoplist and word in stopwords.words(language)) or \
-                        (not any(char.isalnum() for char in word)):
+                            (not any(char.isalnum() for char in word)):
                         # do not process stopwords for simple trees, do not process purely 
                         # non alphanumeric characters
                         continue
                     if tag.startswith('N'):
-                        words.append(lemmatizer.lemmatize(word,'n'))
+                        words.append(lemmatizer.lemmatize(word, 'n'))
                     elif tag.startswith('J'):
-                        words.append(lemmatizer.lemmatize(word,'a'))
+                        words.append(lemmatizer.lemmatize(word, 'a'))
                     else:
                         words.append(word)
                 if len(words) > 0:
@@ -178,9 +178,9 @@ def get_cooc(chunk_trees, stoplist=True, language="english"):
 
 def generate_source(token2sentences,
                     *,
-                    paragraph_id: int = None, 
+                    paragraph_id: int = None,
                     distance_threshhold=5,
-                    weight_threshold = 1/3) -> [Closeness]:
+                    weight_threshold=1 / 3) -> [Closeness]:
     """
     Generates source/statement (srcstm) for following steps.
     
@@ -197,42 +197,41 @@ def generate_source(token2sentences,
             A list of Closeness objects, representing the "relatedness" of
             the terms in the sentences of token2sentences.
     """
-    
+
     closenesses = []
-    
+
     # get all term combinations to see if they are close to each other
     for term1, term2 in combinations(list(token2sentences.keys()), 2):
         w = 0.0
-        
+
         # get positions of first term
         # positions are always per paragraph
         for position1 in token2sentences[term1]:
-            
+
             # get positions of second term
             for position2 in token2sentences[term2]:
- 
+
                 # get the distance between the terms, measured in "terms between"
                 distance = math.fabs(position1 - position2)
-                
+
                 # check if terms are close enough to each other
                 if (distance < distance_threshhold):
-                    
                     # calculate new weight
-                    w += 1/(1 + distance)
+                    w += 1 / (1 + distance)
 
         # check if terms are relevant enough
         if w > weight_threshold:
             closenesses.append(Closeness(term1, term2, w, paragraph_id))
-    
+
     w2statements = defaultdict(list)
     for closeness in closenesses:
         w2statements[closeness.closeness].append(closeness)
-    
+
     ## get weight values in descending orders - why?
     keys = list(w2statements.keys())
     keys.sort(reverse=True)
     new_lines = []
-    
+
     ## get list of closeness, ordered by descending weight
     for key in keys:
         for closeness in w2statements[key]:

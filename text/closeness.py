@@ -4,8 +4,7 @@ class Closeness(object):
     other.
     """
 
-
-    def __init__(self, term, close_to, closeness, paragraph_id = -1):
+    def __init__(self, term, close_to, closeness, paragraph_id=-1):
         """
         Constructor
             
@@ -16,11 +15,12 @@ class Closeness(object):
                 paragraph_id: Optional. Defaults to -1 when not set.
                     The ID of the paragraph the terms appear in.
         """
-        
+
         self.term = term
         self.close_to = close_to
         self.paragraph_id = paragraph_id
         self.closeness = closeness
-        
+
     def __str__(self):
-        return "Term: " + self.term + "\nClose to:" + self.close_to + "\nParagraph id:" + str(self.paragraph_id) + "\nCloseness:" + str(self.closeness)
+        return "Term: " + self.term + "\nClose to:" + self.close_to + "\nParagraph id:" + str(
+            self.paragraph_id) + "\nCloseness:" + str(self.closeness)

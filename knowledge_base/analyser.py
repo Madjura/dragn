@@ -1,5 +1,6 @@
 import math
 
+
 class Analyser:
     """
     Basic class for matrix perspective analysis, offering the following services:
@@ -7,7 +8,7 @@ class Analyser:
       - learning of rules from the perspective and its compressed counterpart
     """
 
-    def __init__(self, 
+    def __init__(self,
                  mem=True,
                  trace=False,
                  matrix=None):
@@ -15,10 +16,10 @@ class Analyser:
         self.trace = trace
         # the matrix handler of the perspective, computed from scratch by default
         self.matrix = matrix
-            
+
         # <token>: {(close to, <token2>): value}
         self.sparse = None
-        
+
         # (close to, <token>): [<tokens>], essentially the reverse of self.sparse
         self.col2row = None
         # get an in-memory representation of the matrix
@@ -30,7 +31,7 @@ class Analyser:
         """
         Calculates tokens similar to a given one.
         """
-    
+
         if subject == None or not subject in self.sparse:
             return []
         # the row vector of the sparse matrix (a column_index:weight dictionary)
@@ -41,12 +42,12 @@ class Analyser:
         # values are examples
         # sparse[paul] = [(close to, paul): 1.0, (close to, roof): 0.6, (close to, ball: 0.3)]
         row = self.sparse[subject]
-        
+
         # length of row
         # sum = 1.0**2 + 0.6**2 + 0.3**2 = 1.45
         # sqrt(sum) = 0.6708
-        un = math.sqrt(sum([row[expression]**2 for expression in row]))
-        
+        un = math.sqrt(sum([row[expression] ** 2 for expression in row]))
+
         # promising holds all expressions that are possibly relevant
         # paul, roof, ball
         promising = set()
@@ -60,7 +61,7 @@ class Analyser:
         # now check all possibly relevant expressions for actual relevancy
         # paul, roof, ball
         for possible in promising:
-            
+
             # ignore same, no reason to check
             if possible == subject:
                 continue
@@ -78,13 +79,13 @@ class Analyser:
                     # uv += 0.3 
                     tmp = row[expression] * compared_row[expression]
                     uv += tmp
-                vn += compared_row[expression]**2
+                vn += compared_row[expression] ** 2
             # vn is length of compared_row after sqrt
             vn = math.sqrt(vn)
-            
+
             # vn is length of compared, un is length of original
             # uv is the product of weights of entries that are in both rows
-            sim = float(uv)/(un*vn)
+            sim = float(uv) / (un * vn)
             if math.fabs(sim) >= minsim:
                 # add only if similarity crosses the threshold (adding code 
                 # translated from the sparse representation row index)
@@ -93,6 +94,6 @@ class Analyser:
             print("DEBUG@similar_to() - number of actually similar:", len(sim_vec))
             print("DEBUG@similar_to() - sorting and converting the results now")
         # getting the (similarity, row vector ID) tuples sorted
-        sorted_tuples = sorted(sim_vec,key=lambda expression: expression[0])
+        sorted_tuples = sorted(sim_vec, key=lambda expression: expression[0])
         sorted_tuples.reverse()
         return [(expression[1], expression[0]) for expression in sorted_tuples[:top]]

@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-  {% load static %}
-  <link rel="stylesheet" type="text/css" href="{% static 'budget/css/navigation.css' %}">
-  <meta charset="utf-8">
-  <title>{% block title %}Budget{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'budget/css/navigation.css' %}">
+    <meta charset="utf-8">
+    <title>{% block title %}Budget{% endblock %}</title>
 </head>
 
 <body>
-	<div id="nav">
-		<ul id="nav-ul">
-			<li><a class="hover" href="{% url 'upload' %}">Upload texts</a></li>
-		</ul>
-	</div>
-  	
-  	<div id="left-overlap">
-  	</div>
-  	<div id="left">
-  	</div>
-	<div id="content">
-		{% block includehelp %}{% endblock %}
-	 	{% block content %}{% endblock %}
-  	</div>
+<div id="nav">
+    <ul id="nav-ul">
+        <li><a class="hover" href="{% url 'upload' %}">Upload texts</a></li>
+    </ul>
+</div>
+
+<div id="left-overlap">
+</div>
+<div id="left">
+</div>
+<div id="content">
+    {% block includehelp %}{% endblock %}
+    {% block content %}{% endblock %}
+</div>
 </body>
 </html>

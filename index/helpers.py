@@ -1,11 +1,12 @@
 from _collections import defaultdict
 
+
 def generate_relation_provenance_weights(sources):
     """
     Generates the mapping of relation tuples to provenance with closeness
     therein.
     """
-    
+
     dictionary = defaultdict(lambda: list())
     inverse = defaultdict(lambda: set())
     for (token, relation, token2, provenance), closeness in sources.items():
@@ -14,17 +15,18 @@ def generate_relation_provenance_weights(sources):
         inverse[token2].add(provenance)
     return dictionary, inverse
 
-def generate_relation_to_provenances(sources: "suids", 
-                                     relation2prov: "suid2puid", 
+
+def generate_relation_to_provenances(sources: "suids",
+                                     relation2prov: "suid2puid",
                                      out_file=None):
     related_statements = []
     relations = defaultdict(lambda: set())
     missing = 0
     processed = 0
     for (subject, predicate, objecT), weight in sources.items():
-        relations[subject].add( (predicate, objecT))
+        relations[subject].add((predicate, objecT))
         if predicate == "related to":
-            related_statements.append( ((subject, predicate, objecT), weight) )
+            related_statements.append(((subject, predicate, objecT), weight))
     for (subject, predicate, objecT), weight in related_statements:
         combined_relations = relations[subject] & relations[objecT]
         prov2weight = defaultdict(lambda: list())
@@ -46,18 +48,19 @@ def generate_relation_to_provenances(sources: "suids",
             if out_file is not None:
                 # other: ('obscurity', 'close to', 'ancient_inscription')    [('call_of_cthulhu.txt_3', 0.5)]
                 # this: str: ('punch', 'related to', 'favorite_punching_bag')    [('harrypotter.txt_127', 0.3080712829341244)]
-                line = "\t".join([str( (subject, predicate, objecT) ), 
-                                   str( [(provenance, prov_weight)] ) ])
+                line = "\t".join([str((subject, predicate, objecT)),
+                                  str([(provenance, prov_weight)])])
                 out_file.write(str.encode(line))
                 out_file.write(str.encode("\n"))
             processed += 1
     return missing, processed
 
+
 def index_to_db(index):
-    import django    
+    import django
     django.setup()
     from dataapp.models import InverseIndex
-    
+
     bulk = []
     for term, provs in index.items():
         bulk.extend([InverseIndex(term=term, index=prov) for prov in provs])

@@ -1,6 +1,7 @@
-from util import paths
 from knowledge_base.analyser import Analyser
 from knowledge_base.neomemstore import NeoMemStore
+from util import paths
+
 
 def knowledge_base_compute(top=100):
     """
@@ -24,7 +25,7 @@ def knowledge_base_compute(top=100):
             4.2) Frequencies of tokens that are relation statements (close to,
                 related to) or provenances are ignored.
             4.3) The average of the remaining frequencies is calculated.
-            4.4) All the tokens with above-average frequency are returned in 
+            4.4) All the tokens with above-average frequency are returned in
                 a list.
         5) The top elements from 4) are iterated over:
             5.1) For each token, the tokens that are similar are calculated.
@@ -75,14 +76,14 @@ def knowledge_base_compute(top=100):
     memstore.import_memstore(paths.MEMSTORE_PATH_EXPERIMENTAL)
     matrix = memstore.corpus.matricise(0)
     analyser = Analyser(memstore, matrix=matrix, trace=True)
-    
+
     tokens = [x for x in memstore.sorted(
         ignored=".*_[0-9]+$|related to|close to")]
-    
+
     similarity_dictionary = {}
     similar = None
     for i, subject in enumerate(tokens):
-        print(i , " out of ", len(tokens))
+        print(i, " out of ", len(tokens))
         similar = analyser.similar_to(subject, top=top)
         for objecT, weight in similar:
             triple1 = (subject, "related to", objecT)

@@ -9,7 +9,7 @@ class Graph(object):
             self.nodes = nodes
         else:
             self.nodes = []
-            
+
     def __str__(self, *args, **kwargs):
         out = ""
         for node in self.nodes:
@@ -17,7 +17,7 @@ class Graph(object):
             for edge in node.edges:
                 out += "--- Edge from {} to {}\n".format(edge.start, edge.end)
         return out
-    
+
     def to_json(self):
         """
         Converts the graph into RFC4627 compliant JSON. 
@@ -28,7 +28,7 @@ class Graph(object):
             Returns:
                 An RFC4627 compliant JSON string for use with Cytoscape.js.
         """
-        
+
         # separate lists required to have the nodes before the edges,
         # needed for cytoscape, the edges need the id of the node
         nodes = []
@@ -41,22 +41,22 @@ class Graph(object):
                     "size": node.label_size * 3,
                     "width": node.width,
                     "color": node.color
-                    },
+                },
                 "position": {
                     "x": i,
                     "y": i
                 },
                 "grabbable": True,
                 "classes": "node-class"
-                })
+            })
             for j, edge in enumerate(node.edges):
                 edges.append({
                     "group": "edges",
                     "data": {
-                        "id": "e{}-{}".format(i,j),
+                        "id": "e{}-{}".format(i, j),
                         "source": edge.start.name,
                         "target": edge.end.name,
                         "color": edge.color
-                        }
-                    })
+                    }
+                })
         return json.dumps(nodes + edges)

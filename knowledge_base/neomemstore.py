@@ -1,10 +1,11 @@
-from _collections import defaultdict
-from knowledge_base.tensor import Tensor
-from math import log
 import gzip
 import operator
-from util import paths
 import re
+from _collections import defaultdict
+from math import log
+
+from knowledge_base.tensor import Tensor
+from util import paths
 
 PERSP_TYPES = ['LAxLIRA']
 
@@ -15,17 +16,17 @@ class NeoMemStore(object):
     often they appear in the texts, weighted expressions for further 
     processing.
     """
-    
+
     def __init__(self):
         # holds token: frequency
         self.lexicon = defaultdict(int)
-        
+
         # <Expression> close to <Expression2>, ParagraphID: Closeness value
         self.relations = Tensor(rank=4)
-        
+
         # <Expression> close to <Expression2>: Value
         self.corpus = Tensor(rank=3)
-        
+
         self.matrix = None
 
     def incorporate(self, closenesses: ["Closeness"]):
@@ -40,14 +41,13 @@ class NeoMemStore(object):
         # first pass: update lexicon with terms
         for paragraph_closeness in closenesses:
             for closeness in paragraph_closeness:
-                expressions += [closeness.term, "close to", closeness.close_to, 
+                expressions += [closeness.term, "close to", closeness.close_to,
                                 closeness.paragraph_id]
-                key = (closeness.term, "close to", closeness.close_to, 
+                key = (closeness.term, "close to", closeness.close_to,
                        closeness.paragraph_id)
                 self.relations[key] = closeness.closeness
         self.update_lexicon(expressions)
-            
-    
+
     def update_lexicon(self, items: [str]):
         """
         Helper function to fill the lexicon with how often each expression 
@@ -63,7 +63,7 @@ class NeoMemStore(object):
         """
         for item in items:
             self.lexicon[item] += 1
-            
+
     def compute_corpus(self):
         """
         Computes the corpus based on the relation tuples.
@@ -72,27 +72,27 @@ class NeoMemStore(object):
         """
         # a list of tuples in the format (subject, close to, other, paragraph)
         relation_tuples = self.relations.keys()
-        
+
         # required for the mutual information score
         relation_count = len(relation_tuples)
-        
+
         # x -> number of independant occurences
         indep_freq = defaultdict(int)
-        
+
         # (x, y) -> number of joint occurences
         joint_freq = defaultdict(int)
-        
+
         # (subject,predicate,objecT) -> (provenance, relevance)
         # subject, predicate, object mapped to provenance, relevance
         relation2provs = defaultdict(lambda: [])
-        
+
         # going through all the statements in the relations
         for subject, predicate, objecT, provenance in relation_tuples:
             indep_freq[subject] += 1
             indep_freq[objecT] += 1
             joint_freq[(subject, objecT)] += 1
             relation2provs[(subject, predicate, objecT)].append(
-                (provenance, 
+                (provenance,
                  self.relations[(subject, predicate, objecT, provenance)]
                  ))
         # going only through the unique triples now regardless of their provenance
@@ -103,17 +103,18 @@ class NeoMemStore(object):
                 (subject, predicate, objecT)]]
             # get the joint frequency of subject and object
             joint = joint_freq[(subject, objecT)]
-            
+
             # also get the joint frequency for the other way around
             if (objecT, subject) in joint_freq:
                 joint += joint_freq[(objecT, subject)]
-                
+
             # frequency times mutual information score
-            fMI = joint_freq[(subject, objecT)] * log(float(relation_count * joint) / (indep_freq[subject] * indep_freq[objecT]), 2)
+            fMI = joint_freq[(subject, objecT)] * log(
+                float(relation_count * joint) / (indep_freq[subject] * indep_freq[objecT]), 2)
 
             # setting the corpus tensor value
-            self.corpus[(subject, predicate, objecT)] = fMI * (float(sum(relevancy))/len(relevancy))
-            
+            self.corpus[(subject, predicate, objecT)] = fMI * (float(sum(relevancy)) / len(relevancy))
+
     def normalise_corpus(self, cut_off=0.95, min_quo=0.1):
         """
         Normalizes the corpus as follows:
@@ -143,55 +144,55 @@ class NeoMemStore(object):
         """
         # get all the values from previous step
         weights = sorted(self.corpus.values())
-        
+
         # take the lowest value of the top percent of weights
         norm_cons = weights[int(cut_off * len(weights)):][0]
-        
+
         # get the lowest positive value and multiply by min_quo
         try:
             min_norm = min([x for x in weights if x > 0]) * min_quo
         except ValueError:
             min_norm = min_quo
         for key in self.corpus:
-            w = self.corpus[key]/norm_cons
+            w = self.corpus[key] / norm_cons
             if w < 0:
                 w = min_norm
             if w >= 1:
                 w = 1.0
             self.corpus[key] = w
-            
+
     def export(self, path=paths.MEMSTORE_PATH_EXPERIMENTAL):
         """
         Exports the lexicon, relations and corpus and writes them to 
         disk.
         """
-        with (gzip.open(path + "/lexicon.tsv.gz" , "w")) as lex_f:
-                self.lexicon_to_file(lex_f)
+        with (gzip.open(path + "/lexicon.tsv.gz", "w")) as lex_f:
+            self.lexicon_to_file(lex_f)
         lex_f.close()
-        
+
         with (gzip.open(path + "/relations.tsv.gz", "w")) as src_f:
             self.relations.to_file(src_f)
         src_f.close()
-        
+
         with (gzip.open(path + "/corpus.tsv.gz", "w")) as crp_f:
             self.corpus.to_file(crp_f)
         crp_f.close()
-        
+
     def import_memstore(self, path=paths.MEMSTORE_PATH_EXPERIMENTAL):
         """Imports the lexicon, relations and corpus from disk."""
-        
+
         with (gzip.open(path + "/lexicon.tsv.gz", "r")) as lexicon_file:
             self.lexicon_from_file(lexicon_file)
         lexicon_file.close()
-        
+
         with (gzip.open(path + "/relations.tsv.gz", "rb")) as sources_file:
             self.relations.from_file(sources_file)
         sources_file.close()
-        
+
         with (gzip.open(path + "/corpus.tsv.gz", "rb")) as corpus_file:
             self.corpus.from_file(corpus_file)
         corpus_file.close()
-        
+
     def lexicon_to_file(self, out_file):
         """
         Writes the lexicon dictionary to a file in the format:
@@ -200,12 +201,12 @@ class NeoMemStore(object):
             Args:
                 out_file: The file that is being written to.
         """
-        
+
         for token, frequency in self.lexicon.items():
             line = "\t".join([token, str(frequency)])
             out_file.write(str.encode(line))
             out_file.write(str.encode("\n"))
-        
+
     def lexicon_from_file(self, lexicon_file):
         """
         Loads the lexicon from a file.
@@ -222,16 +223,16 @@ class NeoMemStore(object):
             token, frequency = line_split
             self.lexicon[token] = int(frequency)
         print("NUMBER OF WEIRD LINES: ", len(weird_lines), weird_lines)
-        
+
     def sorted(self, ignored=None, limit=0):
         # format is [(expression, frequency), (expression2, frequency2), ...]
-        sorted_by_value = [x for x in sorted(self.lexicon.items(), 
-                                             key=operator.itemgetter(1), 
+        sorted_by_value = [x for x in sorted(self.lexicon.items(),
+                                             key=operator.itemgetter(1),
                                              reverse=True)]
-        
+
         if limit > 0:
-            sorted_by_value = sorted_by_value[:limit] # from 0 to limit
-        elif limit <= 0 and ignored:            
+            sorted_by_value = sorted_by_value[:limit]  # from 0 to limit
+        elif limit <= 0 and ignored:
             sorted_by_value_with_limit = []
             for frequency in sorted_by_value:
                 if not re.search(ignored, frequency[0]):

@@ -1,10 +1,13 @@
-from os.path import os                                         
 import pickle
-from extract.text_extract import split_paragraphs, pos_tag, parse_pos, text2cooc,\
+from os.path import os
+
+import progressbar
+
+from extract.text_extract import split_paragraphs, pos_tag, parse_pos, text2cooc, \
     generate_source
 from text.paragraph import Paragraph
 from util import paths
-import progressbar
+
 
 def make_folders():
     """
@@ -14,7 +17,8 @@ def make_folders():
     for path in paths.ALL:
         if not os.path.exists(path):
             os.makedirs(path)
-        
+
+
 def extract_step(text_path: str = paths.TEXT_PATH, language="english"):
     """
     Processes all files in a given folder.
@@ -75,6 +79,7 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english"):
         Args:
             text_path: Optional. The path to the folder where the files are.
                 The default path is specified in util.paths.
+            language: Optional. Default: "english". The language of the texts.
                     
     """
     # iterate over texts
@@ -84,16 +89,16 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english"):
         if not text.endswith(".txt"):
             # support different file types here
             continue
-        with (open(paths.TEXT_PATH + "/" + text, "r", 
+        with (open(paths.TEXT_PATH + "/" + text, "r",
                    encoding="utf-8")) as current_text:
             text_content = current_text.read()
-            
+
             # split the text into paragraphs first
             paragraphs = split_paragraphs(text_content)
-            
+
             # take each paragraph, pos tag each paragraph content
             paragraph_list = []
-            with open(paths.TEXT_META_PATH + "/{}_meta".format(text), "w", 
+            with open(paths.TEXT_META_PATH + "/{}_meta".format(text), "w",
                       encoding="utf8") as metafile:
                 metafile.write("PARAGRAPHS: {}".format(len(paragraphs)))
             print("Current text: {}".format(text))
@@ -104,35 +109,35 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english"):
                 pos = pos_tag(paragraph)
                 new_paragraph = Paragraph(count, pos, text)
                 paragraph_list.append(new_paragraph)
-                
+
                 # parse the pos-tagged sentences into the dictionary format
                 # example: {0: [('A', 'DT'), ('Study', 'NNP'), ('in', 'IN'),
                 pos_tagged_parsed = parse_pos(new_paragraph.sentences)
-                
+
                 ### {'study': {0}, 'temperament': {0}}
                 text2sentence = text2cooc(pos_tagged_parsed, language)
-                
-                #terms = text2sentence.keys()
+
+                # terms = text2sentence.keys()
                 closeness_list = generate_source(
-                    text2sentence, 
-                    paragraph_id = "{}_{}".format(text, count)
-                    )
+                    text2sentence,
+                    paragraph_id="{}_{}".format(str(text), str(count))
+                )
                 closeness.append(closeness_list)
-                
+
                 with open(paths.PARAGRAPH_CONTENT_PATH + "/{}_{}".format(
                         text, count), "w", encoding="utf8") as content_file:
                     content_file.write(paragraph)
-            
-            pickle.dump(paragraph_list, 
+
+            pickle.dump(paragraph_list,
                         open(paths.POS_PATH + "/" + text + ".p", "wb"))
-            
-    with open(paths.TEXT_META_PATH + "/all_meta", "w", 
+
+    with open(paths.TEXT_META_PATH + "/all_meta", "w",
               encoding="utf8") as metafile:
         metafile.write(",".join([x for x in files if x.endswith(".txt")]))
-    pickle.dump(closeness, 
-                open(paths.CLOSENESS_PATH + "/" + "closeness.p", "wb"))         
+    pickle.dump(closeness,
+                open(paths.CLOSENESS_PATH + "/" + "closeness.p", "wb"))
+
 
 if __name__ == "__main__":
     make_folders()
     extract_step(language="english")
-    

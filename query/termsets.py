@@ -1,4 +1,6 @@
 from _collections import defaultdict
+
+
 def load_tuid2relt(content):
     tuid2relt = defaultdict(lambda: list())
     ### LOOK AT LINE IN DEBUGGER

@@ -1,6 +1,7 @@
-from itertools import combinations
-from util.load_prov import load_prov
 from _collections import defaultdict, OrderedDict
+from itertools import combinations
+
+from util.load_prov import load_prov
 
 
 def get_text_for_terms(terms, sort=True, limit=None):
@@ -24,10 +25,10 @@ def get_text_for_terms(terms, sort=True, limit=None):
             With the paragraph lists sorted by their length.
     """
     # django setup stuff to access the index
-    import django    
+    import django
     django.setup()
     from dataapp.models import InverseIndex
-    
+
     # get all the provs for the terms
     provs = {}
     for term in terms:
@@ -38,7 +39,7 @@ def get_text_for_terms(terms, sort=True, limit=None):
     dict_combos = []
     keys = provs.keys()
     for i in range(1, len(keys)):
-        dict_combos.extend(list(combinations(keys, i+1)))
+        dict_combos.extend(list(combinations(keys, i + 1)))
     # create the intersection of provenances of all set combinations
     combo_sets = {}
     for combos in dict_combos:
@@ -72,6 +73,7 @@ def get_text_for_terms(terms, sort=True, limit=None):
             ordered[key] = sorted(texts[key], key=len)
         texts = ordered
     return texts
+
 
 if __name__ == "__main__":
     print(get_text_for_terms(["cult", "water", "fish", "fear"], limit=2))

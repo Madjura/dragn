@@ -2,6 +2,7 @@
 
 from util import paths
 
+
 def load_prov(name):
     """
     Loads the content of a file in the PARAGRAPH_CONTENT_PATH directory.

@@ -1,37 +1,41 @@
-from util import paths
-from index.helpers import generate_relation_provenance_weights,\
-    generate_relation_to_provenances, index_to_db
-import os, gzip
-from knowledge_base.neomemstore import NeoMemStore
+import gzip
+import os
 from _collections import defaultdict
+
+from index.helpers import generate_relation_provenance_weights, \
+    generate_relation_to_provenances, index_to_db
+from knowledge_base.neomemstore import NeoMemStore
+from util import paths
+
 
 def generate_relation_values(sources, relations):
     relation2prov, index = generate_relation_provenance_weights(sources)
     index_to_db(index)
     with gzip.open(
-        os.path.join(paths.RELATION_PROVENANCES_PATH, 
-                     "provenances.tsv.gz"), "w") as f_out:
+            os.path.join(paths.RELATION_PROVENANCES_PATH,
+                         "provenances.tsv.gz"), "w") as f_out:
         for relation, prov_weights in relation2prov.items():
-            line = "\t".join( [str( relation ), str(prov_weights) ] )
+            line = "\t".join([str(relation), str(prov_weights)])
             f_out.write(str.encode(line))
             f_out.write(str.encode("\n"))
-        _missing, _processed = generate_relation_to_provenances(relations, 
-                                                relation2prov, 
-                                                f_out)
+        _missing, _processed = generate_relation_to_provenances(relations,
+                                                                relation2prov,
+                                                                f_out)
         print(_missing, _processed)
     f_out.close()
+
 
 def make_expression_sets(relation_dictionary):
     term_lines = []
     for expression1, related_set in list(relation_dictionary.items()):
         for expression2, weight in related_set:
-            term_lines.append("\t".join([str(x) 
-                                for x in [expression1, expression2, weight]]))
-    with gzip.open(os.path.join(paths.EXPRESSION_SET_PATH_EXPERIMENTAL, 
+            term_lines.append("\t".join([str(x)
+                                         for x in [expression1, expression2, weight]]))
+    with gzip.open(os.path.join(paths.EXPRESSION_SET_PATH_EXPERIMENTAL,
                                 "relationsets.tsv.gz"), "wb") as f:
         f.write(("\n".join(term_lines)).encode())
     f.close()
-    
+
 
 def make_relation_list(relations):
     """
@@ -39,22 +43,23 @@ def make_relation_list(relations):
         Example:
             Paul: set( (house, close to), (ball, related to), ...)
     """
-    
+
     relation_lines = []
     relation_dictionary = defaultdict(lambda: set())
     for (subject, predicate, objecT), weight in relations:
         relation_lines.append(
             "\t".join(
-                    [str(x) for x in [(subject, predicate, objecT), weight]]
-                )
+                [str(x) for x in [(subject, predicate, objecT), weight]]
+            )
         )
-        relation_dictionary[subject].add( (objecT, weight) )
-        relation_dictionary[objecT].add( (subject, weight) )
+        relation_dictionary[subject].add((objecT, weight))
+        relation_dictionary[objecT].add((subject, weight))
     with gzip.open(
             os.path.join(paths.RELATIONS_PATH, "relations.tsv.gz"), "wb") as f:
         f.write("\n".join(relation_lines).encode())
     f.close()
     return relation_dictionary
+
 
 def index_step():
     memstore = NeoMemStore()
@@ -62,7 +67,7 @@ def index_step():
     relation_dictionary = make_relation_list(memstore.corpus.items())
     make_expression_sets(relation_dictionary)
     generate_relation_values(memstore.relations, memstore.corpus)
-    
+
 
 def index_step_old():
     """
@@ -175,6 +180,7 @@ def index_step_old():
                 - IN SHORT:
                     write to a file how "related to" two tokens are in a given provenance
     """
+
 
 if __name__ == "__main__":
     index_step()
