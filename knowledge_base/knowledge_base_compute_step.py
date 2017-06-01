@@ -81,7 +81,6 @@ def knowledge_base_compute(top=100):
         ignored=".*_[0-9]+$|related to|close to")]
 
     similarity_dictionary = {}
-    similar = None
     for i, subject in enumerate(tokens):
         print(i, " out of ", len(tokens))
         similar = analyser.similar_to(subject, top=top)

@@ -30,8 +30,9 @@ class QueryResult(object):
         self.relations = self.load_token2related()
         self.visualization_parameters = self.load_parameters()
 
-    def load_relation2prov(self, path=os.path.join(
-        paths.RELATION_PROVENANCES_PATH, "provenances.tsv.gz")):
+    @staticmethod
+    def load_relation2prov(path=os.path.join(
+            paths.RELATION_PROVENANCES_PATH, "provenances.tsv.gz")):
         """
         Loads the mapping of relation tuples to the provenances.
         The format is:
@@ -90,8 +91,8 @@ class QueryResult(object):
             relevant_cut[token] = relevant[token]
         return relevant_cut
 
-    def load_relation_sets(self,
-                           path=paths.EXPRESSION_SET_PATH_EXPERIMENTAL):
+    @staticmethod
+    def load_relation_sets(path=paths.EXPRESSION_SET_PATH_EXPERIMENTAL):
         """
         Loads the processed relationsets from index_step.
         Returns a dictionary mapping tokens to a list of tuples in the format:
@@ -226,20 +227,23 @@ class QueryResult(object):
         for relation_tuple, _ in token_list:
             if edge_count >= max_edges:
                 break
-            token, related_to, token2 = relation_tuple
-            if token in nodes and token2 in nodes:
-                if related_to in self.visualization_parameters["edge color"]:
-                    edge_color = self.visualization_parameters["edge color"][related_to]
-                # token = self.check_alias(token)
-                # token2 = self.check_alias(token2)
-                graph_edge = Edge(start=nodes[token], end=nodes[token2],
+            subject, predicate, objecT = relation_tuple
+            if subject in nodes and objecT in nodes:
+                if predicate in self.visualization_parameters["edge color"]:
+                    edge_color = self.visualization_parameters["edge color"][predicate]
+                else:
+                    edge_color = "black"
+                # subject = self.check_alias(subject)
+                # objecT = self.check_alias(objecT)
+                graph_edge = Edge(start=nodes[subject], end=nodes[objecT],
                                   color=edge_color)
-                nodes[token].add_edge_object(graph_edge)
+                nodes[subject].add_edge_object(graph_edge)
                 edge_count += 2
         print("RETURNING GRAPH")
         return Graph(nodes=nodes.values())
 
-    def load_token2related(self):
+    @staticmethod
+    def load_token2related():
         """Loads the mapping of tokens to the related tokens."""
         token2related = defaultdict(lambda: list())
         path = os.path.join(paths.RELATIONS_PATH, "relations.tsv.gz")
@@ -258,7 +262,8 @@ class QueryResult(object):
         print("LEN relations ", len(token2related))
         return token2related
 
-    def load_parameters(self):
+    @staticmethod
+    def load_parameters():
         """
         Returns a dictionary of visualization parameters used for the graph.
         TODO: load from a config file or database

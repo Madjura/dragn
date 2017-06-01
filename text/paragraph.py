@@ -2,7 +2,7 @@ from text.sentence import Sentence
 
 
 class Paragraph(object):
-    """Object representation of a pargraph."""
+    """Object representation of a paragraph."""
 
     def __init__(self, paragraph_id: int, sentences: [Sentence], text=None):
         """

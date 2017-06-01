@@ -44,7 +44,7 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english"):
                     - For each combination of tokens, check all combinations 
                         of positions.
                     - Check the distance (math.abs()) of the distances
-                    - If it is below the threshhold (default 5), add 
+                    - If it is below the threshold (default 5), add
                         the following to the current weight:
                         1/(1 + distance)
                         
@@ -59,12 +59,12 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english"):
                         Therefore "Paul" and "the" are on average 1.5 sentences
                         apart.
                             
-                    - If it is above the threshhold, continue with the next 
+                    - If it is above the threshold, continue with the next
                         position
                     - After all positional combinations are checked, create
                         a "Closeness" object for the two tokens, with the weight
                         being the value that was calculated as above IF the
-                        weight is above the threshhold (1/3). If it is not,
+                        weight is above the threshold (1/3). If it is not,
                         continue with the next token.
                         
                         In the example above the weight would be 1.5, so a
@@ -114,7 +114,7 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english"):
                 # example: {0: [('A', 'DT'), ('Study', 'NNP'), ('in', 'IN'),
                 pos_tagged_parsed = parse_pos(new_paragraph.sentences)
 
-                ### {'study': {0}, 'temperament': {0}}
+                # {'study': {0}, 'temperament': {0}}
                 text2sentence = text2cooc(pos_tagged_parsed, language)
 
                 # terms = text2sentence.keys()

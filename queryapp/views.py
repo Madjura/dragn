@@ -12,9 +12,7 @@ def query(request):
     if request.method == "POST":
         queryform = QueryForm(request.POST)
         if queryform.is_valid():
-            result = querystep.query(queryform.cleaned_data["query"],
-                                     max_nodes=queryform.cleaned_data["max_nodes"],
-                                     max_edges=queryform.cleaned_data["max_edges"])
+            result = querystep.query(queryform.cleaned_data["query"])
             graph = result.generate_statement_graph(
                 queryform.cleaned_data["max_nodes"],
                 queryform.cleaned_data["max_edges"])
@@ -22,11 +20,13 @@ def query(request):
                 queryform.cleaned_data["top_text_samples"]))
             nodes = [x.name for x in graph.nodes]
             samples = markup_samples(samples, nodes)
-        context = {
-            "graph_elements": graph.to_json(),
-            "queryform": queryform,
-            "samples": samples
-        }
+            context = {
+                "graph_elements": graph.to_json(),
+                "queryform": queryform,
+                "samples": samples
+            }
+        else:
+            context = {}
         return render(request, "queryapp/result.html", context)
     elif request.method == "GET":
         queryform = QueryForm()
@@ -48,7 +48,7 @@ def load_samples(tops):
 def markup_samples(samples, nodes):
     normalized = set()
     for node in nodes:
-        normalized |= set([node.replace("_", " ")])
+        normalized |= {node.replace("_", " ")}
     updated_samples = []
     print(normalized)
     for provenance, weight, content in samples:

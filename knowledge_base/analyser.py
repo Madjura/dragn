@@ -32,7 +32,7 @@ class Analyser:
         Calculates tokens similar to a given one.
         """
 
-        if subject == None or not subject in self.sparse:
+        if subject is None or not subject in self.sparse:
             return []
         # the row vector of the sparse matrix (a column_index:weight dictionary)
         #                 paul     ball     roof

@@ -46,8 +46,7 @@
 .cy-context-menus-cxt-menuitem:hover {
     color: #ffffff;
     text-decoration: none;
-    background-color: #0B9BCD;
-    background-image: none;
+    background: #0B9BCD none;
     cursor: pointer;
 }
 

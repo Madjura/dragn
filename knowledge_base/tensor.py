@@ -31,13 +31,13 @@ class Tensor:
             else:
                 return 0.0  # not present <-> zero value
         else:
-            raise ValueError('Key is rank-incompatible ... key: %s, rank: %s', \
+            raise ValueError('Key is rank-incompatible ... key: %s, rank: %s',
                              (str(tpl), str(self.rank)))
 
     def __delitem__(self, key):
         # deletes the value indexed by the key (and destroys any indices)
         tpl = tuple(key)
-        if self.has_key(tpl):
+        if tpl in self:
             del self.base_dict[tpl]
             self.midx, self.ridx = {}, {}
 
@@ -52,7 +52,7 @@ class Tensor:
                 del self.base_dict[tpl]
             self.midx, self.ridx = {}, {}
         else:
-            raise ValueError('Key is rank-incompatible ... key: %s, rank: %s', \
+            raise ValueError('Key is rank-incompatible ... key: %s, rank: %s',
                              (str(tpl), str(self.rank)))
 
     def __iter__(self):
@@ -110,7 +110,7 @@ class Tensor:
 
     def __eq__(self, other):
         if not isinstance(other, Tensor):
-            raise NotImplementedError('Cannot compare tensor with a non-tensor: %s', \
+            raise NotImplementedError('Cannot compare tensor with a non-tensor: %s',
                                       (str(type(other)),))
         if self.rank != other.rank:
             return False
@@ -157,10 +157,10 @@ class Tensor:
         # max-based element-wise aggregation of two tensors
         try:
             if self.rank != other.rank:
-                raise NotImplementedError('Cannot aggregate tensors of different' + \
+                raise NotImplementedError('Cannot aggregate tensors of different' +
                                           ' ranks')
         except AttributeError:
-            raise NotImplementedError('Cannot aggregate %s with a tensor', \
+            raise NotImplementedError('Cannot aggregate %s with a tensor',
                                       (str(type(other)),))
         result = Tensor(rank=self.rank)
         # sequential processing
@@ -175,10 +175,10 @@ class Tensor:
         # min-based element-wise aggregation of two tensors
         try:
             if self.rank != other.rank:
-                raise NotImplementedError('Cannot aggregate tensors of different' + \
+                raise NotImplementedError('Cannot aggregate tensors of different' +
                                           ' ranks')
         except AttributeError:
-            raise NotImplementedError('Cannot aggregate %s with a tensor', \
+            raise NotImplementedError('Cannot aggregate %s with a tensor',
                                       (str(type(other)),))
         result = Tensor(rank=self.rank)
         # sequential processing
@@ -220,8 +220,7 @@ class Tensor:
         self.ridx, self.midx = {}, {}
         # contructing the row ID -> key index and dimension ID -> key element ->
         # set of row IDs indices in one pass through the base dictionary
-        for rid, key in [(x, self.base_dict.keys()[x]) for x in \
-                         range(len(self.base_dict))]:
+        for rid, key in [(x, self.base_dict.keys()[x]) for x in range(len(self.base_dict))]:
             # updating the row ID index
             self.ridx[rid] = key
             # adding the row ID to the key element value sets
@@ -249,7 +248,7 @@ class Tensor:
         for query_dim, query_elem in [(x, query[x]) for x in range(len(query))]:
             if query_dim not in self.midx:
                 continue  # weird, shouldn't happen, but have it here for sure
-            if query_elem != None:
+            if query_elem is not None:
                 if query_elem in self.midx[query_dim]:
                     row_ids &= self.midx[query_dim][query_elem]
             else:
@@ -274,7 +273,7 @@ class Tensor:
         for query_dim, query_elem in [(x, query[x]) for x in range(len(query))]:
             if query_dim not in self.midx:
                 continue  # weird, shouldn't happen, but have it here for sure
-            if query_elem != None and query_elem in self.midx[query_dim]:
+            if query_elem is not None and query_elem in self.midx[query_dim]:
                 row_ids |= self.midx[query_dim][query_elem]
         # generating the (key,value) tuples from the matching row IDs
         return [(self.ridx[x], self.base_dict[self.ridx[x]]) for x in row_ids]
@@ -288,7 +287,7 @@ class Tensor:
         elif qtype.lower() == 'or':
             return self.query_or(query)
         else:
-            raise NotImplementedError('Unknown query type %s, try AND or OR', \
+            raise NotImplementedError('Unknown query type %s, try AND or OR',
                                       (qtype,))
 
     def matricise(self, pivot_dim):
@@ -303,7 +302,7 @@ class Tensor:
         try:
             # iterable (multiple) pivot dimensions
             if max(pivot_dim) >= self.rank:
-                raise NotImplementedError('Max. dimension of %s higher than rank %s', \
+                raise NotImplementedError('Max. dimension of %s higher than rank %s',
                                           (str(pivot_dim), str(self.rank)))
             for key, value in self.base_dict.items():
                 col_ids, row_ids = [], []
@@ -323,7 +322,7 @@ class Tensor:
             # single pivot dimension
             # the only one currently implemented
             if pivot_dim >= self.rank:
-                raise NotImplementedError('Dimension %s higher than rank %s', \
+                raise NotImplementedError('Dimension %s higher than rank %s',
                                           (str(pivot_dim), str(self.rank)))
             for key, value in self.base_dict.items():
                 # keys are tuples in the format (X close to Y)
@@ -338,7 +337,7 @@ class Tensor:
         # optionally also an index mapping column IDs to set of rows that have a 
         # non-zero element in that column
         if self.rank != 2:
-            raise NotImplemented('Not applicable for tensors of rank %s', \
+            raise NotImplemented('Not applicable for tensors of rank %s',
                                  (self.rank,))
         dct, idx = {}, {}
         for (i, j), w in self.items():
@@ -351,7 +350,7 @@ class Tensor:
                     idx[j] = set()
                 idx[j].add(i)
         if col2row:
-            return (dct, idx)
+            return dct, idx
         return dct
 
     def __str__(self):
@@ -360,7 +359,7 @@ class Tensor:
         mapping the keys to values.
         """
 
-        return '\n'.join(['\t'.join([str(elem) for elem in key]) + ' -> ' + \
+        return '\n'.join(['\t'.join([str(elem) for elem in key]) + ' -> ' +
                           str(self.base_dict[key]) for key in self.base_dict])
 
     def tab_separated(self, split_into=3, last_done=0):
@@ -369,7 +368,7 @@ class Tensor:
         """
 
         try:
-            tsv = '\n'.join(['\t'.join([str(elem) for elem in key] + \
+            tsv = '\n'.join(['\t'.join([str(elem) for elem in key] +
                                        [str(self.base_dict[key])]) for key in self.base_dict])
         except MemoryError:
             upper_limit = (last_done + 1) * len(self.base_dict) / split_into
@@ -387,7 +386,7 @@ class Tensor:
         content, last_done = self.tab_separated()
         filename.write(content.encode())
         filename.flush()
-        while last_done > 0 and last_done < 3:
+        while 0 < last_done < 3:
             content, last_done = self.tab_separated(last_done=last_done)
             filename.write(content.encode())
             filename.flush()
@@ -408,7 +407,7 @@ class Tensor:
                 lines = open(filename, 'r').read().split('\n')
             except:
                 # if neither file nor filename, proceed with empty lines
-                sys.stderr.write('W (importing a tensor) - cannot import from: %s\n', \
+                sys.stderr.write('W (importing a tensor) - cannot import from: %s\n',
                                  str(filename))
         for line in lines:
             key_val = line.split('\t')[:self.rank + 1]

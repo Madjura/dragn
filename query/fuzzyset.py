@@ -2,7 +2,6 @@ import sys
 from _decimal import Decimal
 
 
-### TODO: modify this, currently 100% copy
 class FuzzySet:
     """
     A simplistic (but efficient) implementation of a fuzzy set class and the
@@ -10,16 +9,18 @@ class FuzzySet:
     to the standard definitions.
     """
 
-    def __init__(self, elements=[]):
+    def __init__(self, elements=None):
         # initialising set, possibly with the (member,degree) pairs from elements
 
+        if elements is None:
+            elements = []
         self.members = {}
         for member, degree in elements:
             try:
-                if degree > 0 and degree <= 1:
+                if 0 < degree <= 1:
                     self.members[member] = float(degree)
             except ValueError:
-                sys.stderr.write('\nW @ FuzzySet(): invalid membership degree: ' + \
+                sys.stderr.write('\nW @ FuzzySet(): invalid membership degree: ' +
                                  str(degree) + ' for the member: ' + str(member) + '\n')
 
     def __repr__(self):
@@ -54,7 +55,7 @@ class FuzzySet:
                 if degree <= 1:
                     self.members[member] = float(degree)
         except ValueError:
-            sys.stderr.write('\nW @ FuzzySet(): invalid membership degree: ' + \
+            sys.stderr.write('\nW @ FuzzySet(): invalid membership degree: ' +
                              str(degree) + ' for the member: ' + str(member) + '\n')
 
     def items(self):
@@ -87,7 +88,7 @@ class FuzzySet:
         for member, degree in l:
             yield member, degree
             i += 1
-            if limit > 0 and i >= limit:
+            if 0 < limit <= i:
                 # if there is a limit and it was reached, stop
                 break
 
@@ -103,7 +104,7 @@ class FuzzySet:
                     if not member in self.members:
                         self.members[member] = float(degree)
             except ValueError:
-                sys.stderr.write('\nW @ FuzzySet(): invalid membership degree: ' + \
+                sys.stderr.write('\nW @ FuzzySet(): invalid membership degree: ' +
                                  str(degree) + ' for the member: ' + str(member) + '\n')
 
     def cut(self, alpha=1.0):
@@ -152,7 +153,6 @@ class FuzzySet:
 
         result = FuzzySet()
         # process all members
-        ### just combines the two?
         for member in set(self.members.keys()) | set(other.members.keys()):
             result[member] = max(self.__getitem__(member), other[member])
         return result

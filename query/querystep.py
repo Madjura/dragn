@@ -1,7 +1,9 @@
 from query.queryresult import QueryResult
 
 
-def query(query=[], queryname=None, max_nodes=25, max_edges=50):
+def query(query=None):
+    if query is None:
+        query = []
     foo = QueryResult()
     foo.query = query
     foo.populate_dictionaries()

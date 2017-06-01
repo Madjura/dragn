@@ -109,11 +109,11 @@ class NeoMemStore(object):
                 joint += joint_freq[(objecT, subject)]
 
             # frequency times mutual information score
-            fMI = joint_freq[(subject, objecT)] * log(
+            fmi = joint_freq[(subject, objecT)] * log(
                 float(relation_count * joint) / (indep_freq[subject] * indep_freq[objecT]), 2)
 
             # setting the corpus tensor value
-            self.corpus[(subject, predicate, objecT)] = fMI * (float(sum(relevancy)) / len(relevancy))
+            self.corpus[(subject, predicate, objecT)] = fmi * (float(sum(relevancy)) / len(relevancy))
 
     def normalise_corpus(self, cut_off=0.95, min_quo=0.1):
         """

@@ -21,7 +21,7 @@ NP: {<JJ.*>*(<N.*>|<JJ.*>)+}
 
 def split_paragraphs(text: str) -> [str]:
     """
-    Takes a text and collects the paragaphs of the text.
+    Takes a text and collects the paragraphs of the text.
     
         Args:
             text: The input string. Unmodified, keep it as is. Supposed to be
@@ -52,7 +52,7 @@ def split_paragraphs(text: str) -> [str]:
 
 def pos_tag(text: str) -> [Sentence]:
     """
-    Tokenizes a given text and generates a list of Sentence objects.
+    Tokenize a given text and generates a list of Sentence objects.
         
         Args:
             text: The input text that is to be POS tagged.
@@ -141,6 +141,8 @@ def get_cooc(chunk_trees, stoplist=True, language="english"):
             chunk_trees: Tree from the NLTK RegexParser.
             stoplist: Optional. Default: True.
                 Whether or not stopwords are to be removed.
+            language: Optional. Default: "english".
+                The language of the texts.
     """
     triples = []
     simple_trees = []
@@ -168,7 +170,7 @@ def get_cooc(chunk_trees, stoplist=True, language="english"):
                         words.append(word)
                 if len(words) > 0:
                     entities.append("_".join(words))
-                    ### experimental
+                    # experimental
                     entities.extend(words)
         for e1, e2 in combinations(entities, 2):
             triples.append((e1, "close to", e2))
@@ -176,11 +178,11 @@ def get_cooc(chunk_trees, stoplist=True, language="english"):
     return triples, simple_trees
 
 
-def generate_source(token2sentences,
+def generate_source(token2sentences: dict,
                     *,
-                    paragraph_id: int = None,
-                    distance_threshhold=5,
-                    weight_threshold=1 / 3) -> [Closeness]:
+                    paragraph_id: object = str,
+                    distance_threshold: int = 5,
+                    weight_threshold: float = 1 / 3) -> object:
     """
     Generates source/statement (srcstm) for following steps.
     
@@ -190,15 +192,17 @@ def generate_source(token2sentences,
                 from text2cooc function.
             paragraph_id: The ID of the paragraph the text2sentences dictionary
                 belongs to.
-            distance_threshhold: Optional. Default: 5. 
+            distance_threshold: Optional. Default: 5.
                 How far apart terms may be to be still considered close 
                 / relevant to each other.
+            weight_threshold: Optional. Default: 1/3.
+                The minimum weight.
         Returns:
             A list of Closeness objects, representing the "relatedness" of
             the terms in the sentences of token2sentences.
     """
 
-    closenesses = []
+    closeness_list = []
 
     # get all term combinations to see if they are close to each other
     for term1, term2 in combinations(list(token2sentences.keys()), 2):
@@ -215,24 +219,24 @@ def generate_source(token2sentences,
                 distance = math.fabs(position1 - position2)
 
                 # check if terms are close enough to each other
-                if (distance < distance_threshhold):
+                if distance < distance_threshold:
                     # calculate new weight
                     w += 1 / (1 + distance)
 
         # check if terms are relevant enough
         if w > weight_threshold:
-            closenesses.append(Closeness(term1, term2, w, paragraph_id))
+            closeness_list.append(Closeness(term1, term2, w, paragraph_id))
 
     w2statements = defaultdict(list)
-    for closeness in closenesses:
+    for closeness in closeness_list:
         w2statements[closeness.closeness].append(closeness)
 
-    ## get weight values in descending orders - why?
+    # get weight values in descending orders - why?
     keys = list(w2statements.keys())
     keys.sort(reverse=True)
     new_lines = []
 
-    ## get list of closeness, ordered by descending weight
+    # get list of closeness, ordered by descending weight
     for key in keys:
         for closeness in w2statements[key]:
             new_lines.append(closeness)
