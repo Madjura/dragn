@@ -6,6 +6,8 @@ from index.helpers import generate_relation_provenance_weights, \
     generate_relation_to_provenances, index_to_db
 from knowledge_base.neomemstore import NeoMemStore
 from util import paths
+from pycallgraph.output.graphviz import GraphvizOutput
+from pycallgraph.pycallgraph import PyCallGraph
 
 
 def generate_relation_values(sources, relations):
@@ -182,5 +184,14 @@ def index_step_old():
     """
 
 
+def with_graphvizoutput():
+    graphviz = GraphvizOutput()
+    graphviz.output_file = 'index_step.png'
+
+    with PyCallGraph(output=graphviz):
+        index_step()
+
+
 if __name__ == "__main__":
-    index_step()
+    #index_step()
+    with_graphvizoutput()

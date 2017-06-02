@@ -1,6 +1,8 @@
 from knowledge_base.analyser import Analyser
 from knowledge_base.neomemstore import NeoMemStore
 from util import paths
+from pycallgraph.output.graphviz import GraphvizOutput
+from pycallgraph.pycallgraph import PyCallGraph
 
 
 def knowledge_base_compute(top=100):
@@ -94,5 +96,13 @@ def knowledge_base_compute(top=100):
     memstore.export(paths.MEMSTORE_PATH_EXPERIMENTAL + "/")
 
 
+def with_graphviz_output():
+    graphviz = GraphvizOutput()
+    graphviz.output_file = 'knowledge_base_compute.png'
+
+    with PyCallGraph(output=graphviz):
+        knowledge_base_compute()
+
 if __name__ == "__main__":
+    #with_graphviz_output()
     knowledge_base_compute()

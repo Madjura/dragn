@@ -7,6 +7,8 @@ from extract.text_extract import split_paragraphs, pos_tag, parse_pos, text2cooc
     generate_source
 from text.paragraph import Paragraph
 from util import paths
+from pycallgraph.output.graphviz import GraphvizOutput
+from pycallgraph.pycallgraph import PyCallGraph
 
 
 def make_folders():
@@ -137,6 +139,14 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english"):
     pickle.dump(closeness,
                 open(paths.CLOSENESS_PATH + "/" + "closeness.p", "wb"))
 
+
+def with_graphviz_output():
+    graphviz = GraphvizOutput()
+    graphviz.output_file = 'extract_step.png'
+
+    with PyCallGraph(output=graphviz):
+        make_folders()
+        extract_step(language="english")
 
 if __name__ == "__main__":
     make_folders()

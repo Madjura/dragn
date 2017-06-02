@@ -173,6 +173,8 @@ class QueryResult(object):
                         w = membership * relation_weight * (w1 + w2) / 2
                         provenance_relations[(prov2, prov1)] += w
         self.relation_set = relation_dict
+        # ADD THE RELATIONS THAT ARE USED TO CALC WEIGHT TO PROV DICT
+        # THIS WAY ITS CLEARER WHY THE SCORES ARE WHAT THEY ARE
         if provenance_dict:
             self.provenance_set = FuzzySet.from_dictionary(provenance_dict)
 
