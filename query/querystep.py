@@ -20,5 +20,5 @@ def with_graphvizoutput():
 
 
 if __name__ == "__main__":
-    #query(["ron", "dumbledore"])
+    #query(["cult", "fish", "water", "fear"])
     with_graphvizoutput()

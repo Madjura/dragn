@@ -1,32 +1,62 @@
 {% extends "base.html" %}
 {% block content %}
-    {% load static %}
-    <script>
-        var graphElements = {{ graph_elements|safe }};
-    </script>
-    <script src="{% static 'skimmr_django/js/jquery-3.1.1.min.js' %}"></script>
-    <script src="{% static 'queryapp/js/cytoscape.js' %}"></script>
-    <script src="{% static 'queryapp/js/cytoscape-menu.js' %}"></script>
-    <script src="{% static 'queryapp/js/weaver.js' %}"></script>
-    <script src="{% static 'queryapp/js/layout.js' %}"></script>
-    <script src="{% static 'queryapp/js/result.js' %}"></script>
-    <script src="{% static 'queryapp/js/jquery.get-word-by-event.js' %}"></script>
-    <link rel="stylesheet" type="text/css" href="{% static 'queryapp/css/result.css' %}"/>
-    <div id="cy"></div>
-    <div id="text-samples">
-        {% for provenance, weight, content, matches in samples %}
-            <div class="text-match-wrapper">
-                <h3>{{ provenance }}, {{ weight }}}</h3>
-	            <div class="text">
-	                {{ content|safe|escape }}
-	            </div>
-	            <div class="match">
-	               {% for match in matches %}
-	                   {{ match }}<br/>
-	               {% endfor %}
-	            </div>
-	        </div>
-            <hr>
-        {% endfor %}
-    </div>
+{% load static %}
+<script>
+    var graphElements = {{ graph_elements|safe }};
+</script>
+<script src="{% static 'skimmr_django/js/jquery-3.1.1.min.js' %}"></script>
+<script src="{% static 'queryapp/js/cytoscape.js' %}"></script>
+<script src="{% static 'queryapp/js/cytoscape-menu.js' %}"></script>
+<script src="{% static 'queryapp/js/weaver.js' %}"></script>
+<script src="{% static 'queryapp/js/layout.js' %}"></script>
+<script src="{% static 'queryapp/js/result.js' %}"></script>
+<script src="{% static 'queryapp/js/jquery.tablesorter.js' %}"></script>
+<script src="{% static 'queryapp/js/jquery.get-word-by-event.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'queryapp/css/result.css' %}"/>
+<link rel="stylesheet" type="text/css" href="{% static 'queryapp/css/tablesorter.css' %}"/>
+<div id="cy"></div>
+<div id="text-samples">
+    {% for provenance, prov_relations, content, matches in samples %}
+        <div class="text-match-wrapper">
+            <h3>{{ provenance }}, {{ prov_relations.0 }}</h3>
+         <div class="text">
+             {{ content|safe|escape }}
+         </div>
+         <div class="match">
+            <h4>Text contains:</h4>
+            <div class="match-samples">
+             {% for match in matches %}
+                 {{ match }}<br/>
+             {% endfor %}
+            </div>
+            <h4>Relations and values</h4>
+            <div class="relations">
+                {% for l in prov_relations.1 %}
+                    <table class="tablesorter-blackice tablesorter">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Predicate</th>
+                                <th>Object</th>
+                                <th>Weight</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+		                    {% for triple in l %}
+		                      <tr>
+                                    <td>{{ triple.1 }}</td> 
+		                            <td {% if triple.2 == "close to" %}style="color:deepskyblue"{% elif triple.2 == "related to" %}style="color:red"{% endif %}>{{ triple.2 }}</td>
+			                        <td>{{ triple.3 }}</td>
+	                                <td>{{ triple.0 }}</td> 
+		                      </tr>
+		                    {% endfor %}
+	                    </tbody>
+                    </table>
+                {% endfor %}
+            </div>
+         </div>
+     </div>
+        <hr>
+    {% endfor %}
+</div>
 {% endblock %}

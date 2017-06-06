@@ -81,13 +81,15 @@
 .text {
 	overflow-y: scroll;
 	height: 500px;
-	width: 70%;
+	width: 45%;
 	float: left;
 }
 
 .match {
-	width: 30%;
+	width: 55%;
 	float: left;
+    overflow-y: scroll;
+    height: 500px;
 }
 
 .text-match-wrapper {
@@ -95,7 +97,7 @@
 }
 
 #content {
-	max-width: 80%;
+	max-width: 90%;
 }
 
 .text-match-wrapper {

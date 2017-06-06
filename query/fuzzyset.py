@@ -168,7 +168,6 @@ class FuzzySet:
                 A FuzzySet object with normalised weights based on the input
                 dictionary.
         """
-
         membership = FuzzySet()
         normalisation = Decimal(max(dictionary.values()))
         if normalisation <= 0:
@@ -181,3 +180,45 @@ class FuzzySet:
                 normalised = 0
             membership[key] = normalised
         return membership
+    
+    
+class ProvFuzzySet(FuzzySet):
+    @staticmethod
+    def from_list_dictionary(list_dictionary):
+        membership = ProvFuzzySet()
+        normalisation = Decimal(max([x[0] for x in list_dictionary.values()]))
+        if normalisation <= 0:
+            normalisation = Decimal(1)
+        for key, value in list_dictionary.items():
+            normalised = Decimal(value[0]) / normalisation
+            if normalised > 1:
+                normalised = 1
+            elif normalised < 0:
+                normalised = 0
+            membership[key] = (normalised, value[1:])
+        return membership
+    
+    def __setitem__(self, member, degree):
+        if degree == 0:
+            if member in self.members:
+                del self.members[member]
+        else:
+            try:
+                if degree <= 1:
+                    self.members[member] = float(degree)
+            except TypeError:
+                degree, value = degree
+                self.members[member] = (degree, value)
+                
+    def sort(self, reverse=False, limit=0):
+        # iterator over items sorted from the least to most relevant (or reverse)
+
+        l = [(x, d) for x, d in list(self.members.items())]
+        l.sort(key=lambda x: x[1], reverse=reverse)
+        i = 0
+        for member, degree in l:
+            yield member, degree
+            i += 1
+            if 0 < limit <= i:
+                # if there is a limit and it was reached, stop
+                break

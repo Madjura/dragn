@@ -8,7 +8,7 @@ from math import log
 from graph.edge import Edge
 from graph.graph import Graph
 from graph.node import CytoNode
-from query.fuzzyset import FuzzySet
+from query.fuzzyset import FuzzySet, ProvFuzzySet
 from util import paths
 
 
@@ -124,7 +124,7 @@ class QueryResult(object):
 
         # { provenance: calculated weight }
         # indicates how "related" a provenance is to the query
-        provenance_dict = defaultdict(int)
+        provenance_dict = defaultdict(lambda: [0, []])
 
         # { (prov1, prov2): weight }
         # indicates how "related" two provenances are
@@ -168,15 +168,14 @@ class QueryResult(object):
 
                 for prov_tuple in relation2prov[(subject, predicate, objecT)]:
                     for provenance, prov_weight in prov_tuple:
-                        provenance_dict[provenance] += membership * relation_weight * prov_weight
+                        provenance_dict[provenance][0] += membership * relation_weight * prov_weight
+                        provenance_dict[provenance][1].append((prov_weight, subject, predicate, objecT))
                     for (prov1, w1), (prov2, w2) in combinations(prov_tuple, 2):
                         w = membership * relation_weight * (w1 + w2) / 2
                         provenance_relations[(prov2, prov1)] += w
         self.relation_set = relation_dict
-        # ADD THE RELATIONS THAT ARE USED TO CALC WEIGHT TO PROV DICT
-        # THIS WAY ITS CLEARER WHY THE SCORES ARE WHAT THEY ARE
         if provenance_dict:
-            self.provenance_set = FuzzySet.from_dictionary(provenance_dict)
+            self.provenance_set = ProvFuzzySet.from_list_dictionary(provenance_dict)
 
     def generate_statement_nodes(self, max_nodes):
         """
