@@ -20,5 +20,5 @@ def with_graphvizoutput():
 
 
 if __name__ == "__main__":
-    #query(["cult", "fish", "water", "fear"])
-    with_graphvizoutput()
+    query(["cult", "fish", "water", "fear"])
+    #with_graphvizoutput()

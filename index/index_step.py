@@ -193,5 +193,5 @@ def with_graphvizoutput():
 
 
 if __name__ == "__main__":
-    #index_step()
-    with_graphvizoutput()
+    index_step()
+    #with_graphvizoutput()

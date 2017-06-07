@@ -79,9 +79,7 @@ def knowledge_base_compute(top=100):
     matrix = memstore.corpus.matricise(0)
     analyser = Analyser(memstore, matrix=matrix, trace=True)
 
-    tokens = [x for x in memstore.sorted(
-        ignored=".*_[0-9]+$|related to|close to")]
-
+    tokens = [x for x in memstore.sorted(ignored=".*_[0-9]+$|related to|close to")]
     similarity_dictionary = {}
     for i, subject in enumerate(tokens):
         print(i, " out of ", len(tokens))

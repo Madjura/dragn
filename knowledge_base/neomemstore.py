@@ -99,8 +99,8 @@ class NeoMemStore(object):
         for subject, predicate, objecT in relation2provs:
             # get the relevances for subject, predicate, object tuples
             # this is the Closeness.closeness value
-            relevancy = [x[1] for x in relation2provs[
-                (subject, predicate, objecT)]]
+            relevancy = [x[1] 
+                         for x in relation2provs[(subject, predicate, objecT)]]
             # get the joint frequency of subject and object
             joint = joint_freq[(subject, objecT)]
 

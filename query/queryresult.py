@@ -27,8 +27,11 @@ class QueryResult(object):
         self.provenance_set = FuzzySet()
         # minimum weight that relations must have to be considered
         self.min_weight = min_weight
-        self.relations = self.load_token2related()
         self.visualization_parameters = self.load_parameters()
+        self.relation2prov = self.load_relation2prov()
+        self.relations = self.load_token2related()
+        # { relation_triple: [(provenance, weight), ...] }
+        self.relation_sets = self.load_relation_sets()
 
     @staticmethod
     def load_relation2prov(path=os.path.join(
@@ -64,12 +67,11 @@ class QueryResult(object):
         """
         import time
         start = time.time()
-        relation_sets = self.load_relation_sets()
         query_relevant = FuzzySet()
         for term in self.query:
             # x are tuples of (token, weight)
-            query_relevant = query_relevant | FuzzySet([x
-                                                        for x in relation_sets[term]])
+            # keeps the higher value of "close to" and "related to" both present
+            query_relevant = query_relevant | FuzzySet([x for x in self.relation_sets[term]])
         print("prepare for query took {}".format(time.time() - start))
         return query_relevant
 
@@ -114,9 +116,17 @@ class QueryResult(object):
     def populate_dictionaries(self):
         """
         Prepares the ranking of tokens / relations for use with the graph.
+        
+            1) Get all tokens possibly relevant to the query
+            2) Get all triples related to the token in some way
+            3) Filter out those with too low of a relation as specified by min_weight
+            4) Filter out those that don't have relevance to the query or that token
+            5) Get the degree of membership of the token <-> the query
+            6) Multiply the membership with the weight from the triple
+            7) Add that value to a dict for the related token and the matching queryterm (used to calculate nodes)
+            8) Get the provenance, weight tuple for the relation triple
+            9) Weight the provenance by the prov weight * relation weight * membership
         """
-        # { relation_triple: [(provenance, weight), ...] }
-        relation2prov = self.load_relation2prov()
 
         # { relation_triple: calculated weight }
         # used to rank / limit the graph nodes by top values
@@ -157,7 +167,6 @@ class QueryResult(object):
                 keeps higher of close to / related to
                 """
                 membership = relevant_cut[possibly_related]
-
                 calculated_relation_weight = membership * relation_weight
                 relation_dict[(subject, predicate, objecT)] += calculated_relation_weight
                 self.tokens2weights[possibly_related] += calculated_relation_weight
@@ -165,8 +174,7 @@ class QueryResult(object):
                     self.tokens2weights[subject] += calculated_relation_weight
                 elif objecT != possibly_related:
                     self.tokens2weights[objecT] += calculated_relation_weight
-
-                for prov_tuple in relation2prov[(subject, predicate, objecT)]:
+                for prov_tuple in self.relation2prov[(subject, predicate, objecT)]:
                     for provenance, prov_weight in prov_tuple:
                         provenance_dict[provenance][0] += membership * relation_weight * prov_weight
                         provenance_dict[provenance][1].append((prov_weight, subject, predicate, objecT))

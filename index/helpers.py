@@ -3,16 +3,16 @@ from _collections import defaultdict
 
 def generate_relation_provenance_weights(sources):
     """
-    Generates the mapping of relation tuples to provenance with closeness
+    Generates the mapping of predicate tuples to provenance with closeness
     therein.
     """
 
     dictionary = defaultdict(lambda: list())
     inverse = defaultdict(lambda: set())
-    for (token, relation, token2, provenance), closeness in sources.items():
-        dictionary[(token, relation, token2)].append((provenance, closeness))
-        inverse[token].add(provenance)
-        inverse[token2].add(provenance)
+    for (subject, predicate, objecT, provenance), closeness in sources.items():
+        dictionary[(subject, predicate, objecT)].append((provenance, closeness))
+        inverse[subject].add(provenance)
+        inverse[objecT].add(provenance)
     return dictionary, inverse
 
 
