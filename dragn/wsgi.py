@@ -1,5 +1,5 @@
 """
-WSGI config for skimmr_django project.
+WSGI config for dragn project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
