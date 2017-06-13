@@ -7,19 +7,22 @@ from pycallgraph.pycallgraph import PyCallGraph
 from query import querystep
 
 
-
-def all_steps(query=None):
+def all_steps(query=None, texts=None, language="english", alias=None):
+    alias_object = alias
+    alias = "/" + alias.identifier
     print("MAKING FOLDERS")
-    make_folders()
+    make_folders(alias=alias)
     print("FOLDERS DONE, EXTRACT STEP")
-    extract_step()
+    extract_step(texts=texts, language=language, alias=alias)
     print("EXTRACT STEP DONE, KB CREATE")
-    knowledge_base_create()
+    knowledge_base_create(alias=alias)
     print("KB CREATE DONE, KB COMPUTE")
-    knowledge_base_compute()
+    knowledge_base_compute(alias=alias)
     print("KB COMPUTE DONE, INDEX")
-    index_step()
+    index_step(alias=alias)
     print("INDEX DONE")
+    alias_object.processed = True
+    alias_object.save()
     if query:
         querystep.query(query)
 

@@ -5,7 +5,7 @@ from pycallgraph.output.graphviz import GraphvizOutput
 from pycallgraph.pycallgraph import PyCallGraph
 
 
-def knowledge_base_compute(top=100):
+def knowledge_base_compute(top=100, alias=None):
     """
     In this step, expressions related to other expressions are identified and 
     stored in the NeoMemStore.
@@ -75,7 +75,7 @@ def knowledge_base_compute(top=100):
             to the disk.
     """
     memstore = NeoMemStore()
-    memstore.import_memstore(paths.MEMSTORE_PATH_EXPERIMENTAL)
+    memstore.import_memstore(paths.MEMSTORE_PATH_EXPERIMENTAL + alias)
     matrix = memstore.corpus.matricise(0)
     analyser = Analyser(memstore, matrix=matrix, trace=True)
 
@@ -91,7 +91,7 @@ def knowledge_base_compute(top=100):
                 similarity_dictionary[(subject, "related to", objecT)] = weight
     for key, value in similarity_dictionary.items():
         memstore.corpus[key] = value
-    memstore.export(paths.MEMSTORE_PATH_EXPERIMENTAL + "/")
+    memstore.export(paths.MEMSTORE_PATH_EXPERIMENTAL + alias + "/")
 
 
 def with_graphviz_output():

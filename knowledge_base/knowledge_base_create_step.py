@@ -6,7 +6,7 @@ from pycallgraph.output.graphviz import GraphvizOutput
 from pycallgraph.pycallgraph import PyCallGraph
 
 
-def knowledge_base_create():
+def knowledge_base_create(alias=None):
     """
     NeoMemStore is built in this step, based on the texts from the text_extract 
     step.
@@ -80,13 +80,13 @@ def knowledge_base_create():
     memstore = NeoMemStore()
 
     # closenesses are calculcated in extract_step
-    closenesses = pickle.load(open(paths.CLOSENESS_PATH + "/closeness.p", "rb"))
+    closenesses = pickle.load(open(paths.CLOSENESS_PATH + alias + "/closeness.p", "rb"))
     memstore.incorporate(closenesses)
     print("relations len ", len(memstore.relations))
     memstore.compute_corpus()
     memstore.normalise_corpus()
     print(len(memstore.corpus))
-    memstore.export(paths.MEMSTORE_PATH_EXPERIMENTAL + "/")
+    memstore.export(paths.MEMSTORE_PATH_EXPERIMENTAL + alias + "/")
 
 
 def with_graphvizoutput():

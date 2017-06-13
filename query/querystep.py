@@ -3,10 +3,11 @@ from pycallgraph.output.graphviz import GraphvizOutput
 from pycallgraph.pycallgraph import PyCallGraph
 
 
-def query(query=None):
+def query(query=None, alias=None):
     if query is None:
         query = []
-    foo = QueryResult()
+    print(alias)
+    foo = QueryResult(alias=alias)
     foo.query = query
     foo.populate_dictionaries()
     return foo

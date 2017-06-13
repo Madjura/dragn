@@ -13,11 +13,11 @@ from graph.graph import Graph
 from util.pagerank import PageRank
 
 
-def generate_relation_values(sources, relations):
+def generate_relation_values(sources, relations, alias):
     relation2prov, index = generate_relation_provenance_weights(sources)
     index_to_db(index)
     with gzip.open(
-            os.path.join(paths.RELATION_PROVENANCES_PATH,
+            os.path.join(paths.RELATION_PROVENANCES_PATH + alias,
                          "provenances.tsv.gz"), "w") as f_out:
         for relation, prov_weights in relation2prov.items():
             line = "\t".join([str(relation), str(prov_weights)])
@@ -30,19 +30,19 @@ def generate_relation_values(sources, relations):
     f_out.close()
 
 
-def make_expression_sets(relation_dictionary):
+def make_expression_sets(relation_dictionary, alias):
     term_lines = []
     for expression1, related_set in list(relation_dictionary.items()):
         for expression2, weight in related_set:
             term_lines.append("\t".join([str(x)
                                          for x in [expression1, expression2, weight]]))
-    with gzip.open(os.path.join(paths.EXPRESSION_SET_PATH_EXPERIMENTAL,
+    with gzip.open(os.path.join(paths.EXPRESSION_SET_PATH_EXPERIMENTAL + alias,
                                 "relationsets.tsv.gz"), "wb") as f:
         f.write(("\n".join(term_lines)).encode())
     f.close()
 
 
-def make_relation_list(relations):
+def make_relation_list(relations, alias):
     """
     Creates a mapping of token: set of relations.
         Example:
@@ -60,10 +60,11 @@ def make_relation_list(relations):
         relation_dictionary[subject].add((objecT, weight))
         relation_dictionary[objecT].add((subject, weight))
     with gzip.open(
-            os.path.join(paths.RELATIONS_PATH, "relations.tsv.gz"), "wb") as f:
+            os.path.join(paths.RELATIONS_PATH + alias, "relations.tsv.gz"), "wb") as f:
         f.write("\n".join(relation_lines).encode())
     f.close()
     return relation_dictionary
+
 
 def make_pagerank(relations):
     nodes = {}
@@ -93,13 +94,13 @@ def make_pagerank(relations):
     print(pr)
     
                 
-def index_step():
+def index_step(alias):
     memstore = NeoMemStore()
-    memstore.import_memstore(paths.MEMSTORE_PATH_EXPERIMENTAL)
-    relation_dictionary = make_relation_list(memstore.corpus.items())
+    memstore.import_memstore(paths.MEMSTORE_PATH_EXPERIMENTAL + alias)
+    relation_dictionary = make_relation_list(memstore.corpus.items(), alias)
     # make_pagerank(memstore.corpus.items())
-    make_expression_sets(relation_dictionary)
-    generate_relation_values(memstore.relations, memstore.corpus)
+    make_expression_sets(relation_dictionary, alias)
+    generate_relation_values(memstore.relations, memstore.corpus, alias)
 
 
 def index_step_old():

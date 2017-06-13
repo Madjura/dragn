@@ -1,7 +1,8 @@
 MAIN_FOLDER = "../data"
 
 # Path to where the texts are placed
-TEXT_PATH = MAIN_FOLDER + "/texts"
+# TEXT_PATH = MAIN_FOLDER + "/texts"
+TEXT_PATH = "E:\workspace\dragn\data\\texts"
 
 TEXT_META_PATH = MAIN_FOLDER + "/texts/meta"
 
@@ -29,7 +30,8 @@ RELATIONS_PATH = MAIN_FOLDER + "/relations"
 
 RELATION_EXPRESSIONS_PATH = MAIN_FOLDER + "/relations/expressions"
 
-RELATION_PROVENANCES_PATH = MAIN_FOLDER + "/relations/provenances"
+#RELATION_PROVENANCES_PATH = MAIN_FOLDER + "/relations/provenances"
+RELATION_PROVENANCES_PATH = "E:\\workspace\\data\\relations\\provenances"
 
 RELATIONS_WITH_PROVENANCES_PATH = MAIN_FOLDER + "/relations/provenances"
 

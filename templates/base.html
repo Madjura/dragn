@@ -8,20 +8,23 @@
 
 <body>
 <div id="nav">
-    <ul id="nav-ul">
-        <li><a class="hover" href="{% url 'upload' %}">Upload texts</a></li>
-    </ul>
-    
-    <div id="form">
-        <form action="{% url 'query' %}" method="post" id="query-form">
-            {% csrf_token %}
+    {% if request.user.is_superuser %}
+        <a class="hover" href="{% url 'upload' %}">Upload texts</a>
+        <a class="hover" href="{% url 'process' %}">Process texts</a>
+    {% endif %}
 
-            {% for field in queryform %}
-                <label for="{{ field.auto_id }}">{{ field.label }}</label> {{ field }}
-            {% endfor %}
-            <input type="submit" class="ajax" value="Search" name="search">
-        </form>
-    </div>
+    {% if queryform %}
+        <div id="form">
+            <form action="{% url 'query' %}" method="post" id="query-form">
+                {% csrf_token %}
+
+                {% for field in queryform %}
+                    <label for="{{ field.auto_id }}">{{ field.label }}</label> {{ field }}
+                {% endfor %}
+                <input type="submit" class="ajax" value="Search" name="search">
+            </form>
+        </div>
+    {% endif %}
 </div>
 
 <div id="content">

@@ -16,11 +16,13 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
-from queryapp.views import query
+from queryapp.views import query, process
 from uploadapp.views import UploadView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^query/$', query, name="query"),
     url(r'^upload/$', UploadView.as_view(), name="upload"),
+    url(r'^process/$', process, name="process"),
+    url(r'$', query, name="index"),
 ]

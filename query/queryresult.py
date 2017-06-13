@@ -18,7 +18,7 @@ class QueryResult(object):
     format that can be displayed to the user.
     """
 
-    def __init__(self, min_weight=0.5):
+    def __init__(self, min_weight=0.5, alias=None):
         self.query = None
         self.queried_combined = defaultdict(lambda: set())
         self.aliases = defaultdict(lambda: set())
@@ -28,10 +28,11 @@ class QueryResult(object):
         # minimum weight that relations must have to be considered
         self.min_weight = min_weight
         self.visualization_parameters = self.load_parameters()
-        self.relation2prov = self.load_relation2prov()
-        self.relations = self.load_token2related()
+        self.relation2prov = self.load_relation2prov(path=paths.RELATION_PROVENANCES_PATH + alias + "/provenances.tsv.gz")
+        self.relations = self.load_token2related(path=os.path.join(paths.RELATIONS_PATH + alias, "relations.tsv.gz"))
         # { relation_triple: [(provenance, weight), ...] }
-        self.relation_sets = self.load_relation_sets()
+        self.relation_sets = self.load_relation_sets(path=paths.EXPRESSION_SET_PATH_EXPERIMENTAL + alias)
+        self.alias = alias
 
     @staticmethod
     def load_relation2prov(path=os.path.join(
@@ -252,10 +253,9 @@ class QueryResult(object):
         return Graph(nodes=nodes.values())
 
     @staticmethod
-    def load_token2related():
+    def load_token2related(path=os.path.join(paths.RELATIONS_PATH, "relations.tsv.gz")):
         """Loads the mapping of tokens to the related tokens."""
         token2related = defaultdict(lambda: list())
-        path = os.path.join(paths.RELATIONS_PATH, "relations.tsv.gz")
         with gzip.open(path, "rb") as f:
             for line in f.read().decode().split("\n"):
                 spl = line.split("\t")

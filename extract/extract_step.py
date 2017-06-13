@@ -11,17 +11,21 @@ from pycallgraph.output.graphviz import GraphvizOutput
 from pycallgraph.pycallgraph import PyCallGraph
 
 
-def make_folders():
+def make_folders(alias=None):
     """
     Creates the folders required for using the system.
     The path to the folders can be found in the "util" package.
     """
     for path in paths.ALL:
-        if not os.path.exists(path):
-            os.makedirs(path)
+        if not alias:
+            if not os.path.exists(path):
+                os.makedirs(path)
+        else:
+            if not os.path.exists(path + "/" + alias):
+                os.makedirs(path + "/" + alias)
 
 
-def extract_step(text_path: str = paths.TEXT_PATH, language="english"):
+def extract_step(text_path: str = paths.TEXT_PATH, language="english", texts=None, alias=None):
     """
     Processes all files in a given folder.
     The process is as follows:
@@ -87,6 +91,8 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english"):
     # iterate over texts
     closeness = []
     files = os.listdir(text_path)
+    if texts:
+        files = texts
     for text in files:
         if not text.endswith(".txt"):
             # support different file types here
@@ -125,19 +131,18 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english"):
                     paragraph_id="{}_{}".format(str(text), str(count))
                 )
                 closeness.append(closeness_list)
-
-                with open(paths.PARAGRAPH_CONTENT_PATH + "/{}_{}".format(
-                        text, count), "w", encoding="utf8") as content_file:
+                with open(paths.PARAGRAPH_CONTENT_PATH + "{}/{}_{}".format(
+                        alias, text, count), "w", encoding="utf8") as content_file:
+                    print(content_file)
                     content_file.write(paragraph)
-
             pickle.dump(paragraph_list,
-                        open(paths.POS_PATH + "/" + text + ".p", "wb"))
+                        open(paths.POS_PATH + "/" + alias + "/" + text + ".p", "wb"))
 
     with open(paths.TEXT_META_PATH + "/all_meta", "w",
               encoding="utf8") as metafile:
         metafile.write(",".join([x for x in files if x.endswith(".txt")]))
     pickle.dump(closeness,
-                open(paths.CLOSENESS_PATH + "/" + "closeness.p", "wb"))
+                open(paths.CLOSENESS_PATH + "/" + alias + "/" + "closeness.p", "wb"))
 
 
 def with_graphviz_output():
