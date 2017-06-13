@@ -8,6 +8,9 @@ from knowledge_base.neomemstore import NeoMemStore
 from util import paths
 from pycallgraph.output.graphviz import GraphvizOutput
 from pycallgraph.pycallgraph import PyCallGraph
+from graph.node import Node
+from graph.graph import Graph
+from util.pagerank import PageRank
 
 
 def generate_relation_values(sources, relations):
@@ -62,11 +65,39 @@ def make_relation_list(relations):
     f.close()
     return relation_dictionary
 
-
+def make_pagerank(relations):
+    nodes = {}
+    for (subject, predicate, objecT), weight in relations:
+        if predicate == "close to":
+            if not subject in nodes:
+                nodes[subject] = Node(name=subject)
+            if not objecT in nodes:
+                nodes[objecT] = Node(name=objecT)
+            edge = nodes[subject].get_edge(end=nodes[objecT])
+            if edge and weight > edge.val:
+                edge.val = weight
+            elif not edge:
+                nodes[subject].add_edge(nodes[objecT], weight)
+    graph = Graph(nodes=list(nodes.values()))
+    pagerank = PageRank(graph)
+    pagerank.initial_matrix()
+    pagerank.probability_matrix()
+    vector = [0 for _ in range(len(nodes.values()))]
+    vector[0] = 1
+    result = pagerank.iterate_until_convergence(vector, iterations=100)
+    foo = sorted(range(len(result.result)), key=lambda k: result.result[k], reverse=True)
+    cut = foo[:100]
+    pr = []
+    for index in cut:
+        pr.append((graph.nodes[index].name, result.result[index]))
+    print(pr)
+    
+                
 def index_step():
     memstore = NeoMemStore()
     memstore.import_memstore(paths.MEMSTORE_PATH_EXPERIMENTAL)
     relation_dictionary = make_relation_list(memstore.corpus.items())
+    # make_pagerank(memstore.corpus.items())
     make_expression_sets(relation_dictionary)
     generate_relation_values(memstore.relations, memstore.corpus)
 

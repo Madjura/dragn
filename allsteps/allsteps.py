@@ -30,5 +30,5 @@ def with_graphvizoutput():
         all_steps(["cult", "fish", "water", "fear"])
 
 if __name__ == "__main__":
-    #all_steps()
-    with_graphvizoutput()
+    all_steps()
+    #with_graphvizoutput()

@@ -39,6 +39,9 @@ class Node(object):
 
     def add_edge_object(self, edge: Edge):
         self.edges.append(edge)
+        
+    def add_edge(self, target, value):
+        self.edges.append(Edge(start=self, end=target, val=value))
 
     def get_edge(self, *, end: int = None):
         """

@@ -171,7 +171,7 @@ def get_cooc(chunk_trees, stoplist=True, language="english"):
                 if len(words) > 0:
                     entities.append("_".join(words))
                     # experimental
-                    entities.extend(words)
+                    #entities.extend(words)
         for e1, e2 in combinations(entities, 2):
             triples.append((e1, "close to", e2))
             triples.append((e2, "close to", e1))
@@ -230,7 +230,6 @@ def generate_source(token2sentences: dict,
     w2statements = defaultdict(list)
     for closeness in closeness_list:
         w2statements[closeness.closeness].append(closeness)
-
     # get weight values in descending orders - why?
     keys = list(w2statements.keys())
     keys.sort(reverse=True)

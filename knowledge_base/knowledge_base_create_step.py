@@ -82,8 +82,10 @@ def knowledge_base_create():
     # closenesses are calculcated in extract_step
     closenesses = pickle.load(open(paths.CLOSENESS_PATH + "/closeness.p", "rb"))
     memstore.incorporate(closenesses)
+    print("relations len ", len(memstore.relations))
     memstore.compute_corpus()
     memstore.normalise_corpus()
+    print(len(memstore.corpus))
     memstore.export(paths.MEMSTORE_PATH_EXPERIMENTAL + "/")
 
 
