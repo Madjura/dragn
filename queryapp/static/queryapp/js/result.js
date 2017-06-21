@@ -21,7 +21,7 @@ function updateCy(elements) {
                     "text-valign": "center",
                     "width": "data(size)",
                     "height": "data(size)",
-                    "background-color": "data(color)",
+                    "background-color": "data(color)"
                 }
             },
             {

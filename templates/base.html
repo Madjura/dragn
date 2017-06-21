@@ -8,6 +8,7 @@
 
 <body>
 <div id="nav">
+    <a class="hover" href="{% url 'index' %}">Main</a>
     {% if request.user.is_superuser %}
         <a class="hover" href="{% url 'upload' %}">Upload texts</a>
         <a class="hover" href="{% url 'process' %}">Process texts</a>
