@@ -36,7 +36,6 @@ from graph.node import CytoNode
 from query.fuzzyset import FuzzySet, ProvFuzzySet
 from util import paths
 
-
 class QueryResult(object):
     """
     Wrapper over the processed text files to produce a graph in JSON
@@ -53,9 +52,12 @@ class QueryResult(object):
         # minimum weight that relations must have to be considered
         self.min_weight = min_weight
         self.visualization_parameters = self.load_parameters()
+        print("Loading relation to provenance mapping")
         self.relation2prov = self.load_relation2prov(path=paths.RELATION_PROVENANCES_PATH + alias + "/provenances.tsv.gz")
+        print("Loading related")
         self.relations = self.load_token2related(path=os.path.join(paths.RELATIONS_PATH + alias, "relations.tsv.gz"))
         # { relation_triple: [(provenance, weight), ...] }
+        print("Loading relations")
         self.relation_sets = self.load_relation_sets(path=paths.EXPRESSION_SET_PATH_EXPERIMENTAL + alias)
         self.alias = alias
 
@@ -75,12 +77,11 @@ class QueryResult(object):
                 A dictionary of relation tuple -> provenance mappings.
         """
         relation2prov = defaultdict(lambda: list())
-        with gzip.open(path, "r") as f:
-            lines = f.read().decode().split("\n")
-            for line in lines:
+        with gzip.open(path, "rb") as f:
+            for line in f:
                 if not line:
                     continue
-                line_split = line.split("\t")
+                line_split = line.decode().split("\t")
                 relation_tuple = literal_eval(line_split[0])
                 provenances = literal_eval(line_split[1])
                 relation2prov[relation_tuple].append(provenances)
@@ -91,14 +92,11 @@ class QueryResult(object):
         Returns original FuzzySet containing tokens relevant to the 
         query.
         """
-        import time
-        start = time.time()
         query_relevant = FuzzySet()
         for term in self.query:
             # x are tuples of (token, weight)
             # keeps the higher value of "close to" and "related to" both present
             query_relevant = query_relevant | FuzzySet([x for x in self.relation_sets[term]])
-        print("prepare for query took {}".format(time.time() - start))
         return query_relevant
 
     def filter_relevant(self, relevant: FuzzySet):
@@ -131,9 +129,8 @@ class QueryResult(object):
         relations = defaultdict(lambda: list())
         with gzip.open(
                 os.path.join(path, "relationsets.tsv.gz"), "rb") as f:
-            lines = f.read().decode()
-            for line in lines.split("\n"):
-                line_split = line.split("\t")
+            for line in f:
+                line_split = line.decode().split("\t")
                 token, token2, weight = line_split
                 relation_tuple = (token2, float(weight))
                 relations[token].append(relation_tuple)
@@ -274,7 +271,6 @@ class QueryResult(object):
                                   color=edge_color)
                 nodes[subject].add_edge_object(graph_edge)
                 edge_count += 2
-        print("RETURNING GRAPH")
         return Graph(nodes=nodes.values())
 
     @staticmethod
@@ -282,8 +278,8 @@ class QueryResult(object):
         """Loads the mapping of tokens to the related tokens."""
         token2related = defaultdict(lambda: list())
         with gzip.open(path, "rb") as f:
-            for line in f.read().decode().split("\n"):
-                spl = line.split("\t")
+            for line in f:
+                spl = line.decode().split("\t")
                 try:
                     relation_triple = literal_eval(spl[0])
                 except SyntaxError:
@@ -293,7 +289,6 @@ class QueryResult(object):
                 token2related[subject].append((relation_triple, weight))
                 token2related[predicate].append((relation_triple, weight))
             f.close()
-        print("LEN relations ", len(token2related))
         return token2related
 
     @staticmethod

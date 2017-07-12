@@ -133,7 +133,6 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english", texts=Non
                 closeness.append(closeness_list)
                 with open(paths.PARAGRAPH_CONTENT_PATH + "{}/{}_{}".format(
                         alias, text, count), "w", encoding="utf8") as content_file:
-                    print(content_file)
                     content_file.write(paragraph)
             pickle.dump(paragraph_list,
                         open(paths.POS_PATH + "/" + alias + "/" + text + ".p", "wb"))
@@ -154,5 +153,5 @@ def with_graphviz_output():
         extract_step(language="english")
 
 if __name__ == "__main__":
-    make_folders()
-    extract_step(language="english")
+    make_folders(alias="/azatoth.txt")
+    extract_step(language="english", alias="/azatoth.txt")

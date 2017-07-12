@@ -32,6 +32,13 @@ def with_graphvizoutput():
     with PyCallGraph(output=graphviz):
         all_steps(["cult", "fish", "water", "fear"])
 
+
+class FakeAlias(object):
+    def __init__(self, identifier):
+        self.identifier = identifier
+
+
 if __name__ == "__main__":
-    all_steps()
+    alias = FakeAlias("test.txt")
+    all_steps(texts=["test.txt"], alias=alias)
     #with_graphvizoutput()

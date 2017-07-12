@@ -16,17 +16,18 @@ POS_PATH = MAIN_FOLDER + "/pos"
 
 # Path the closeness file
 # Pickled list of a list of Closeness objects
-CLOSENESS_PATH = MAIN_FOLDER + "/closeness"
+#CLOSENESS_PATH = MAIN_FOLDER + "/closeness"
+CLOSENESS_PATH = "E:\workspace\data\closeness"
 
-MEMSTORE_PATH_EXPERIMENTAL = MAIN_FOLDER + "/memstoreexperimental"
+MEMSTORE_PATH_EXPERIMENTAL = "E:\\workspace\\data\\memstoreexperimental\\"
 
 SUIDS_PATH_EXPERIMENTAL = MAIN_FOLDER + "/suidsexperimental"
 
 INDEX_PATH_EXPERIMENTAL = MAIN_FOLDER + "/indexexperimental"
 
-EXPRESSION_SET_PATH_EXPERIMENTAL = MAIN_FOLDER + "/expressionsexperimental"
+EXPRESSION_SET_PATH_EXPERIMENTAL = "E:\\workspace\\data\\expressionsexperimental"
 
-RELATIONS_PATH = MAIN_FOLDER + "/relations"
+RELATIONS_PATH = "E:\\workspace\data\\relations"
 
 RELATION_EXPRESSIONS_PATH = MAIN_FOLDER + "/relations/expressions"
 

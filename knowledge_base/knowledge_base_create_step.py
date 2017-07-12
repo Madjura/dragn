@@ -82,10 +82,8 @@ def knowledge_base_create(alias=None):
     # closenesses are calculcated in extract_step
     closenesses = pickle.load(open(paths.CLOSENESS_PATH + alias + "/closeness.p", "rb"))
     memstore.incorporate(closenesses)
-    print("relations len ", len(memstore.relations))
     memstore.compute_corpus()
     memstore.normalise_corpus()
-    print(len(memstore.corpus))
     memstore.export(paths.MEMSTORE_PATH_EXPERIMENTAL + alias + "/")
 
 
@@ -97,5 +95,5 @@ def with_graphvizoutput():
         knowledge_base_create()
 
 if __name__ == "__main__":
-    knowledge_base_create()
+    knowledge_base_create(alias="/azatoth.txt")
     #with_graphvizoutput()

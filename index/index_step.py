@@ -13,8 +13,8 @@ from graph.graph import Graph
 from util.pagerank import PageRank
 
 
-def generate_relation_values(sources, relations, alias):
-    relation2prov, index = generate_relation_provenance_weights(sources)
+def generate_relation_values(sources, relations: "memstore corpus", alias):
+    relation2prov, index = generate_relation_provenance_weights(sources, relations)
     index_to_db(index)
     with gzip.open(
             os.path.join(paths.RELATION_PROVENANCES_PATH + alias,
@@ -23,10 +23,7 @@ def generate_relation_values(sources, relations, alias):
             line = "\t".join([str(relation), str(prov_weights)])
             f_out.write(str.encode(line))
             f_out.write(str.encode("\n"))
-        _missing, _processed = generate_relation_to_provenances(relations,
-                                                                relation2prov,
-                                                                f_out)
-        print(_missing, _processed)
+        generate_relation_to_provenances(relations, relation2prov, f_out)
     f_out.close()
 
 
@@ -225,5 +222,5 @@ def with_graphvizoutput():
 
 
 if __name__ == "__main__":
-    index_step()
+    index_step(alias="/beast.txt,beyondthewall.txt,book.txt")
     #with_graphvizoutput()

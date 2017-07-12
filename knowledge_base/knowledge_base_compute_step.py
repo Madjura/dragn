@@ -103,4 +103,4 @@ def with_graphviz_output():
 
 if __name__ == "__main__":
     #with_graphviz_output()
-    knowledge_base_compute()
+    knowledge_base_compute(alias="/beast.txt,beyondthewall.txt,book.txt")

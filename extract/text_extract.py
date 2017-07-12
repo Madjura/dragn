@@ -141,7 +141,7 @@ def text2cooc(pos_dictionary: {int, (str, str)},
                         if verb not in term2sentence_id:
                             term2sentence_id[verb] = set()
                         term2sentence_id[verb].add(sentence_id)
-                        # trying to parse the sentence_id into a top-level chunk tree
+        # trying to parse the sentence_id into a top-level chunk tree
         tree = parser_cmp.parse(pos_dictionary[sentence_id])
         # getting the top-level tree triples and decomposing the NPs
         cmp_triples, simple_trees = get_cooc([tree], stoplist=False,
@@ -266,3 +266,9 @@ def generate_source(token2sentences: dict,
         for closeness in w2statements[key]:
             new_lines.append(closeness)
     return new_lines
+
+if __name__ == "__main__":
+    p = RegexpParser(NP_GRAMMAR_COMPOUND)
+    sentence = [("the", "DT"), ("little", "JJ"), ("yellow", "JJ"),
+                ("dog", "NN"), ("outside", "IN"), ("Innsmouth", "NNP")]
+    print(p.parse(sentence))

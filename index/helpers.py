@@ -1,7 +1,7 @@
 from _collections import defaultdict
 
 
-def generate_relation_provenance_weights(sources):
+def generate_relation_provenance_weights(sources, relations):
     """
     Generates the mapping of predicate tuples to provenance with closeness
     therein.
@@ -10,6 +10,7 @@ def generate_relation_provenance_weights(sources):
     dictionary = defaultdict(lambda: list())
     inverse = defaultdict(lambda: set())
     for (subject, predicate, objecT, provenance), closeness in sources.items():
+        closeness = relations[(subject, predicate, objecT)]
         dictionary[(subject, predicate, objecT)].append((provenance, closeness))
         inverse[subject].add(provenance)
         inverse[objecT].add(provenance)
@@ -58,6 +59,8 @@ def generate_relation_to_provenances(sources: "suids",
 
 def index_to_db(index):
     import django
+    import os
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dragn.settings")
     django.setup()
     from dataapp.models import InverseIndex
 
