@@ -36,6 +36,7 @@ from graph.node import CytoNode
 from query.fuzzyset import FuzzySet, ProvFuzzySet
 from util import paths
 
+
 class QueryResult(object):
     """
     Wrapper over the processed text files to produce a graph in JSON
@@ -58,7 +59,7 @@ class QueryResult(object):
         self.relations = self.load_token2related(path=os.path.join(paths.RELATIONS_PATH + alias, "relations.tsv.gz"))
         # { relation_triple: [(provenance, weight), ...] }
         print("Loading relations")
-        self.relation_sets = self.load_relation_sets(path=paths.EXPRESSION_SET_PATH_EXPERIMENTAL + alias)
+        self.relation_sets = self.load_relation_sets(path=paths.RELATION_WEIGHT_PATH + alias)
         self.alias = alias
 
     @staticmethod
@@ -85,6 +86,19 @@ class QueryResult(object):
                 relation_tuple = literal_eval(line_split[0])
                 provenances = literal_eval(line_split[1])
                 relation2prov[relation_tuple].append(provenances)
+        # get the maximum value for each prov
+        # this is necessary because in index step we calculate additional triples that are immediately written to file
+        # here we eliminate the duplicates and take just the max value
+        for key, value in relation2prov.items():
+            prov_max = defaultdict(int)
+            for l in value:
+                for prov, score in l:
+                    current = prov_max[prov]
+                    if score > current:
+                        prov_max[prov] = score
+            tmp = [(prov, score) for prov, score in prov_max.items()]
+            relation2prov[key] = [tmp]
+            subject, predicate, objecT = key
         return relation2prov
 
     def prepare_for_query(self):
@@ -118,7 +132,7 @@ class QueryResult(object):
         return relevant_cut
 
     @staticmethod
-    def load_relation_sets(path=paths.EXPRESSION_SET_PATH_EXPERIMENTAL):
+    def load_relation_sets(path=paths.RELATION_WEIGHT_PATH):
         """
         Loads the processed relationsets from index_step.
         Returns a dictionary mapping tokens to a list of tuples in the format:
@@ -157,7 +171,7 @@ class QueryResult(object):
 
         # { provenance: calculated weight }
         # indicates how "related" a provenance is to the query
-        provenance_dict = defaultdict(lambda: [0, []])
+        provenance_dict = defaultdict(lambda: [0, set()])
 
         # { (prov1, prov2): weight }
         # indicates how "related" two provenances are
@@ -200,7 +214,9 @@ class QueryResult(object):
                 for prov_tuple in self.relation2prov[(subject, predicate, objecT)]:
                     for provenance, prov_weight in prov_tuple:
                         provenance_dict[provenance][0] += membership * relation_weight * prov_weight
-                        provenance_dict[provenance][1].append((prov_weight, subject, predicate, objecT))
+                        provenance_dict[provenance][1].add((prov_weight, subject, predicate, objecT))
+                        if subject == "dark" and predicate == "related to" and objecT == "new_england":
+                            print("FOO")
                     for (prov1, w1), (prov2, w2) in combinations(prov_tuple, 2):
                         w = membership * relation_weight * (w1 + w2) / 2
                         provenance_relations[(prov2, prov1)] += w

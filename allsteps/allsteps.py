@@ -37,8 +37,11 @@ class FakeAlias(object):
     def __init__(self, identifier):
         self.identifier = identifier
 
+    def save(self):
+        pass
+
 
 if __name__ == "__main__":
-    alias = FakeAlias("test.txt")
-    all_steps(texts=["test.txt"], alias=alias)
+    alias = FakeAlias("beast.txt,beyondthewall.txt,book.txt")
+    all_steps(texts=["beast.txt", "beyondthewall.txt", "book.txt"], alias=alias)
     #with_graphvizoutput()

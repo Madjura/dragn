@@ -57,6 +57,7 @@ def markup_samples(samples, nodes):
     updated_samples = []
     print(normalized)
     for provenance, weight, content in samples:
+        # for triples in weight check if it exists in the text, TODO
         matches = set()
         for n in normalized:
             match = re.findall("\\b{}\\b".format(n), content, re.IGNORECASE)

@@ -57,7 +57,7 @@ class Analyser:
         Calculates tokens similar to a given one.
         """
 
-        if subject is None or not subject in self.sparse:
+        if subject is None or subject not in self.sparse:
             return []
         # the row vector of the sparse matrix (a column_index:weight dictionary)
         #                 paul     ball     roof
@@ -82,11 +82,9 @@ class Analyser:
             print("DEBUG@similar_to() - subject vector size        :", len(row))
             print("DEBUG@similar_to() - number of possibly similar:", len(promising))
         sim_vec = []
-
         # now check all possibly relevant expressions for actual relevancy
         # paul, roof, ball
         for possible in promising:
-
             # ignore same, no reason to check
             if possible == subject:
                 continue
@@ -96,18 +94,19 @@ class Analyser:
             # computing the actual similarity
             uv = 0.0
             vn = 0.0
+            # first iterate over the column values
+            # then get the row values for each of the column vlues -> this is compared_row
             for expression in compared_row:
+                # then check if the column values of the compared_row appear in the original row
                 if expression in row:
                     # example: paul and ball
                     # row[(close to, paul)] = 1.0
                     # compared_row[(close to, paul)] = 0.3
                     # uv += 0.3 
-                    tmp = row[expression] * compared_row[expression]
-                    uv += tmp
+                    uv += row[expression] * compared_row[expression]
                 vn += compared_row[expression] ** 2
             # vn is length of compared_row after sqrt
             vn = math.sqrt(vn)
-
             # vn is length of compared, un is length of original
             # uv is the product of weights of entries that are in both rows
             sim = float(uv) / (un * vn)

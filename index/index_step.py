@@ -27,13 +27,13 @@ def generate_relation_values(sources, relations: "memstore corpus", alias):
     f_out.close()
 
 
-def make_expression_sets(relation_dictionary, alias):
+def make_relation_weights(relation_dictionary, alias):
     term_lines = []
     for expression1, related_set in list(relation_dictionary.items()):
         for expression2, weight in related_set:
             term_lines.append("\t".join([str(x)
                                          for x in [expression1, expression2, weight]]))
-    with gzip.open(os.path.join(paths.EXPRESSION_SET_PATH_EXPERIMENTAL + alias,
+    with gzip.open(os.path.join(paths.RELATION_WEIGHT_PATH + alias,
                                 "relationsets.tsv.gz"), "wb") as f:
         f.write(("\n".join(term_lines)).encode())
     f.close()
@@ -96,7 +96,7 @@ def index_step(alias):
     memstore.import_memstore(paths.MEMSTORE_PATH_EXPERIMENTAL + alias)
     relation_dictionary = make_relation_list(memstore.corpus.items(), alias)
     # make_pagerank(memstore.corpus.items())
-    make_expression_sets(relation_dictionary, alias)
+    make_relation_weights(relation_dictionary, alias)
     generate_relation_values(memstore.relations, memstore.corpus, alias)
 
 
@@ -222,5 +222,5 @@ def with_graphvizoutput():
 
 
 if __name__ == "__main__":
-    index_step(alias="/beast.txt,beyondthewall.txt,book.txt")
+    index_step(alias="/book.txt,call_of_cthulhu.txt")
     #with_graphvizoutput()
