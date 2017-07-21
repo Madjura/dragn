@@ -58,8 +58,9 @@ class QueryResult(object):
         print("Loading related")
         self.relations = self.load_token2related(path=os.path.join(paths.RELATIONS_PATH + alias, "relations.tsv.gz"))
         # { relation_triple: [(provenance, weight), ...] }
-        #print("Loading relations")
-        #self.relation_sets = self.load_relation_sets(path=paths.RELATION_WEIGHT_PATH + alias)
+        # legacy stuff that is PROBABLY not important
+        # print("Loading relations")
+        # self.relation_sets = self.load_relation_sets(path=paths.RELATION_WEIGHT_PATH + alias)
         self.alias = alias
 
     @staticmethod
@@ -120,7 +121,8 @@ class QueryResult(object):
                     tuple_token = s
                 tuple_list.append((tuple_token, score))
             query_relevant = query_relevant | FuzzySet([x for x in tuple_list])
-            #query_relevant = query_relevant | FuzzySet([x for x in self.relation_sets[term]])
+            # legacy stuff that is probably not important but ill keep it just in case everything goes up in flames
+            # query_relevant = query_relevant | FuzzySet([x for x in self.relation_sets[term]])
         return query_relevant
 
     def filter_relevant(self, relevant: FuzzySet):

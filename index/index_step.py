@@ -20,7 +20,7 @@ def generate_relation_values(sources, relations: "memstore corpus", alias):
             line = "\t".join([str(relation), str(prov_weights)])
             f_out.write(str.encode(line))
             f_out.write(str.encode("\n"))
-        #add_related_to(relations, relation2prov, f_out)
+        add_related_to(relations, relation2prov, f_out)
     f_out.close()
 
 
