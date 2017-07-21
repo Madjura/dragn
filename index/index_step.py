@@ -78,5 +78,5 @@ def with_graphvizoutput():
 
 
 if __name__ == "__main__":
-    index_step(alias="/book.txt,call_of_cthulhu.txt")
+    index_step(alias="/beyondthewall.txt,book.txt")
     #with_graphvizoutput()

@@ -58,8 +58,8 @@ class QueryResult(object):
         print("Loading related")
         self.relations = self.load_token2related(path=os.path.join(paths.RELATIONS_PATH + alias, "relations.tsv.gz"))
         # { relation_triple: [(provenance, weight), ...] }
-        print("Loading relations")
-        self.relation_sets = self.load_relation_sets(path=paths.RELATION_WEIGHT_PATH + alias)
+        #print("Loading relations")
+        #self.relation_sets = self.load_relation_sets(path=paths.RELATION_WEIGHT_PATH + alias)
         self.alias = alias
 
     @staticmethod
@@ -98,7 +98,6 @@ class QueryResult(object):
                         prov_max[prov] = score
             tmp = [(prov, score) for prov, score in prov_max.items()]
             relation2prov[key] = [tmp]
-            subject, predicate, objecT = key
         return relation2prov
 
     def prepare_for_query(self):
@@ -110,7 +109,18 @@ class QueryResult(object):
         for term in self.query:
             # x are tuples of (token, weight)
             # keeps the higher value of "close to" and "related to" both present
-            query_relevant = query_relevant | FuzzySet([x for x in self.relation_sets[term]])
+            triple_list = self.relations[term]
+            tuple_list = []
+            for spo, score in triple_list:
+                s, _, o = spo
+                tuple_token = None
+                if s == term:
+                    tuple_token = o
+                elif o == term:
+                    tuple_token = s
+                tuple_list.append((tuple_token, score))
+            query_relevant = query_relevant | FuzzySet([x for x in tuple_list])
+            #query_relevant = query_relevant | FuzzySet([x for x in self.relation_sets[term]])
         return query_relevant
 
     def filter_relevant(self, relevant: FuzzySet):
