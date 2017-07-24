@@ -4,11 +4,17 @@ import json
 class Graph(object):
     """Simple graph with nodes and edges."""
 
-    def __init__(self, *, nodes: ["Node"] = None):
+    def __init__(self, *, nodes: ["Node"] = None, clean=True):
         if nodes is not None:
             self.nodes = nodes
         else:
             self.nodes = []
+        if clean:
+            for index in range(len(nodes)):
+                backindex = len(nodes) - index - 1
+                node = nodes[backindex]
+                if not node.edges:
+                    del nodes[backindex]
 
     def __str__(self, *args, **kwargs):
         out = ""

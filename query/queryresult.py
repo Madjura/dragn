@@ -180,58 +180,40 @@ class QueryResult(object):
         # { relation_triple: calculated weight }
         # used to rank / limit the graph nodes by top values
         relation_dict = defaultdict(int)
-
         # { provenance: calculated weight }
         # indicates how "related" a provenance is to the query
         provenance_dict = defaultdict(lambda: [0, set()])
-
         # { (prov1, prov2): weight }
         # indicates how "related" two provenances are
-        provenance_relations = defaultdict(float)
-
+        # provenance_relations = defaultdict(float)
         # all relation tuples containing query terms, with weight above threshhold
         query_relevant = self.prepare_for_query()
-        # relevant_cut = self.filter_relevant(query_relevant)
         relevant_cut = self.filter_relevant(query_relevant)
         # iterate over the tokens relevant to the query
         for possibly_related in relevant_cut:
-
             # get all relation tuples in which "possibly_related" appears
             for relation_triple in self.relations[possibly_related]:
                 (subject, predicate, objecT), relation_weight = relation_triple
-
                 # find the relation tuples that contain "possibly_related" and
                 # a term from the query
                 if not (subject in self.query or objecT in self.query):
                     # random relation that does not have any relevance
                     continue
-
-                # get the membership degree of "possibly related" to the query             
-                """
-                makes fuzzyset of all (subject, weight) tuples 
-                the tuples come from the dict with
-                subject: [(objecT, weight), ...]
-                then keeps only the ones with weight above threshhold
-                from that it gets the value <--- membership
-                keeps higher of close to / related to
-                """
+                # get the membership degree of "possibly related" to the query
+                # this is the higher value of "related to" or "close to"
                 membership = relevant_cut[possibly_related]
                 calculated_relation_weight = membership * relation_weight
                 relation_dict[(subject, predicate, objecT)] += calculated_relation_weight
-                self.tokens2weights[possibly_related] += calculated_relation_weight
-                if subject != possibly_related:
-                    self.tokens2weights[subject] += calculated_relation_weight
-                elif objecT != possibly_related:
-                    self.tokens2weights[objecT] += calculated_relation_weight
+                # add updated score to subject and object
+                self.tokens2weights[subject] += calculated_relation_weight
+                self.tokens2weights[objecT] += calculated_relation_weight
                 for prov_tuple in self.relation2prov[(subject, predicate, objecT)]:
                     for provenance, prov_weight in prov_tuple:
-                        provenance_dict[provenance][0] += membership * relation_weight * prov_weight
+                        provenance_dict[provenance][0] += calculated_relation_weight * prov_weight
                         provenance_dict[provenance][1].add((prov_weight, subject, predicate, objecT))
-                        if subject == "dark" and predicate == "related to" and objecT == "new_england":
-                            print("FOO")
-                    for (prov1, w1), (prov2, w2) in combinations(prov_tuple, 2):
-                        w = membership * relation_weight * (w1 + w2) / 2
-                        provenance_relations[(prov2, prov1)] += w
+                    # for (prov1, w1), (prov2, w2) in combinations(prov_tuple, 2):
+                        # w = calculated_relation_weight * (w1 + w2) / 2
+                        # provenance_relations[(prov2, prov1)] += w
         self.relation_set = relation_dict
         if provenance_dict:
             self.provenance_set = ProvFuzzySet.from_list_dictionary(provenance_dict)
@@ -293,13 +275,11 @@ class QueryResult(object):
                     edge_color = self.visualization_parameters["edge color"][predicate]
                 else:
                     edge_color = "black"
-                # subject = self.check_alias(subject)
-                # objecT = self.check_alias(objecT)
                 graph_edge = Edge(start=nodes[subject], end=nodes[objecT],
                                   color=edge_color)
                 nodes[subject].add_edge_object(graph_edge)
                 edge_count += 2
-        return Graph(nodes=nodes.values())
+        return Graph(nodes=list(nodes.values()))
 
     @staticmethod
     def load_token2related(path=os.path.join(paths.RELATIONS_PATH, "relations.tsv.gz")):
