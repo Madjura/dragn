@@ -9,7 +9,7 @@ TEXT_META_PATH = MAIN_FOLDER + "/texts/meta"
 # Path to where the paragraph files will be placed
 PARAGRAPHS_PATH = MAIN_FOLDER + "/paragraphs"
 
-PARAGRAPH_CONTENT_PATH = MAIN_FOLDER + "/paragraphs/contents"
+PARAGRAPH_CONTENT_PATH = "E:\workspace\data\paragraphs\contents"
 
 # Path to where the POS tagged text / sentence chunks are
 POS_PATH = MAIN_FOLDER + "/pos"

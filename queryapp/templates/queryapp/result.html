@@ -12,16 +12,27 @@
 <script src="{% static 'queryapp/js/weaver.js' %}"></script>
 <script src="{% static 'queryapp/js/layout.js' %}"></script>
 <script src="{% static 'queryapp/js/result.js' %}"></script>
+<script src="{% static 'queryapp/js/distant-modal.js' %}"></script>
 <script src="{% static 'queryapp/js/jquery.tablesorter.js' %}"></script>
 <script src="{% static 'queryapp/js/jquery.get-word-by-event.js' %}"></script>
 <link rel="stylesheet" type="text/css" href="{% static 'queryapp/css/result.css' %}"/>
 <link rel="stylesheet" type="text/css" href="{% static 'queryapp/css/tablesorter.css' %}"/>
+<link rel="stylesheet" type="text/css" href="{% static 'queryapp/css/reader-modal.css' %}"/>
+<div id="reading-modal" class="modal">
+  <!-- Modal content -->
+    <span id="alias-name" style="display:none;">{{ alias }}</span>
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div id="distant-text"></div>
+  </div>
+</div>
 <div id="cy"></div>
 <div id="text-samples">
     {% for provenance, prov_relations, content, matches in samples %}
         <div class="text-match-wrapper">
             <h3>{{ provenance }}, {{ prov_relations.0 }}</h3>
          <div class="text">
+             <span class="distant-modal" id="{{ provenance }}_previous">Previous</span> <span class="distant-modal" id="{{ provenance }}_next">Next</span><br/>
              {{ content|safe|escape }}
          </div>
          <div class="match">

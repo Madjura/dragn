@@ -43,7 +43,7 @@ class QueryResult(object):
     format that can be displayed to the user.
     """
 
-    def __init__(self, min_weight=0.5, alias=None):
+    def __init__(self, min_weight=0.5, alias=None, relation_type="all"):
         self.query = None
         self.queried_combined = defaultdict(lambda: set())
         self.aliases = defaultdict(lambda: set())
@@ -54,9 +54,11 @@ class QueryResult(object):
         self.min_weight = min_weight
         self.visualization_parameters = self.load_parameters()
         print("Loading relation to provenance mapping")
-        self.relation2prov = self.load_relation2prov(path=paths.RELATION_PROVENANCES_PATH + alias + "/provenances.tsv.gz")
+        self.relation2prov = self.load_relation2prov(path=paths.RELATION_PROVENANCES_PATH + alias + "/provenances.tsv.gz",
+                                                     relation_type=relation_type)
         print("Loading related")
-        self.relations = self.load_token2related(path=os.path.join(paths.RELATIONS_PATH + alias, "relations.tsv.gz"))
+        self.relations = self.load_token2related(path=os.path.join(paths.RELATIONS_PATH + alias, "relations.tsv.gz"),
+                                                 relation_type=relation_type)
         # { relation_triple: [(provenance, weight), ...] }
         # legacy stuff that is PROBABLY not important
         # print("Loading relations")
@@ -65,7 +67,7 @@ class QueryResult(object):
 
     @staticmethod
     def load_relation2prov(path=os.path.join(
-            paths.RELATION_PROVENANCES_PATH, "provenances.tsv.gz")):
+            paths.RELATION_PROVENANCES_PATH, "provenances.tsv.gz"), relation_type="all"):
         """
         Loads the mapping of relation tuples to the provenances.
         The format is:
@@ -85,6 +87,11 @@ class QueryResult(object):
                     continue
                 line_split = line.decode().split("\t")
                 relation_tuple = literal_eval(line_split[0])
+                s, p, o = relation_tuple
+                if relation_type == "related to" and p != "related to":
+                    continue
+                elif relation_type == "close to" and p != "close to":
+                    continue
                 provenances = literal_eval(line_split[1])
                 relation2prov[relation_tuple].append(provenances)
         # get the maximum value for each prov
@@ -111,6 +118,7 @@ class QueryResult(object):
             # x are tuples of (token, weight)
             # keeps the higher value of "close to" and "related to" both present
             triple_list = self.relations[term]
+            print("SELF RELATION ", self.relations)
             tuple_list = []
             for spo, score in triple_list:
                 s, _, o = spo
@@ -176,10 +184,6 @@ class QueryResult(object):
             8) Get the provenance, weight tuple for the relation triple
             9) Weight the provenance by the prov weight * relation weight * membership
         """
-
-        # { relation_triple: calculated weight }
-        # used to rank / limit the graph nodes by top values
-        relation_dict = defaultdict(int)
         # { provenance: calculated weight }
         # indicates how "related" a provenance is to the query
         provenance_dict = defaultdict(lambda: [0, set()])
@@ -203,7 +207,7 @@ class QueryResult(object):
                 # this is the higher value of "related to" or "close to"
                 membership = relevant_cut[possibly_related]
                 calculated_relation_weight = membership * relation_weight
-                relation_dict[(subject, predicate, objecT)] += calculated_relation_weight
+                self.relation_set[(subject, predicate, objecT)] += calculated_relation_weight
                 # add updated score to subject and object
                 self.tokens2weights[subject] += calculated_relation_weight
                 self.tokens2weights[objecT] += calculated_relation_weight
@@ -214,7 +218,6 @@ class QueryResult(object):
                     # for (prov1, w1), (prov2, w2) in combinations(prov_tuple, 2):
                         # w = calculated_relation_weight * (w1 + w2) / 2
                         # provenance_relations[(prov2, prov1)] += w
-        self.relation_set = relation_dict
         if provenance_dict:
             self.provenance_set = ProvFuzzySet.from_list_dictionary(provenance_dict)
 
@@ -282,7 +285,7 @@ class QueryResult(object):
         return Graph(nodes=list(nodes.values()))
 
     @staticmethod
-    def load_token2related(path=os.path.join(paths.RELATIONS_PATH, "relations.tsv.gz")):
+    def load_token2related(path=os.path.join(paths.RELATIONS_PATH, "relations.tsv.gz"), relation_type="all"):
         """Loads the mapping of tokens to the related tokens."""
         token2related = defaultdict(lambda: list())
         with gzip.open(path, "rb") as f:
@@ -293,9 +296,13 @@ class QueryResult(object):
                 except SyntaxError:
                     continue
                 weight = float(spl[1])
-                subject, _, predicate = relation_triple
+                subject, predicate, objecT = relation_triple
+                if relation_type == "related to" and predicate != "related to":
+                    continue
+                elif relation_type == "close to" and predicate != "close to":
+                    continue
                 token2related[subject].append((relation_triple, weight))
-                token2related[predicate].append((relation_triple, weight))
+                token2related[objecT].append((relation_triple, weight))
             f.close()
         return token2related
 

@@ -8,6 +8,7 @@ class Text(models.Model):
     def __str__(self):
         return self.name
 
+
 class TextsAlias(models.Model):
     identifier = models.CharField(max_length=100, unique=True)
     texts = models.ManyToManyField(Text)

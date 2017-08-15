@@ -4,3 +4,4 @@ Django==1.10.6
 nltk==3.2.1
 numpy==1.12.1
 pydot==1.2.3
+django-multiupload

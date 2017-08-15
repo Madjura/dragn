@@ -2,6 +2,7 @@ import os
 import re
 
 from django.db import IntegrityError
+from django.http import JsonResponse
 from django.shortcuts import render
 
 from allsteps.allsteps import all_steps
@@ -28,7 +29,8 @@ def query(request):
             context = {
                 "graph_elements": graph.to_json(),
                 "queryform": queryform,
-                "samples": samples
+                "samples": samples,
+                "alias": alias.identifier
             }
         else:
             context = {}
@@ -99,6 +101,29 @@ def process(request):
         "processform": processform,
     }
     return render(request, "queryapp/process.html", context)
+
+
+def get_provenance(request):
+    provenance = request.POST["provenance"]
+    provenance_id = int(provenance.split("_")[1])
+    provenance_name = provenance.split("_")[0]
+    provenance_id_next = provenance_id
+    provenance_id_previous = provenance_id
+    provenance_next = "{}_{}".format(provenance_name, provenance_id_next)
+    provenance_previous = "{}_{}".format(provenance_name, provenance_id_previous)
+    alias = request.POST["alias"]
+    file_path = "{}/{}/{}".format(paths.PARAGRAPH_CONTENT_PATH, alias, provenance)
+    data = {}
+    if os.path.isfile(file_path):
+        with open(file_path, "r") as paragraph:
+            data["content"] = paragraph.read()
+    else:
+        print(file_path)
+    data["provenance"] = provenance
+    data["next"] = provenance_next
+    data["previous"] = provenance_previous
+    return JsonResponse(data)
+
 
 if __name__ == "__main__":
     markup_samples(["Harry visited Hagrid and Harry."], ["harry_and_ron", "ron"])
