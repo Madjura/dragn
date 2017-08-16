@@ -3,14 +3,13 @@ from pycallgraph.output.graphviz import GraphvizOutput
 from pycallgraph.pycallgraph import PyCallGraph
 
 
-def query(query=None, alias=None):
-    if query is None:
-        query = []
-    print(alias)
-    foo = QueryResult(alias=alias)
-    foo.query = query
-    foo.populate_dictionaries()
-    return foo
+def query(user_query=None, alias=None):
+    if user_query is None:
+        user_query = []
+    result = QueryResult(alias=alias)
+    result.query = user_query
+    result.populate_dictionaries()
+    return result
 
 
 def with_graphvizoutput():

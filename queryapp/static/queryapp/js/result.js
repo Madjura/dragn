@@ -58,10 +58,8 @@ function updateCy(elements) {
     };
     if (elements) {
         cy.add(elements);
-        console.log(elements);
     } else {
         cy.add(graphElements);
-        console.log(graphElements);
     }
     var layout = cy.elements().layout(options);
     try {
@@ -481,8 +479,12 @@ $(document).ready(function () {
         }
     });
     updateCy();
-    $("#text-samples").getWordByEvent('click', function (event, word) {
-        $("#id_query").val($("#id_query").val() + "," + word);
-    });
+    $(".text-content").getWordByEvent('click', addWordToQuery);
+    $("#distant-text").getWordByEvent('click', addWordToQuery);
     $(".tablesorter-blackice").tablesorter();
 });
+
+function addWordToQuery(event, word) {
+    word = word.replace(/\b[-.,()&$#!\[\]{}"']+\B|\B[-.,()&$#!\[\]{}"']+\b/g, "").trim();
+    $("#id_query").val($("#id_query").val() + "," + word);
+}

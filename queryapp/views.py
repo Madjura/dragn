@@ -57,7 +57,6 @@ def markup_samples(samples, nodes):
     for node in nodes:
         normalized |= {node.replace("_", " ")}
     updated_samples = []
-    print(normalized)
     for provenance, weight, content in samples:
         # for triples in weight check if it exists in the text, TODO
         matches = set()
@@ -112,16 +111,23 @@ def get_provenance(request):
     provenance_next = "{}_{}".format(provenance_name, provenance_id_next)
     provenance_previous = "{}_{}".format(provenance_name, provenance_id_previous)
     alias = request.POST["alias"]
+    matches = request.POST.getlist("matches[]")
     file_path = "{}/{}/{}".format(paths.PARAGRAPH_CONTENT_PATH, alias, provenance)
     data = {}
     if os.path.isfile(file_path):
         with open(file_path, "r") as paragraph:
-            data["content"] = paragraph.read()
+            content = paragraph.read()
+            for n in matches:
+                match = re.findall("\\b{}\\b".format(n), content, re.IGNORECASE)
+                if match:
+                    content = re.sub("\\b{}\\b".format(n), "<b>{}</b>".format(match[0]), content, flags=re.IGNORECASE)
+            data["content"] = content
     else:
         print(file_path)
     data["provenance"] = provenance
     data["next"] = provenance_next
     data["previous"] = provenance_previous
+    data["matches"] = ";".join(matches)
     return JsonResponse(data)
 
 

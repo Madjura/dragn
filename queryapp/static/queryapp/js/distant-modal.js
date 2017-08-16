@@ -46,6 +46,19 @@ $(document).ready(function() {
 
 function show_modal(target) {
     var idSplit = $(target).attr("id").split("_");
+    var parent = $(target).parent();
+    var matchElement = parent.next(".match");
+    var matchElementMatches = $(matchElement.children(".match-samples")[0]);
+    var matchElementList = $(matchElementMatches.children(".match-list")[0]);
+    var matches = [];
+    matchElementList.find("li").each(function() {
+        matches.push($(this).html());
+    });
+    if (matches.length == 0) {
+        console.log($("#modal-matches").html().split(";"));
+        matches = $("#modal-matches").html().split(";");
+    }
+    console.log(matchElementList);
     var provenance = idSplit[0];
     var provenanceParagraph = parseInt(idSplit[1]);
     var previousOrNext = idSplit[2];
@@ -57,17 +70,20 @@ function show_modal(target) {
         console.log("Error while getting paragraph.");
         return;
     }
-    var provenance =  provenance + "_" + provenanceParagraph;
+    provenance =  provenance + "_" + provenanceParagraph;
     $.ajax({
         type: "POST",
         url: '/provenance/',
-        data: {"provenance": provenance, "alias": $("#alias-name").html()},
+        data: {"provenance": provenance, "alias": $("#alias-name").html(), "matches": matches},
         datatype: "json",
         success: function(data) {
             var modal = document.getElementById('reading-modal');
+            var matches = data.matches;
+            console.log("AJAX MATCHES: " + matches);
             var previous = $('<span />').attr({'class': 'distant-modal', "id": data.previous + "_previous"}).html('Previous');
             var next = $('<span />').attr({'class': 'distant-modal', "id": data.next + "_next"}).html('Next');
             $("#distant-text").empty();
+            $("#modal-matches").html(matches);
             $("#distant-text").append("<h3>"+data.previous+"</h3>")
             $("#distant-text").append(previous);
             $("#distant-text").append(" ");

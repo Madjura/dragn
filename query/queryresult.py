@@ -118,7 +118,6 @@ class QueryResult(object):
             # x are tuples of (token, weight)
             # keeps the higher value of "close to" and "related to" both present
             triple_list = self.relations[term]
-            print("SELF RELATION ", self.relations)
             tuple_list = []
             for spo, score in triple_list:
                 s, _, o = spo
@@ -269,10 +268,14 @@ class QueryResult(object):
         token_list = list(self.relation_set.items())
         edge_count = 0
         token_list.sort(key=lambda x: x[1], reverse=True)
+        import pprint
+        pprint.pprint(token_list)
         for relation_tuple, _ in token_list:
             if edge_count >= max_edges:
                 break
             subject, predicate, objecT = relation_tuple
+            if subject == "fantastic_conception" or objecT == "fantastic_conception":
+                print("foo")
             if subject in nodes and objecT in nodes:
                 if predicate in self.visualization_parameters["edge color"]:
                     edge_color = self.visualization_parameters["edge color"][predicate]
@@ -280,9 +283,11 @@ class QueryResult(object):
                     edge_color = "black"
                 graph_edge = Edge(start=nodes[subject], end=nodes[objecT],
                                   color=edge_color)
+                back_edge = Edge(start=nodes[objecT], end=nodes[subject], color=edge_color)
                 nodes[subject].add_edge_object(graph_edge)
+                nodes[objecT].add_edge_object(back_edge)
                 edge_count += 2
-        return Graph(nodes=list(nodes.values()))
+        return Graph(nodes=list(nodes.values()), clean=False)
 
     @staticmethod
     def load_token2related(path=os.path.join(paths.RELATIONS_PATH, "relations.tsv.gz"), relation_type="all"):
@@ -345,7 +350,6 @@ class QueryResult(object):
 
 if __name__ == "__main__":
     import time
-
     start = time.time()
     foo = QueryResult()
     print("INIT TOOK: ", time.time() - start)
