@@ -274,17 +274,23 @@ class QueryResult(object):
             if edge_count >= max_edges:
                 break
             subject, predicate, objecT = relation_tuple
-            if subject == "fantastic_conception" or objecT == "fantastic_conception":
-                print("foo")
             if subject in nodes and objecT in nodes:
                 if predicate in self.visualization_parameters["edge color"]:
                     edge_color = self.visualization_parameters["edge color"][predicate]
                 else:
                     edge_color = "black"
-                graph_edge = Edge(start=nodes[subject], end=nodes[objecT],
-                                  color=edge_color)
+                graph_edge = Edge(start=nodes[subject], end=nodes[objecT], color=edge_color)
                 back_edge = Edge(start=nodes[objecT], end=nodes[subject], color=edge_color)
+                # night related to twisted_time + twisted_time close to night = blue instead of purple!
+                check_edge = nodes[objecT].get_edge(end=nodes[subject])
+                if check_edge and check_edge.color != graph_edge.color:
+                    check_edge.color = "magenta"
+                    graph_edge.color = "magenta"
                 nodes[subject].add_edge_object(graph_edge)
+                check_edge = nodes[subject].get_edge(end=nodes[objecT])
+                if check_edge and check_edge.color != back_edge.color:
+                    check_edge.color = "magenta"
+                    back_edge.color = "magenta"
                 nodes[objecT].add_edge_object(back_edge)
                 edge_count += 2
         return Graph(nodes=list(nodes.values()), clean=False)

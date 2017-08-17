@@ -31,49 +31,49 @@
 <div id="text-samples">
     {% for provenance, prov_relations, content, matches in samples %}
         <div class="text-match-wrapper">
-            <h3>{{ provenance }}, {{ prov_relations.0 }}</h3>
-         <div class="text">
-             <span class="distant-modal" id="{{ provenance }}_previous">Previous</span> <span class="distant-modal" id="{{ provenance }}_next">Next</span><br/>
-             <div class="text-content">
-                {{ content|safe|escape }}
-             </div>
-         </div>
-         <div class="match">
+            <h3 id="heading-{{ provenance }}">{{ provenance }}, {{ prov_relations.0 }}</h3>
+            <div class="text">
+                 <span class="distant-modal" id="{{ provenance }}_previous">Previous</span> <span class="distant-modal" id="{{ provenance }}_next">Next</span><br/>
+                 <div class="text-content">
+                    {{ content|safe|escape }}
+                 </div>
+            </div>
+            <div class="match">
             <h4>Text contains:</h4>
-            <div class="match-samples">
-                <ul class="match-list">
-                    {% for match in matches %}
-                        <li>{{ match }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
+                <div class="match-samples">
+                    <ul id="match-list-{{ provenance }}" class="match-list">
+                        {% for match in matches %}
+                            <li>{{ match }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
             <h4>Relations and values</h4>
-            <div class="relations">
-                {% for l in prov_relations.1 %}
-                    <table class="tablesorter-blackice tablesorter">
-                        <thead>
-                            <tr>
-                                <th>Subject</th>
-                                <th>Predicate</th>
-                                <th>Object</th>
-                                <th>Weight</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-		                    {% for triple in l %}
-		                      <tr>
-                                    <td>{{ triple.1 }}</td> 
-		                            <td {% if triple.2 == "close to" %}style="color:deepskyblue"{% elif triple.2 == "related to" %}style="color:red"{% endif %}>{{ triple.2 }}</td>
-			                        <td>{{ triple.3 }}</td>
-	                                <td>{{ triple.0 }}</td> 
-		                      </tr>
-		                    {% endfor %}
-	                    </tbody>
-                    </table>
-                {% endfor %}
+                <div class="relations">
+                    {% for l in prov_relations.1 %}
+                        <table class="tablesorter-blackice tablesorter">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Predicate</th>
+                                    <th>Object</th>
+                                    <th>Weight</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for triple in l %}
+                                  <tr>
+                                        <td>{{ triple.1 }}</td>
+                                        <td {% if triple.2 == "close to" %}style="color:deepskyblue"{% elif triple.2 == "related to" %}style="color:red"{% endif %}>{{ triple.2 }}</td>
+                                        <td>{{ triple.3 }}</td>
+                                        <td>{{ triple.0 }}</td>
+                                  </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endfor %}
+                </div>
             </div>
-         </div>
-     </div>
+        </div>
         <hr>
     {% endfor %}
 </div>

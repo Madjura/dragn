@@ -248,6 +248,24 @@ function updateCy(elements) {
                     layoutNodes("cose", target.closedNeighborhood().nodes());
                 },
                 coreAsWell: false
+            },
+            {
+                id: "find-samples",
+                title: "Find text(s) containing this",
+                selector: "node",
+                onClickFunction: function (event) {
+                    var target = browserTarget(event);
+                    var provenances = [];
+                    $(".match-list li").each(function() {
+                        if (target.id().replace(/_/g, " ") == $(this).html()) {
+                            var matchingList = $(this).closest(".match").closest(".text-match-wrapper");
+                            var top = matchingList.position().top;
+                            console.log(top);
+                            $(window).scrollTop( top - 50);
+                        }
+                    });
+                },
+                coreAsWell: false
             }
         ],
         // css classes that menu items will have
