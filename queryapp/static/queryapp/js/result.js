@@ -6,6 +6,31 @@ function browserTarget(e) {
     return target;
 }
 
+var provenancesScroll = [];
+var lastScroll = -1;
+
+$(document).ready(function() {
+    $("#sample-next").on("click", function() {
+        if (lastScroll < provenancesScroll.length - 1) {
+            lastScroll++;
+        }
+        var matchingList = provenancesScroll[lastScroll].closest(".match").closest(".text-match-wrapper");
+        var top = matchingList.position().top;
+        $(window).scrollTop( top - 70);
+    });
+    $("#sample-previous").on("click", function() {
+        if (lastScroll > 0) {
+            lastScroll--;
+        }
+        var matchingList = provenancesScroll[lastScroll].closest(".match").closest(".text-match-wrapper");
+        var top = matchingList.position().top;
+        $(window).scrollTop( top - 70);
+    });
+    $("#to-top").on("click", function() {
+       document.body.scrollTop = document.documentElement.scrollTop = 0;
+    });
+});
+
 function updateCy(elements) {
     var cy = cytoscape({
         container: $("#cy"),
@@ -255,13 +280,21 @@ function updateCy(elements) {
                 selector: "node",
                 onClickFunction: function (event) {
                     var target = browserTarget(event);
-                    var provenances = [];
-                    $(".match-list li").each(function() {
-                        if (target.id().replace(/_/g, " ") == $(this).html()) {
-                            var matchingList = $(this).closest(".match").closest(".text-match-wrapper");
-                            var top = matchingList.position().top;
-                            console.log(top);
-                            $(window).scrollTop( top - 50);
+                    $("#sample-scroll").html("Scrolling for: " + target.id());
+                    provenancesScroll = []
+                    $(".match-list").each(function() {
+                        var flag = false;
+                        $(this).children("li").each(function() {
+                            if (target.id().replace(/_/g, " ") == $(this).html()) {
+                                var matchingList = $(this).closest(".match").closest(".text-match-wrapper");
+                                var top = matchingList.position().top;
+                                console.log(top);
+                                flag = true;
+                                //$(window).scrollTop( top - 50);
+                            }
+                        });
+                        if (flag) {
+                            provenancesScroll.push($(this));
                         }
                     });
                 },
