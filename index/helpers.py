@@ -23,6 +23,11 @@ def add_related_to(sources, relation2prov, out_file=None):
     for (subject, predicate, objecT), weight in sources.items():
         relations[subject].add((predicate, objecT))
         if predicate == "related to":
+            # (('jesus_of_nazareth', 'related to', 'custom_moses'), 0.279028174830471),
+            if subject == "jesus_of_nazareth" and predicate == "custom_moses":
+                print("INDEX IF 1")
+            elif subject == "custom_moses" and predicate == "jesus_of_nazareth":
+                print("INDEX IF 2")
             related.append(((subject, predicate, objecT), weight))
     # check all "related to" triples
     for (subject, predicate, objecT), weight in related:

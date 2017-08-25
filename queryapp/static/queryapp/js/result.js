@@ -285,7 +285,8 @@ function updateCy(elements) {
                     $(".match-list").each(function() {
                         var flag = false;
                         $(this).children("li").each(function() {
-                            if (target.id().replace(/_/g, " ") == $(this).html()) {
+                            var label = $(this).html();
+                            if (target.id().replace(/_/g, " ").toLowerCase() == label.toLowerCase()) {
                                 var matchingList = $(this).closest(".match").closest(".text-match-wrapper");
                                 var top = matchingList.position().top;
                                 console.log(top);
@@ -531,7 +532,7 @@ $(document).ready(function () {
     });
     updateCy();
     $(".text-content").getWordByEvent('click', addWordToQuery);
-    $("#distant-text").getWordByEvent('click', addWordToQuery);
+    $("#modal-result-text").getWordByEvent('click', addWordToQuery);
     $(".tablesorter-blackice").tablesorter();
 });
 

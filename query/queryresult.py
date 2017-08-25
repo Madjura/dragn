@@ -25,6 +25,7 @@ The following functions were used from the original system:
 
 import gzip
 import os
+import pprint
 from _collections import defaultdict
 from ast import literal_eval
 from itertools import combinations
@@ -113,6 +114,7 @@ class QueryResult(object):
         Returns original FuzzySet containing tokens relevant to the 
         query.
         """
+        query_terms = [x for x in self.query]
         query_relevant = FuzzySet()
         for term in self.query:
             # x are tuples of (token, weight)
@@ -127,9 +129,15 @@ class QueryResult(object):
                 elif o == term:
                     tuple_token = s
                 tuple_list.append((tuple_token, score))
+            for t, _ in tuple_list:
+                try:
+                    query_terms.remove(t)
+                except ValueError:
+                    continue
             query_relevant = query_relevant | FuzzySet([x for x in tuple_list])
             # legacy stuff that is probably not important but ill keep it just in case everything goes up in flames
             # query_relevant = query_relevant | FuzzySet([x for x in self.relation_sets[term]])
+        query_relevant = query_relevant | FuzzySet([(x, 1.0) for x in query_terms])
         return query_relevant
 
     def filter_relevant(self, relevant: FuzzySet):
@@ -148,6 +156,9 @@ class QueryResult(object):
         relevant_cut = FuzzySet()
         for token in relevant.cut(self.min_weight):
             relevant_cut[token] = relevant[token]
+        print("RELEVANT CUT")
+        # relevant cut is combined for fear+talk (beyondthewall,book)
+        pprint.pprint(relevant_cut)
         return relevant_cut
 
     @staticmethod
@@ -191,7 +202,12 @@ class QueryResult(object):
         # provenance_relations = defaultdict(float)
         # all relation tuples containing query terms, with weight above threshhold
         query_relevant = self.prepare_for_query()
+        if "trapper" in query_relevant:
+            print("TRAPPER IN QR")
         relevant_cut = self.filter_relevant(query_relevant)
+        if "trapper" in relevant_cut:
+            print("TRAPPER IN RC")
+        pq = False
         # iterate over the tokens relevant to the query
         for possibly_related in relevant_cut:
             # get all relation tuples in which "possibly_related" appears
@@ -199,18 +215,30 @@ class QueryResult(object):
                 (subject, predicate, objecT), relation_weight = relation_triple
                 # find the relation tuples that contain "possibly_related" and
                 # a term from the query
+                if not pq:
+                    print(self.query)
+                    pq = True
                 if not (subject in self.query or objecT in self.query):
                     # random relation that does not have any relevance
                     continue
+                if objecT == "trapper":
+                    print("FOO")
                 # get the membership degree of "possibly related" to the query
                 # this is the higher value of "related to" or "close to"
                 membership = relevant_cut[possibly_related]
                 calculated_relation_weight = membership * relation_weight
-                self.relation_set[(subject, predicate, objecT)] += calculated_relation_weight
                 # add updated score to subject and object
                 self.tokens2weights[subject] += calculated_relation_weight
                 self.tokens2weights[objecT] += calculated_relation_weight
+                # why in graph but not in texts: no text where both appear
+                self.relation_set[(subject, predicate, objecT)] += calculated_relation_weight
+                # flag = False
+                # TODO: investigate, maybe wrong
+                #  + self.relation2prov[(subject, "related to", objecT)]
                 for prov_tuple in self.relation2prov[(subject, predicate, objecT)]:
+                    # if not flag:
+                    #     self.relation_set[(subject, predicate, objecT)] += calculated_relation_weight
+                    #     flag = True
                     for provenance, prov_weight in prov_tuple:
                         provenance_dict[provenance][0] += calculated_relation_weight * prov_weight
                         provenance_dict[provenance][1].add((prov_weight, subject, predicate, objecT))

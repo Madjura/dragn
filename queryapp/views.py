@@ -66,6 +66,7 @@ def markup_samples(samples, nodes):
                 content = re.sub("\\b{}\\b".format(n), "<b>{}</b>".format(match[0]), content, flags=re.IGNORECASE)
                 matches |= set(match)
         updated_samples.append((provenance, weight, content, matches))
+    print("MARKUP SAMPLES")
     print(updated_samples)
     return updated_samples
 
@@ -104,18 +105,23 @@ def process(request):
 
 def get_provenance(request):
     provenance = request.POST["provenance"]
-    provenance_id = int(provenance.split("_")[1])
-    provenance_name = provenance.split("_")[0]
+    next_or_previous = provenance.split("_")[-1]
+    provenance_id = int(re.findall(r'_\d+_', provenance)[0].split("_")[1])
+    if next_or_previous == "next":
+        provenance_id += 1
+    elif next_or_previous == "previous":
+        provenance_id -= 1
+    provenance_name = re.findall('(.+)_\d+', provenance)[0]
     provenance_id_next = provenance_id
     provenance_id_previous = provenance_id
     provenance_next = "{}_{}".format(provenance_name, provenance_id_next)
     provenance_previous = "{}_{}".format(provenance_name, provenance_id_previous)
     alias = request.POST["alias"]
     matches = request.POST.getlist("matches[]")
-    file_path = "{}/{}/{}".format(paths.PARAGRAPH_CONTENT_PATH, alias, provenance)
+    file_path = "{}/{}/{}_{}".format(paths.PARAGRAPH_CONTENT_PATH, alias, provenance_name, provenance_id)
     data = {}
     if os.path.isfile(file_path):
-        with open(file_path, "r") as paragraph:
+        with open(file_path, "r", encoding="utf8") as paragraph:
             content = paragraph.read()
             for n in matches:
                 match = re.findall("\\b{}\\b".format(n), content, re.IGNORECASE)

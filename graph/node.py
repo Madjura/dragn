@@ -99,9 +99,5 @@ class CytoNode(Node):
         if duplicate:
             if duplicate.color != edge.color:
                 duplicate.color = "magenta"
-            else:
-                if not back_edge:
-                    raise DuplicateEdgeError(
-                        "Duplicate edge found - this should never happen.")
         else:
             super().add_edge_object(edge)

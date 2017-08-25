@@ -59,9 +59,9 @@ function show_modal(target) {
         matches = $("#modal-matches").html().split(";");
     }
     console.log(matchElementList);
-    var provenance = idSplit[0];
     var provenanceParagraph = parseInt(idSplit[1]);
-    var previousOrNext = idSplit[2];
+    var previousOrNext = idSplit[idSplit.length-1];
+    var provenance = $(target).attr("id");
     if (previousOrNext == "previous") {
         provenanceParagraph--;
     } else if (previousOrNext == "next") {
@@ -70,7 +70,6 @@ function show_modal(target) {
         console.log("Error while getting paragraph.");
         return;
     }
-    provenance =  provenance + "_" + provenanceParagraph;
     $.ajax({
         type: "POST",
         url: '/provenance/',
@@ -89,7 +88,7 @@ function show_modal(target) {
             $("#distant-text").append(" ");
             $("#distant-text").append(next);
             $("#distant-text").append("<br/>");
-            $("#distant-text").append("<span>"+data.content+"</span>");
+            $("#distant-text").append("<span id='modal-result-text'>"+data.content+"</span>");
             $(".distant-modal").on("click", function(e) {
                 show_modal(e.target);
                 modal.style.display = "block";

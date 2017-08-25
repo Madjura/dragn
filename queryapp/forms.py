@@ -21,6 +21,9 @@ class QueryForm(forms.Form):
         print(self.fields["texts"].choices)
 
     def clean_query(self):
+        query_split = self.cleaned_data["query"].split(",")
+        print(query_split)
+        print(type(query_split))
         return self.cleaned_data["query"].split(",")
 
 
