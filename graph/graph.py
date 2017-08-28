@@ -44,6 +44,8 @@ class Graph(object):
                 "group": "nodes",
                 "data": {
                     "id": node.name,
+                    "label": "BANANA",
+                    "font-size": 20,
                     "size": node.label_size * 3,
                     "width": node.width,
                     "color": node.color
@@ -65,4 +67,5 @@ class Graph(object):
                         "color": edge.color
                     }
                 })
+        print(json.dumps(nodes + edges))
         return json.dumps(nodes + edges)

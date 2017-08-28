@@ -42,8 +42,9 @@ function updateCy(elements) {
                 selector: 'node',
                 style: {
                     "content": "data(id)",
+                    "font-size": 20,
                     "text-halign": "center",
-                    "text-valign": "center",
+                    "text-valign": "top",
                     "width": "data(size)",
                     "height": "data(size)",
                     "background-color": "data(color)"

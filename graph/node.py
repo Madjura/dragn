@@ -1,5 +1,4 @@
 from graph.edge import Edge
-from graph.exceptions import DuplicateEdgeError
 
 
 class Node(object):
