@@ -18,7 +18,9 @@ def query(request):
         queryform = QueryForm(request.POST)
         if queryform.is_valid():
             alias = TextsAlias.objects.get(pk=queryform.cleaned_data["texts"])
-            result = querystep.query(queryform.cleaned_data["query"], alias="\\"+alias.identifier)
+            lesser_edges = queryform.cleaned_data["lesser_edges"]
+            result = querystep.query(queryform.cleaned_data["query"], alias="\\"+alias.identifier,
+                                     lesser_edges=lesser_edges)
             graph = result.generate_statement_graph(
                 queryform.cleaned_data["max_nodes"],
                 queryform.cleaned_data["max_edges"])

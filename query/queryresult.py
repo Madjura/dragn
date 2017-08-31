@@ -30,6 +30,7 @@ from _collections import defaultdict
 from ast import literal_eval
 from itertools import combinations
 from math import log
+from operator import itemgetter
 
 from graph.edge import Edge
 from graph.graph import Graph
@@ -44,8 +45,9 @@ class QueryResult(object):
     format that can be displayed to the user.
     """
 
-    def __init__(self, min_weight=0.5, alias=None, relation_type="all"):
+    def __init__(self, min_weight=0.5, alias=None, relation_type="all", lesser_edges=True):
         self.query = None
+        self.lesser_edges = lesser_edges
         self.queried_combined = defaultdict(lambda: set())
         self.aliases = defaultdict(lambda: set())
         self.tokens2weights = defaultdict(int)
@@ -65,6 +67,7 @@ class QueryResult(object):
         # print("Loading relations")
         # self.relation_sets = self.load_relation_sets(path=paths.RELATION_WEIGHT_PATH + alias)
         self.alias = alias
+        self.provenance_dict = None
 
     @staticmethod
     def load_relation2prov(path=os.path.join(
@@ -129,15 +132,17 @@ class QueryResult(object):
                 elif o == term:
                     tuple_token = s
                 tuple_list.append((tuple_token, score))
-            for t, _ in tuple_list:
-                try:
-                    query_terms.remove(t)
-                except ValueError:
-                    continue
+            #for t, _ in tuple_list:
+                #try:
+                #    query_terms.remove(t)
+                #except ValueError:
+                #    continue
             query_relevant = query_relevant | FuzzySet([x for x in tuple_list])
             # legacy stuff that is probably not important but ill keep it just in case everything goes up in flames
             # query_relevant = query_relevant | FuzzySet([x for x in self.relation_sets[term]])
-        query_relevant = query_relevant | FuzzySet([(x, 1.0) for x in query_terms])
+        for x in query_terms:
+            query_relevant[x] = 1.0
+        # query_relevant = query_relevant | FuzzySet([(x, 1.0) for x in query_terms])
         return query_relevant
 
     def filter_relevant(self, relevant: FuzzySet):
@@ -156,9 +161,7 @@ class QueryResult(object):
         relevant_cut = FuzzySet()
         for token in relevant.cut(self.min_weight):
             relevant_cut[token] = relevant[token]
-        print("RELEVANT CUT")
         # relevant cut is combined for fear+talk (beyondthewall,book)
-        pprint.pprint(relevant_cut)
         return relevant_cut
 
     @staticmethod
@@ -202,12 +205,10 @@ class QueryResult(object):
         # provenance_relations = defaultdict(float)
         # all relation tuples containing query terms, with weight above threshhold
         query_relevant = self.prepare_for_query()
-        if "trapper" in query_relevant:
-            print("TRAPPER IN QR")
+        print("QR: ", query_relevant["jesus"])
         relevant_cut = self.filter_relevant(query_relevant)
-        if "trapper" in relevant_cut:
-            print("TRAPPER IN RC")
-        pq = False
+        for k, v in relevant_cut.items():
+            print(k, v)
         # iterate over the tokens relevant to the query
         for possibly_related in relevant_cut:
             # get all relation tuples in which "possibly_related" appears
@@ -215,14 +216,9 @@ class QueryResult(object):
                 (subject, predicate, objecT), relation_weight = relation_triple
                 # find the relation tuples that contain "possibly_related" and
                 # a term from the query
-                if not pq:
-                    print(self.query)
-                    pq = True
                 if not (subject in self.query or objecT in self.query):
                     # random relation that does not have any relevance
                     continue
-                if objecT == "trapper":
-                    print("FOO")
                 # get the membership degree of "possibly related" to the query
                 # this is the higher value of "related to" or "close to"
                 membership = relevant_cut[possibly_related]
@@ -232,21 +228,13 @@ class QueryResult(object):
                 self.tokens2weights[objecT] += calculated_relation_weight
                 # why in graph but not in texts: no text where both appear
                 self.relation_set[(subject, predicate, objecT)] += calculated_relation_weight
-                # flag = False
-                # TODO: investigate, maybe wrong
-                #  + self.relation2prov[(subject, "related to", objecT)]
                 for prov_tuple in self.relation2prov[(subject, predicate, objecT)]:
-                    # if not flag:
-                    #     self.relation_set[(subject, predicate, objecT)] += calculated_relation_weight
-                    #     flag = True
                     for provenance, prov_weight in prov_tuple:
                         provenance_dict[provenance][0] += calculated_relation_weight * prov_weight
                         provenance_dict[provenance][1].add((prov_weight, subject, predicate, objecT))
-                    # for (prov1, w1), (prov2, w2) in combinations(prov_tuple, 2):
-                        # w = calculated_relation_weight * (w1 + w2) / 2
-                        # provenance_relations[(prov2, prov1)] += w
-        if provenance_dict:
-            self.provenance_set = ProvFuzzySet.from_list_dictionary(provenance_dict)
+        print("NOW ", provenance_dict["bible_full.txt_18763"][0])
+        print("NOW2 ", provenance_dict["bible_full.txt_21514"][0])
+        self.provenance_dict = provenance_dict
 
     def generate_statement_nodes(self, max_nodes):
         """
@@ -296,8 +284,6 @@ class QueryResult(object):
         token_list = list(self.relation_set.items())
         edge_count = 0
         token_list.sort(key=lambda x: x[1], reverse=True)
-        import pprint
-        pprint.pprint(token_list)
         for relation_tuple, _ in token_list:
             if edge_count >= max_edges:
                 break
@@ -321,6 +307,41 @@ class QueryResult(object):
                     back_edge.color = "magenta"
                 nodes[objecT].add_edge_object(back_edge)
                 edge_count += 2
+        if self.lesser_edges:
+            for combo in list(combinations(nodes.keys(), 2)):
+                if edge_count >= max_edges:
+                    break
+                s, o = combo
+                t1 = (s, "close to", o)
+                t2 = (o, "close to", s)
+                t11 = (s, "related to", o)
+                t22 = (o, "related to", s)
+                to_check = [t1, t2, t11, t22]
+                # possible problem with creating non-existant relations again
+                # explanation: example for "devil" and "unto"
+                # "unto" appears in the text, "devil" does not
+                # graph has unto related to devil, so it adds the relation to the table
+                for t in to_check:
+                    if any(t_ in self.relation_set for t_ in to_check):
+                        break
+                    val = self.relation2prov[t]
+                    if not val:
+                        continue
+                    ss, pp, oo = t
+                    edge_color = self.visualization_parameters["edge color"][pp]
+                    check_edge = nodes[oo].get_edge(end=nodes[ss])
+                    if not check_edge:
+                        nodes[ss].get_edge(end=nodes[oo])
+                    if check_edge and check_edge.color != edge_color:
+                        edge_color = "magenta"
+                    new_edge = Edge(start=nodes[ss], end=nodes[oo], color=edge_color)
+                    nodes[ss].add_edge_object(new_edge)
+                    edge_count += 2
+                    for pt in val:
+                        for prov, weight in pt:
+                            self.provenance_dict[prov][0] += weight
+                            self.provenance_dict[prov][1].add((weight, ss, pp, oo))
+        self.provenance_set = ProvFuzzySet.from_list_dictionary(self.provenance_dict)
         return Graph(nodes=list(nodes.values()), clean=False)
 
     @staticmethod

@@ -9,6 +9,7 @@ class QueryForm(forms.Form):
     max_nodes = fields.IntegerField(min_value=1, required=False, initial=25)
     max_edges = fields.IntegerField(min_value=1, required=False, initial=50)
     top_text_samples = fields.IntegerField(min_value=1, required=False, initial=10)
+    lesser_edges = fields.BooleanField(required=False)
     texts = fields.ChoiceField(required=True,
                                help_text="Select text combination to process. If what you want is not here,"
                                          "process it first.",
