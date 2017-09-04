@@ -14,20 +14,12 @@ from pycallgraph.pycallgraph import PyCallGraph
 def generate_relation_values(sources, relations: "memstore corpus", alias):
     relation2prov, index = generate_relation_provenance_weights(sources, relations)
     index_to_db(index)
-    with gzip.open(
-            os.path.join(paths.RELATION_PROVENANCES_PATH + alias,
-                         "provenances.tsv.gz"), "w") as f_out:
-        for relation, prov_weights in relation2prov.items():
-            line = "\t".join([str(relation), str(prov_weights)])
-            f_out.write(str.encode(line))
-            f_out.write(str.encode("\n"))
-        # replace None with f_out when done
-        f = add_related_to(relations, relation2prov, f_out)
-        merge = {**relation2prov, **f}
+    f = add_related_to(relations, relation2prov)
+    merge = {**relation2prov, **f}
     p = os.path.join(paths.RELATION_PROVENANCES_PATH + alias, "r2p.json")
+    # format is (spo): (prov, score)
     with open(p, "w") as f:
         f.write(ujson.dumps(merge))
-    # format is (spo): (prov, score)
 
 
 def make_relation_weights(relation_dictionary, alias):

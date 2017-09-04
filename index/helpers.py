@@ -17,7 +17,7 @@ def generate_relation_provenance_weights(sources, relations):
     return dictionary, inverse
 
 
-def add_related_to(sources, relation2prov, out_file=None):
+def add_related_to(sources, relation2prov):
     related = []
     dictionary = defaultdict(lambda: list())
     relations = defaultdict(lambda: set())
@@ -57,12 +57,6 @@ def add_related_to(sources, relation2prov, out_file=None):
                                  + identifier)
             prov_weight *= weight
             dictionary[(subject, predicate, objecT)].append((provenance, prov_weight))
-            if out_file is not None:
-                # predicate is ALWAYS related to
-                line = "\t".join([str((subject, predicate, objecT)),
-                                  str([(provenance, prov_weight)])])
-                out_file.write(str.encode(line))
-                out_file.write(str.encode("\n"))
     return dictionary
 
 

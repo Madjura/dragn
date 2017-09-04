@@ -1,3 +1,4 @@
+ujson
 pycallgraph
 progressbar2
 Django==1.10.6

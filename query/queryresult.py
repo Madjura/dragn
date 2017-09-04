@@ -59,8 +59,7 @@ class QueryResult(object):
         self.visualization_parameters = self.load_parameters()
         print("Loading relation to provenance mapping")
         self.relation2prov = self.load_relation2prov(
-            path=paths.RELATION_PROVENANCES_PATH + alias + "/provenances.tsv.gz",
-            relation_type=relation_type)
+            path=paths.RELATION_PROVENANCES_PATH + alias + "/r2p.json")
         print("Loading related")
         self.relations = self.load_token2related(path=os.path.join(paths.RELATIONS_PATH + alias, "relations.tsv.gz"),
                                                  relation_type=relation_type)
@@ -72,8 +71,7 @@ class QueryResult(object):
         self.provenance_dict = None
 
     @staticmethod
-    def load_relation2prov(path=os.path.join(
-            paths.RELATION_PROVENANCES_PATH, "provenances.tsv.gz"), relation_type="all"):
+    def load_relation2prov(path=None):
         """
         Loads the mapping of relation tuples to the provenances.
         The format is:
@@ -83,7 +81,6 @@ class QueryResult(object):
                 path: Optional. Default: paths.RELATION_PROVENANCES_PATH.
                     The path to the file of tuple -> provennces mapping, as
                     created in index_step.
-                relation_type: Optional. Default: "all". What kind of relation(s) to consider.
             Returns:
                 A dictionary of relation tuple -> provenance mappings.
         """
@@ -95,21 +92,6 @@ class QueryResult(object):
         for key in relation2prov.keys():
             fix[literal_eval(key)] = relation2prov[key]
         relation2prov = fix
-        # KEYS ARE STRINGS
-        # FIX THIS
-        #with gzip.open(path, "rb") as f:
-        #    for line in f:
-        #        if not line:
-        #            continue
-        #        line_split = line.decode().split("\t")
-        #        relation_tuple = literal_eval(line_split[0])
-        #        s, p, o = relation_tuple
-        #        if relation_type == "related to" and p != "related to":
-        #            continue
-        #        elif relation_type == "close to" and p != "close to":
-        #            continue
-        #        provenances = literal_eval(line_split[1])
-        #        relation2prov[relation_tuple].append(provenances)
         print("--- %s seconds FOR LOADING DICT ---" % (time.time() - start_time))
         start_time = time.time()
         # get the maximum value for each prov
@@ -310,6 +292,7 @@ class QueryResult(object):
                 nodes[objecT].add_edge_object(back_edge)
                 edge_count += 2
         if self.lesser_edges:
+            print("LESSER EDGES: TRUE")
             for combo in list(combinations(nodes.keys(), 2)):
                 if edge_count >= max_edges:
                     break

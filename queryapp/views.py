@@ -19,6 +19,7 @@ def query(request):
         if queryform.is_valid():
             alias = TextsAlias.objects.get(pk=queryform.cleaned_data["texts"])
             lesser_edges = queryform.cleaned_data["lesser_edges"]
+            print("FORM LESSER EDGES: ", lesser_edges)
             result = querystep.query(queryform.cleaned_data["query"], alias="\\"+alias.identifier,
                                      lesser_edges=lesser_edges)
             graph = result.generate_statement_graph(
