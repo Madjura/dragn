@@ -24,13 +24,14 @@ The following functions were used from the original system:
 """
 
 import gzip
+import json
 import os
-import pprint
 from _collections import defaultdict
 from ast import literal_eval
 from itertools import combinations
 from math import log
-from operator import itemgetter
+
+import ujson
 
 from graph.edge import Edge
 from graph.graph import Graph
@@ -57,8 +58,9 @@ class QueryResult(object):
         self.min_weight = min_weight
         self.visualization_parameters = self.load_parameters()
         print("Loading relation to provenance mapping")
-        self.relation2prov = self.load_relation2prov(path=paths.RELATION_PROVENANCES_PATH + alias + "/provenances.tsv.gz",
-                                                     relation_type=relation_type)
+        self.relation2prov = self.load_relation2prov(
+            path=paths.RELATION_PROVENANCES_PATH + alias + "/provenances.tsv.gz",
+            relation_type=relation_type)
         print("Loading related")
         self.relations = self.load_token2related(path=os.path.join(paths.RELATIONS_PATH + alias, "relations.tsv.gz"),
                                                  relation_type=relation_type)
@@ -81,36 +83,53 @@ class QueryResult(object):
                 path: Optional. Default: paths.RELATION_PROVENANCES_PATH.
                     The path to the file of tuple -> provennces mapping, as
                     created in index_step.
+                relation_type: Optional. Default: "all". What kind of relation(s) to consider.
             Returns:
                 A dictionary of relation tuple -> provenance mappings.
         """
-        relation2prov = defaultdict(lambda: list())
-        with gzip.open(path, "rb") as f:
-            for line in f:
-                if not line:
-                    continue
-                line_split = line.decode().split("\t")
-                relation_tuple = literal_eval(line_split[0])
-                s, p, o = relation_tuple
-                if relation_type == "related to" and p != "related to":
-                    continue
-                elif relation_type == "close to" and p != "close to":
-                    continue
-                provenances = literal_eval(line_split[1])
-                relation2prov[relation_tuple].append(provenances)
+        import time
+        start_time = time.time()
+        with open(path.replace("provenances.tsv.gz", "r2p.json")) as f:
+            relation2prov = ujson.load(f)
+        fix = {}
+        for key in relation2prov.keys():
+            fix[literal_eval(key)] = relation2prov[key]
+        relation2prov = fix
+        # KEYS ARE STRINGS
+        # FIX THIS
+        #with gzip.open(path, "rb") as f:
+        #    for line in f:
+        #        if not line:
+        #            continue
+        #        line_split = line.decode().split("\t")
+        #        relation_tuple = literal_eval(line_split[0])
+        #        s, p, o = relation_tuple
+        #        if relation_type == "related to" and p != "related to":
+        #            continue
+        #        elif relation_type == "close to" and p != "close to":
+        #            continue
+        #        provenances = literal_eval(line_split[1])
+        #        relation2prov[relation_tuple].append(provenances)
+        print("--- %s seconds FOR LOADING DICT ---" % (time.time() - start_time))
+        start_time = time.time()
         # get the maximum value for each prov
         # this is necessary because in index step we calculate additional triples that are immediately written to file
         # here we eliminate the duplicates and take just the max value
         for key, value in relation2prov.items():
             prov_max = defaultdict(int)
             for l in value:
-                for prov, score in l:
+                tmp = []
+                it = iter(l)
+                for x in it:
+                    tmp.append((x, next(it)))
+                for prov, score in tmp:
                     current = prov_max[prov]
                     if score > current:
                         prov_max[prov] = score
             tmp = [(prov, score) for prov, score in prov_max.items()]
             relation2prov[key] = [tmp]
-        return relation2prov
+        print("--- %s seconds FOR SECOND HALF ---" % (time.time() - start_time))
+        return defaultdict(lambda: list(), relation2prov)
 
     def prepare_for_query(self):
         """
@@ -132,11 +151,6 @@ class QueryResult(object):
                 elif o == term:
                     tuple_token = s
                 tuple_list.append((tuple_token, score))
-            #for t, _ in tuple_list:
-                #try:
-                #    query_terms.remove(t)
-                #except ValueError:
-                #    continue
             query_relevant = query_relevant | FuzzySet([x for x in tuple_list])
             # legacy stuff that is probably not important but ill keep it just in case everything goes up in flames
             # query_relevant = query_relevant | FuzzySet([x for x in self.relation_sets[term]])
@@ -189,39 +203,29 @@ class QueryResult(object):
         
             1) Get all tokens possibly relevant to the query
             2) Get all triples related to the token in some way
-            3) Filter out those with too low of a relation as specified by min_weight
-            4) Filter out those that don't have relevance to the query or that token
-            5) Get the degree of membership of the token <-> the query
-            6) Multiply the membership with the weight from the triple
-            7) Add that value to a dict for the related token and the matching queryterm (used to calculate nodes)
-            8) Get the provenance, weight tuple for the relation triple
-            9) Weight the provenance by the prov weight * relation weight * membership
+            3) Filter out those that don't have relevance to the query or that token
+            4) Get the degree of membership of the token <-> the query
+            5) Multiply the membership with the weight from the triple
+            6) Add that value to a dict for the related token and the matching queryterm (used to calculate nodes)
+            7) Get the provenance, weight tuple for the relation triple
+            8) Weight the provenance by the prov weight * relation weight * membership
         """
-        # { provenance: calculated weight }
-        # indicates how "related" a provenance is to the query
         provenance_dict = defaultdict(lambda: [0, set()])
-        # { (prov1, prov2): weight }
-        # indicates how "related" two provenances are
-        # provenance_relations = defaultdict(float)
-        # all relation tuples containing query terms, with weight above threshhold
         query_relevant = self.prepare_for_query()
-        print("QR: ", query_relevant["jesus"])
-        relevant_cut = self.filter_relevant(query_relevant)
-        for k, v in relevant_cut.items():
-            print(k, v)
+        related_tokens = self.filter_relevant(query_relevant)
         # iterate over the tokens relevant to the query
-        for possibly_related in relevant_cut:
+        for possibly_related in related_tokens:
             # get all relation tuples in which "possibly_related" appears
             for relation_triple in self.relations[possibly_related]:
                 (subject, predicate, objecT), relation_weight = relation_triple
-                # find the relation tuples that contain "possibly_related" and
+                # find the relation triples that contain "possibly_related" and
                 # a term from the query
                 if not (subject in self.query or objecT in self.query):
                     # random relation that does not have any relevance
                     continue
                 # get the membership degree of "possibly related" to the query
                 # this is the higher value of "related to" or "close to"
-                membership = relevant_cut[possibly_related]
+                membership = related_tokens[possibly_related]
                 calculated_relation_weight = membership * relation_weight
                 # add updated score to subject and object
                 self.tokens2weights[subject] += calculated_relation_weight
@@ -232,8 +236,6 @@ class QueryResult(object):
                     for provenance, prov_weight in prov_tuple:
                         provenance_dict[provenance][0] += calculated_relation_weight * prov_weight
                         provenance_dict[provenance][1].add((prov_weight, subject, predicate, objecT))
-        print("NOW ", provenance_dict["bible_full.txt_18763"][0])
-        print("NOW2 ", provenance_dict["bible_full.txt_21514"][0])
         self.provenance_dict = provenance_dict
 
     def generate_statement_nodes(self, max_nodes):

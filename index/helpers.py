@@ -19,15 +19,12 @@ def generate_relation_provenance_weights(sources, relations):
 
 def add_related_to(sources, relation2prov, out_file=None):
     related = []
+    dictionary = defaultdict(lambda: list())
     relations = defaultdict(lambda: set())
+
     for (subject, predicate, objecT), weight in sources.items():
         relations[subject].add((predicate, objecT))
         if predicate == "related to":
-            # (('jesus_of_nazareth', 'related to', 'custom_moses'), 0.279028174830471),
-            if subject == "jesus_of_nazareth" and predicate == "custom_moses":
-                print("INDEX IF 1")
-            elif subject == "custom_moses" and predicate == "jesus_of_nazareth":
-                print("INDEX IF 2")
             related.append(((subject, predicate, objecT), weight))
     # check all "related to" triples
     for (subject, predicate, objecT), weight in related:
@@ -59,12 +56,14 @@ def add_related_to(sources, relation2prov, out_file=None):
                 raise ValueError("This should never happen unless something goes HORRIBLY wrong. Problematic value: "
                                  + identifier)
             prov_weight *= weight
+            dictionary[(subject, predicate, objecT)].append((provenance, prov_weight))
             if out_file is not None:
                 # predicate is ALWAYS related to
                 line = "\t".join([str((subject, predicate, objecT)),
                                   str([(provenance, prov_weight)])])
                 out_file.write(str.encode(line))
                 out_file.write(str.encode("\n"))
+    return dictionary
 
 
 def index_to_db(index):

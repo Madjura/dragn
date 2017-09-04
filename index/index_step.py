@@ -1,5 +1,6 @@
 import gzip
 import os
+import ujson
 from _collections import defaultdict
 
 from index.helpers import generate_relation_provenance_weights, \
@@ -20,8 +21,13 @@ def generate_relation_values(sources, relations: "memstore corpus", alias):
             line = "\t".join([str(relation), str(prov_weights)])
             f_out.write(str.encode(line))
             f_out.write(str.encode("\n"))
-        add_related_to(relations, relation2prov, f_out)
-    f_out.close()
+        # replace None with f_out when done
+        f = add_related_to(relations, relation2prov, f_out)
+        merge = {**relation2prov, **f}
+    p = os.path.join(paths.RELATION_PROVENANCES_PATH + alias, "r2p.json")
+    with open(p, "w") as f:
+        f.write(ujson.dumps(merge))
+    # format is (spo): (prov, score)
 
 
 def make_relation_weights(relation_dictionary, alias):
@@ -78,5 +84,5 @@ def with_graphvizoutput():
 
 
 if __name__ == "__main__":
-    index_step(alias="/beyondthewall.txt,book.txt")
+    index_step(alias="/bible_full.txt")
     #with_graphvizoutput()
