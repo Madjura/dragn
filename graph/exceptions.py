@@ -1,3 +1,4 @@
+"""Exceptions in the dragn graph system."""
 class DuplicateEdgeError(Exception):
     """
     Exception used to indicate the same edge is being added twice to a graph.

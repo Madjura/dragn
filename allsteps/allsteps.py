@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+"""
+Allows the execution of all steps in the dragn pipeline.
+"""
 from extract.extract_step import extract_step, make_folders
 from index.index_step import index_step
 from knowledge_base.knowledge_base_compute_step import knowledge_base_compute
@@ -7,7 +11,15 @@ from pycallgraph.pycallgraph import PyCallGraph
 from query import querystep
 
 
-def all_steps(query=None, texts=None, language="english", alias=None):
+def all_steps(texts, query=None, language="english", alias=None):
+    """
+    Performs all steps in the pipeline, up to and including query_step.
+    :param texts: A list of texts to be processed.
+    :param query: Optional. The query to be performed, if query_step execution is intended.
+    :param language: Optional. Default: English. The language of the texts.
+    :param alias: The Alias used for the text(s).
+    :return:
+    """
     alias_object = alias
     alias = "/" + alias.identifier
     print("MAKING FOLDERS")
@@ -26,22 +38,39 @@ def all_steps(query=None, texts=None, language="english", alias=None):
     if query:
         querystep.query(query)
 
+
 def with_graphvizoutput():
+    """
+    Runs all_steps with GraphvizOutput, producing a call graph of all functions.
+    :return:
+    """
     graphviz = GraphvizOutput()
     graphviz.output_file = "allstep.png"
     with PyCallGraph(output=graphviz):
         all_steps(["cult", "fish", "water", "fear"])
 
 
+# noinspection PyMethodMayBeStatic
 class FakeAlias(object):
+    """
+    Used for running dragn without starting the Django server.
+    Required because the Alias is stored in the database and not accessible properly without the server. This is used as
+    a replacement and functions exactly as the normal Alias would, except it does not come from the database, neither
+    is it stored there.
+    Mostly used for debugging.
+    """
     def __init__(self, identifier):
         self.identifier = identifier
 
     def save(self):
+        """
+        Blank method to bypass the Django database regarding the Alias System.
+        :return:
+        """
         pass
 
 
 if __name__ == "__main__":
-    alias = FakeAlias("beast.txt,beyondthewall.txt,book.txt")
-    all_steps(texts=["beast.txt", "beyondthewall.txt", "book.txt"], alias=alias)
-    #with_graphvizoutput()
+    fake = FakeAlias("beast.txt,beyondthewall.txt,book.txt")
+    all_steps(texts=["beast.txt", "beyondthewall.txt", "book.txt"], alias=fake)
+    # with_graphvizoutput()

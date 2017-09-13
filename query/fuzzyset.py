@@ -187,7 +187,10 @@ class ProvFuzzySet(FuzzySet):
     @staticmethod
     def from_list_dictionary(list_dictionary):
         membership = ProvFuzzySet()
-        normalisation = Decimal(max([x[0] for x in list_dictionary.values()]))
+        try:
+            normalisation = Decimal(max([x[0] for x in list_dictionary.values()]))
+        except ValueError:
+            normalisation = 1
         if normalisation <= 0:
             normalisation = Decimal(1)
         for key, value in list_dictionary.items():

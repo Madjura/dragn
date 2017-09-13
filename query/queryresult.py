@@ -194,8 +194,10 @@ class QueryResult(object):
         """
         provenance_dict = defaultdict(lambda: [0, set()])
         query_relevant = self.prepare_for_query()
+        print("QR: ", query_relevant)
         related_tokens = self.filter_relevant(query_relevant)
         # iterate over the tokens relevant to the query
+        print("RELATED: ", related_tokens)
         for possibly_related in related_tokens:
             # get all relation tuples in which "possibly_related" appears
             for relation_triple in self.relations[possibly_related]:
@@ -212,9 +214,12 @@ class QueryResult(object):
                 # add updated score to subject and object
                 self.tokens2weights[subject] += calculated_relation_weight
                 self.tokens2weights[objecT] += calculated_relation_weight
-                # why in graph but not in texts: no text where both appear
-                self.relation_set[(subject, predicate, objecT)] += calculated_relation_weight
+                flag = True
                 for prov_tuple in self.relation2prov[(subject, predicate, objecT)]:
+                    if flag:
+                    # why in graph but not in texts: no text where both appear
+                        self.relation_set[(subject, predicate, objecT)] += calculated_relation_weight
+                        flag = False
                     for provenance, prov_weight in prov_tuple:
                         provenance_dict[provenance][0] += calculated_relation_weight * prov_weight
                         provenance_dict[provenance][1].add((prov_weight, subject, predicate, objecT))
@@ -326,6 +331,7 @@ class QueryResult(object):
                         for prov, weight in pt:
                             self.provenance_dict[prov][0] += weight
                             self.provenance_dict[prov][1].add((weight, ss, pp, oo))
+        print(self.provenance_dict)
         self.provenance_set = ProvFuzzySet.from_list_dictionary(self.provenance_dict)
         return Graph(nodes=list(nodes.values()), clean=False)
 

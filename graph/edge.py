@@ -1,3 +1,4 @@
+"""Edges/Vertices in the dragn graph system."""
 from graph.exceptions import MissingSourceEndError
 
 

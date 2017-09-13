@@ -1,10 +1,15 @@
+#!/usr/bin/env python3
+"""
+Allows the execution of extract_step.
+In this step the texts are pre-processed, they are tokenized and POS-tags are assigned.
+"""
 import pickle
 from os.path import os
 
 import progressbar
 
-from extract.text_extract import split_paragraphs, pos_tag, parse_pos, text2cooc, \
-    generate_source
+from extract.text_extract import split_paragraphs, pos_tag, extract_from_sentences, \
+    calculate_weighted_distance
 from text.paragraph import Paragraph
 from util import paths
 from pycallgraph.output.graphviz import GraphvizOutput
@@ -15,21 +20,23 @@ def make_folders(alias=None):
     """
     Creates the folders required for using the system.
     The path to the folders can be found in the "util" package.
+    :param alias: The Alias of the texts.
+    :return:
     """
     for path in paths.ALL:
         if not alias:
             if not os.path.exists(path):
                 os.makedirs(path)
         else:
-            if not os.path.exists(path + "/" + alias):
+            folder = path + "/" + alias
+            if not os.path.exists(folder) and path not in paths.EXCLUDE:
                 os.makedirs(path + "/" + alias)
 
 
-def extract_step(text_path: str = paths.TEXT_PATH, language="english", texts=None, alias=None):
+def extract_step(text_path: str = paths.TEXT_PATH, language="english", texts: [str] = None, alias=None):
     """
     Processes all files in a given folder.
     The process is as follows:
-    
         1) Read the content of the file
         2) Split the content into Paragraph objects (each Paragraph has a list
             of containing sentences)
@@ -47,16 +54,16 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english", texts=Non
                         [Paul: (0), threw: (0), the: (0, 1), ...]
             3.3) Generate the "Closeness" for each combination of tokens
                 The weighting of the "Closeness" is calculated like so:
-                    - For each combination of tokens, check all combinations 
+                    - For each combination of tokens, check all combinations
                         of positions.
                     - Check the distance (math.abs()) of the distances
                     - If it is below the threshold (default 5), add
                         the following to the current weight:
                         1/(1 + distance)
-                        
+
                         Example for "Paul" and "the":
                             Position "0" from "Paul" and "0" from "the"
-                            abs(0 - 0) = 0, < 5 
+                            abs(0 - 0) = 0, < 5
                             w += 1/(1+0) = 1
                             ----------------
                             Position "0" from "Paul" and "1" from "the"
@@ -64,7 +71,6 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english", texts=Non
                             w += 1/(1+1) = 1.5
                         Therefore "Paul" and "the" are on average 1.5 sentences
                         apart.
-                            
                     - If it is above the threshold, continue with the next
                         position
                     - After all positional combinations are checked, create
@@ -72,21 +78,20 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english", texts=Non
                         being the value that was calculated as above IF the
                         weight is above the threshold (1/3). If it is not,
                         continue with the next token.
-                        
+
                         In the example above the weight would be 1.5, so a
                         new Closeness object would be created and added to the
                         list.
-                        
             3.4) Add the resulting list from 3.3) to a list and continue with
                 the next paragraph
         4) Write the resulting list of "Closeness" objects for each text
             to the disk.
-        
-        Args:
-            text_path: Optional. The path to the folder where the files are.
-                The default path is specified in util.paths.
-            language: Optional. Default: "english". The language of the texts.
-                    
+    :param text_path: The path to the folder where the files are.
+    :param language: Optional. Default: "english". The language of the texts.
+    :param texts: Optional. A list of strings of filenames to be processed. If not provided, all texts in the system
+    will be used.
+    :param alias: Optional. The Alias of the collection of texts.
+    :return:
     """
     # iterate over texts
     closeness = []
@@ -97,17 +102,13 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english", texts=Non
         if not text.endswith(".txt"):
             # support different file types here
             continue
-        with (open(paths.TEXT_PATH + "/" + text, "r",
-                   encoding="utf-8")) as current_text:
+        with (open(paths.TEXT_PATH + "/" + text, "r", encoding="utf-8")) as current_text:
             text_content = current_text.read()
-
             # split the text into paragraphs first
             paragraphs = split_paragraphs(text_content)
-
             # take each paragraph, pos tag each paragraph content
             paragraph_list = []
-            with open(paths.TEXT_META_PATH + "/{}_meta".format(text), "w",
-                      encoding="utf8") as metafile:
+            with open(paths.TEXT_META_PATH + "/{}_meta".format(text), "w", encoding="utf8") as metafile:
                 metafile.write("PARAGRAPHS: {}".format(len(paragraphs)))
             print("Current text: {}".format(text))
             bar = progressbar.ProgressBar(max_value=len(paragraphs))
@@ -117,22 +118,13 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english", texts=Non
                 pos = pos_tag(paragraph)
                 new_paragraph = Paragraph(count, pos, text)
                 paragraph_list.append(new_paragraph)
-
-                # parse the pos-tagged sentences into the dictionary format
-                # example: {0: [('A', 'DT'), ('Study', 'NNP'), ('in', 'IN'),
-                pos_tagged_parsed = parse_pos(new_paragraph.sentences)
-
                 # {'study': {0}, 'temperament': {0}}
-                text2sentence = text2cooc(pos_tagged_parsed, language)
-
+                text2sentence = extract_from_sentences(new_paragraph.sentences, language)
                 # terms = text2sentence.keys()
-                closeness_list = generate_source(
-                    text2sentence,
-                    paragraph_id="{}_{}".format(str(text), str(count))
-                )
+                closeness_list = calculate_weighted_distance(text2sentence, paragraph_id="{}_{}".format(str(text), str(count)))
                 closeness.append(closeness_list)
-                with open(paths.PARAGRAPH_CONTENT_PATH + "{}/{}_{}".format(
-                        alias, text, count), "w", encoding="utf8") as content_file:
+                with open(paths.PARAGRAPH_CONTENT_PATH + "{}/{}_{}".format(alias, text, count), "w", encoding="utf8") \
+                        as content_file:
                     content_file.write(paragraph)
             pickle.dump(paragraph_list,
                         open(paths.POS_PATH + "/" + alias + "/" + text + ".p", "wb"))
@@ -145,6 +137,10 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english", texts=Non
 
 
 def with_graphviz_output():
+    """
+    Runs extract_step with GraphvizOutput, producing a call graph of all functions.
+    :return:
+    """
     graphviz = GraphvizOutput()
     graphviz.output_file = 'extract_step.png'
 

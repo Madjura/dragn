@@ -19,8 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 This class is based on the Analyser class of the original system.
 The following functions were used from the original system:
     - similarTo (renamed to similar_to)
-
-    Those functions were used as a base to develop the new ones in this file.
 """
 
 import math
@@ -33,10 +31,7 @@ class Analyser:
       - learning of rules from the perspective and its compressed counterpart
     """
 
-    def __init__(self,
-                 mem=True,
-                 trace=False,
-                 matrix=None):
+    def __init__(self, mem=True, trace=False, matrix=None):
         """Initialising the class with an input matrix to be analysed."""
         self.trace = trace
         # the matrix handler of the perspective, computed from scratch by default

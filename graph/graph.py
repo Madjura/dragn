@@ -1,10 +1,15 @@
+"""Graphs in the dragn graph system."""
 import json
 
 
 class Graph(object):
     """Simple graph with nodes and edges."""
-
     def __init__(self, *, nodes: ["Node"] = None, clean=True):
+        """
+        Constructor.
+        :param nodes: Optional. A list of nodes that make up the graph.
+        :param clean: Optional. Default: True. Whether nodes with no connected edges are to be deleted.
+        """
         if nodes is not None:
             self.nodes = nodes
         else:
@@ -30,11 +35,8 @@ class Graph(object):
         The resulting JSON string is intended to be used with 
         Cytoscape.js 3.0.0 (http://js.cytoscape.org/) and can be loaded into
         it to display the graph.
-        
-            Returns:
-                An RFC4627 compliant JSON string for use with Cytoscape.js.
+        :return An RFC4627 compliant JSON string for use with Cytoscape.js.
         """
-
         # separate lists required to have the nodes before the edges,
         # needed for cytoscape, the edges need the id of the node
         nodes = []
@@ -44,7 +46,6 @@ class Graph(object):
                 "group": "nodes",
                 "data": {
                     "id": node.name,
-                    "label": "BANANA",
                     "font-size": 20,
                     "size": node.label_size * 3,
                     "width": node.width,
@@ -67,5 +68,4 @@ class Graph(object):
                         "color": edge.color
                     }
                 })
-        print(json.dumps(nodes + edges))
         return json.dumps(nodes + edges)

@@ -1,28 +1,32 @@
+"""Helper methods for index_step."""
 from _collections import defaultdict
 
 
 def generate_relation_provenance_weights(sources, relations):
     """
-    Generates the mapping of predicate tuples to provenance with closeness
-    therein.
+    Generates the mapping of predicate tuples to provenance with their score therein.
     """
-
     dictionary = defaultdict(lambda: list())
     inverse = defaultdict(lambda: set())
-    for (subject, predicate, objecT, provenance), closeness in sources.items():
-        closeness = relations[(subject, predicate, objecT)]
-        dictionary[(subject, predicate, objecT)].append((provenance, closeness))
+    for (subject, predicate, objecT, provenance), score in sources.items():
+        score = relations[(subject, predicate, objecT)]
+        dictionary[(subject, predicate, objecT)].append((provenance, score))
         inverse[subject].add(provenance)
         inverse[objecT].add(provenance)
     return dictionary, inverse
 
 
-def add_related_to(sources, relation2prov):
+def add_related_to(relations, relation2prov):
+    """
+    Calculates "related to" relations.
+    :param relations: Relations that were already found.
+    :param relation2prov: The dictionary mapping relations to the provenance.
+    :return: A dictionary containing the "related to" relations.
+    """
     related = []
     dictionary = defaultdict(lambda: list())
     relations = defaultdict(lambda: set())
-
-    for (subject, predicate, objecT), weight in sources.items():
+    for (subject, predicate, objecT), weight in relations.items():
         relations[subject].add((predicate, objecT))
         if predicate == "related to":
             related.append(((subject, predicate, objecT), weight))
@@ -61,6 +65,11 @@ def add_related_to(sources, relation2prov):
 
 
 def index_to_db(index):
+    """
+    Writes the inverted index to the database.
+    :param index: The index.
+    :return:
+    """
     import django
     import os
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dragn.settings")
@@ -70,6 +79,7 @@ def index_to_db(index):
     bulk = []
     for term, provs in index.items():
         bulk.extend([InverseIndex(term=term, index=prov) for prov in provs])
+    # noinspection PyBroadException
     try:
         InverseIndex.objects.bulk_create(bulk)
     except:

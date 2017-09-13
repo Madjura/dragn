@@ -17,13 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 The following functions were used from the original system:
-    - get_cooc
-    - text2cooc
-    - gen_src (renamed to generate_source)
+    - get_cooc (renamed to get_cooccurence)
+    - text2cooc (renamed to extract_from_sentences)
+    - gen_src (renamed to calculate_weighted_distance)
 
     Those functions were used as a base to develop the new ones in this file.
 """
-
 import math
 from _collections import OrderedDict, defaultdict
 from itertools import combinations
@@ -37,31 +36,17 @@ from nltk.tree import Tree
 from text.closeness import Closeness
 from text.sentence import Sentence
 
-NP_GRAMMAR_COMPOUND = """
-NP: {<JJ.*>*(<N.*>|<JJ.*>)+((<IN>|<TO>)?<JJ.*>*(<N.*>|<JJ.*>)+)*((<CC>|,)<JJ.*>*(<N.*>|<JJ.*>)+((<IN>|<TO>)?<JJ.*>*(<N.*>|<JJ.*>)+)*)*}
-"""
-NP_GRAMMAR_SIMPLE = """
-NP: {<JJ.*>*(<N.*>|<JJ.*>)+}
-"""
-
 
 def split_paragraphs(text: str) -> [str]:
     """
     Takes a text and collects the paragraphs of the text.
-    
-        Args:
-            text: The input string. Unmodified, keep it as is. Supposed to be
-                the content of a file read with .read().
-        Returns:
-            A list of strings, where each element is a paragraph of the original
-            text.
+    :param text: The content of a text file.
+    :return: A list of strings, where each element is a paragraph of the input text.
     """
     lines = text.split("\n")
     current_paragraph = []
     paragraphs = []
-
-    # iterate over each line of the text, with .strip() applied to remove
-    # trailing whitespace
+    # iterate over each line of the text, with .strip() applied to remove trailing whitespace
     for line in map(lambda x: x.strip(), lines):
         if len(line) > 0:
             # the line is NOT a paragraph if there is something there
@@ -79,11 +64,8 @@ def split_paragraphs(text: str) -> [str]:
 def pos_tag(text: str) -> [Sentence]:
     """
     Tokenize a given text and generates a list of Sentence objects.
-        
-        Args:
-            text: The input text that is to be POS tagged.
-        Returns:
-            A list of Sentence objects.
+    :param text: Tokenizes a given text and generates a list of Sentence objects, with the appropiate POS-tags added.
+    :return: A list of Sentence objects representing the sentences in the text.
     """
     sentences = []
     for count, sentence in enumerate(nltk.sent_tokenize(text)):
@@ -96,45 +78,28 @@ def pos_tag(text: str) -> [Sentence]:
     return sentences
 
 
-def parse_pos(sentences: [Sentence]) -> {int, (str, str)}:
+def extract_from_sentences(sentences, add_verbs=True, language="english") -> {str, list}:
     """
-    Parses a POS-tagged file and return a dictionary of sentence number -> list 
-    of (token,POS-tag) tuples.
-    
-        Args:
-            sentences: A list of Sentence objects.
-        Returns:
-            A dictionary where the keys are the id of a sentence and the values
-            are a list of tuples, with the tuples in the 
-            format of (token, POS-tag).
+    Processes Sentence objects to calculate contained Noun Phrases based on a given grammar and maps them to the
+    sentences they occur in.
+    :param sentences: A list of Sentence objects.
+    :param add_verbs: Optional. Default: True. Whether or not verbs are to be added to the mapping.
+    :param language: Optional. Default: English. The langue of the sentences.
+    :return: A dictionary mapping tokens to the sentence IDs of the sentences they appear in.
     """
-    dictionary = {}
+    # produce the mapping of sentences to their contained (words, pos) tuples
+    pos_dictionary = {}
+    NP_GRAMMAR_COMPOUND = "NP: {<JJ.*>*(<N.*>|<JJ.*>)+((<IN>|<TO>)?<JJ.*>*(<N.*>|<JJ.*>)+)*((<CC>|,)<JJ.*>*(<N.*>|<JJ.*>)+((<IN>|<TO>)?<JJ.*>*(<N.*>|<JJ.*>)+)*)*}"
     for sentence in sentences:
-        dictionary[sentence.sentence_id] = [(token, tag)
-                                            for token, tag in sentence.tokens.items()]
-    return dictionary
-
-
-def text2cooc(pos_dictionary: {int, (str, str)},
-              add_verbs=True,
-              language="english") -> {str, list}:
-    """
-    Processes the input dictionary in the format:
-        {sentence_id: [(Token, POS-tag),}
-    and returns a dictionary mapping tokens to ID of the sentence they appear 
-    in.
-    """
+        pos_dictionary[sentence.sentence_id] = [(token, tag) for token, tag in sentence.tokens.items()]
     parser_cmp = RegexpParser(NP_GRAMMAR_COMPOUND)
     term2sentence_id = {}
     lemmatizer = WordNetLemmatizer()
-
     for sentence_id, pos_tagged_tokens in pos_dictionary.items():
         if add_verbs:
             # updating the inverse occurrence index with verbs
             for subject, tag in pos_tagged_tokens:
                 # check if subject is tagged as a verb
-                # Penn Treebank uses VB for all verbs
-                # for more details see https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
                 if tag.startswith("VB"):
                     verb = lemmatizer.lemmatize(subject, "v").lower()
                     if verb not in stopwords.words(language):
@@ -144,10 +109,10 @@ def text2cooc(pos_dictionary: {int, (str, str)},
         # trying to parse the sentence_id into a top-level chunk tree
         tree = parser_cmp.parse(pos_dictionary[sentence_id])
         # getting the top-level tree triples and decomposing the NPs
-        cmp_triples, simple_trees = get_cooc([tree], stoplist=False,
-                                             language=language)
-        smp_triples, _ = get_cooc(simple_trees, stoplist=True,
-                                  language=language)
+        cmp_triples, simple_trees = get_cooccurence([tree], ignore_stopwords=False,
+                                                    language=language)
+        smp_triples, _ = get_cooccurence(simple_trees, ignore_stopwords=True,
+                                         language=language)
         # updating the inverse occurrence index with NPs 
         for subject, _, objecT in cmp_triples + smp_triples:
             if subject.lower() not in term2sentence_id:
@@ -159,21 +124,20 @@ def text2cooc(pos_dictionary: {int, (str, str)},
     return term2sentence_id
 
 
-def get_cooc(chunk_trees, stoplist=True, language="english"):
+def get_cooccurence(chunk_trees, ignore_stopwords=True, language="english"):
     """
     Parses a chunk tree and gets co-occurance of terms.
-    
-        Args:
-            chunk_trees: Tree from the NLTK RegexParser.
-            stoplist: Optional. Default: True.
-                Whether or not stopwords are to be removed.
-            language: Optional. Default: "english".
-                The language of the texts.
+    :param chunk_trees: Tree from the NLTK RegexParser, generated over POS-tagged sentences using the provided grammar.
+    :param ignore_stopwords: Optional. Default: True. Whether stopwords are to be ignored or not.
+    :param language: Optional. Default: English. The language of the texts over which the chunk trees were generated.
+    :return: A list of co-occuring tokens and a simple parse tree generated over the leaves of  the chunks of the
+    provided one.
     """
     triples = []
     simple_trees = []
-    lemmatizer = WordNetLemmatizer()  # from nltk
-    parser_simple = RegexpParser(NP_GRAMMAR_SIMPLE)  # from nltk
+    lemmatizer = WordNetLemmatizer()
+    NP_GRAMMAR_SIMPLE = "NP: {<JJ.*>*(<N.*>|<JJ.*>)+}"
+    parser_simple = RegexpParser(NP_GRAMMAR_SIMPLE)
     for t in chunk_trees:
         entities = []
         for chunk in t:
@@ -183,7 +147,7 @@ def get_cooc(chunk_trees, stoplist=True, language="english"):
                 simple_trees.append(parser_simple.parse(chunk.leaves()))
                 words = []
                 for word, tag in chunk:
-                    if (stoplist and word in stopwords.words(language)) or \
+                    if (ignore_stopwords and word in stopwords.words(language)) or \
                             (not any(char.isalnum() for char in word)):
                         # do not process stopwords for simple trees, do not process purely 
                         # non alphanumeric characters
@@ -196,79 +160,52 @@ def get_cooc(chunk_trees, stoplist=True, language="english"):
                         words.append(word)
                 if len(words) > 0:
                     entities.append("_".join(words))
-                    # experimental
-                    #entities.extend(words)
         for e1, e2 in combinations(entities, 2):
             triples.append((e1, "close to", e2))
             triples.append((e2, "close to", e1))
     return triples, simple_trees
 
 
-def generate_source(token2sentences: dict,
-                    *,
-                    paragraph_id: object = str,
-                    distance_threshold: int = 5,
-                    weight_threshold: float = 1 / 3) -> object:
+def calculate_weighted_distance(token2sentences: dict, *, paragraph_id: object = str, distance_threshold: int = 5,
+                                weight_threshold: float = 1 / 3) -> object:
     """
-    Generates source/statement (srcstm) for following steps.
-    
-        Args:
-            token2sentences: A dictionary in the format 
-                    {str: List[int]},
-                from text2cooc function.
-            paragraph_id: The ID of the paragraph the text2sentences dictionary
-                belongs to.
-            distance_threshold: Optional. Default: 5.
-                How far apart terms may be to be still considered close 
-                / relevant to each other.
-            weight_threshold: Optional. Default: 1/3.
-                The minimum weight.
-        Returns:
-            A list of Closeness objects, representing the "relatedness" of
-            the terms in the sentences of token2sentences.
+    Calculates the weighted distance between tokens given an inverse index mapping the tokens to the sentences they
+    appear in.
+    The distance is calculated by summing up 1/(1+distance) for each combination of positions of two tokens.
+    :param token2sentences: The inverse index mapping tokens to the sentences they appear in.
+    :param paragraph_id: The ID of the paragraph currently being processed, the one the sentences belong to.
+    :param distance_threshold: Optional. Default: 5. The maximum distance in sentences that token can be apart to still
+    be considered.
+    :param weight_threshold: Optional. Default: 1/3. The minimum weight two tokens need to have to be considered.
+    :return: A list of Closeness objects, representing the weighted distance between pairs of tokens.
     """
-
     closeness_list = []
-
     # get all term combinations to see if they are close to each other
     for term1, term2 in combinations(list(token2sentences.keys()), 2):
         w = 0.0
-
         # get positions of first term
         # positions are always per paragraph
         for position1 in token2sentences[term1]:
-
             # get positions of second term
             for position2 in token2sentences[term2]:
-
                 # get the distance between the terms, measured in "terms between"
                 distance = math.fabs(position1 - position2)
-
                 # check if terms are close enough to each other
                 if distance < distance_threshold:
                     # calculate new weight
                     w += 1 / (1 + distance)
-
         # check if terms are relevant enough
         if w > weight_threshold:
             closeness_list.append(Closeness(term1, term2, w, paragraph_id))
-
     w2statements = defaultdict(list)
     for closeness in closeness_list:
         w2statements[closeness.closeness].append(closeness)
     # get weight values in descending orders - why?
     keys = list(w2statements.keys())
     keys.sort(reverse=True)
-    new_lines = []
-
+    closenesses = []
     # get list of closeness, ordered by descending weight
     for key in keys:
         for closeness in w2statements[key]:
-            new_lines.append(closeness)
-    return new_lines
-
-if __name__ == "__main__":
-    p = RegexpParser(NP_GRAMMAR_COMPOUND)
-    sentence = [("the", "DT"), ("little", "JJ"), ("yellow", "JJ"),
-                ("dog", "NN"), ("outside", "IN"), ("Innsmouth", "NNP")]
-    print(p.parse(sentence))
+            closenesses.append(closeness)
+    return closenesses

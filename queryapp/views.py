@@ -97,7 +97,7 @@ def process(request):
                 alias.save()
                 for text in text_objects:
                     alias.texts.add(text)
-            all_steps(texts=processform.cleaned_data["texts"], language=processform.cleaned_data["language"],
+            all_steps(processform.cleaned_data["texts"], language=processform.cleaned_data["language"],
                       alias=alias)
     processform = ProcessForm(text_choices=texts)
     context = {

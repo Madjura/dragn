@@ -46,31 +46,24 @@ class NeoMemStore(object):
     def __init__(self):
         # holds token: frequency
         self.lexicon = defaultdict(int)
-
         # <Expression> close to <Expression2>, ParagraphID: Closeness value
         self.relations = Tensor(rank=4)
-
         # <Expression> close to <Expression2>: Value
         self.corpus = Tensor(rank=3)
-
         self.matrix = None
 
-    def incorporate(self, closenesses: ["Closeness"]):
+    def incorporate(self, closenesses):
         """
         Incorporates Closeness objects into this NeoMemStore.
-            
-            Args:
-                closenesses: A list of Closeness objects, as created in 
-                    extract_step.
+        :param closenesses: A list of Closeness objects, as created in  extract_step.
+        :return:
         """
         expressions = []
         # first pass: update lexicon with terms
         for paragraph_closeness in closenesses:
             for closeness in paragraph_closeness:
-                expressions += [closeness.term, "close to", closeness.close_to,
-                                closeness.paragraph_id]
-                key = (closeness.term, "close to", closeness.close_to,
-                       closeness.paragraph_id)
+                expressions += [closeness.term, "close to", closeness.close_to, closeness.paragraph_id]
+                key = (closeness.term, "close to", closeness.close_to, closeness.paragraph_id)
                 self.relations[key] = closeness.closeness
         self.update_lexicon(expressions)
 
@@ -83,9 +76,8 @@ class NeoMemStore(object):
             "understand" appears in 42 "X close to Y" relations.
         Used to find the "most relevant" (those that appear in most statements)
         expressions to boost the speed by ignoring the others.
-        
-            Args:
-                items: A list of expressions the lexicon is being updated with.
+        :param items: A list of expressions the lexicon is being updated with.
+        :return:
         """
         for item in items:
             self.lexicon[item] += 1
@@ -98,46 +90,36 @@ class NeoMemStore(object):
         """
         # a list of tuples in the format (subject, close to, other, paragraph)
         relation_tuples = self.relations.keys()
-
         # required for the mutual information score
         relation_count = len(relation_tuples)
-
         # x -> number of independant occurences
         indep_freq = defaultdict(int)
-
         # (x, y) -> number of joint occurences
         joint_freq = defaultdict(int)
-
         # (subject,predicate,objecT) -> (provenance, relevance)
         # subject, predicate, object mapped to provenance, relevance
         relation2provs = defaultdict(lambda: [])
-
         # going through all the statements in the relations
         for subject, predicate, objecT, provenance in relation_tuples:
             indep_freq[subject] += 1
             indep_freq[objecT] += 1
             joint_freq[(subject, objecT)] += 1
             relation2provs[(subject, predicate, objecT)].append(
-                (provenance,
-                 self.relations[(subject, predicate, objecT, provenance)]
-                 ))
+                (provenance, self.relations[(subject, predicate, objecT, provenance)])
+            )
         # going only through the unique triples now regardless of their provenance
         for subject, predicate, objecT in relation2provs:
             # get the relevances for subject, predicate, object tuples
             # this is the Closeness.closeness value
-            relevancy = [x[1] 
-                         for x in relation2provs[(subject, predicate, objecT)]]
+            relevancy = [x[1] for x in relation2provs[(subject, predicate, objecT)]]
             # get the joint frequency of subject and object
             joint = joint_freq[(subject, objecT)]
-
             # also get the joint frequency for the other way around
             if (objecT, subject) in joint_freq:
                 joint += joint_freq[(objecT, subject)]
-
             # frequency times mutual information score
             fmi = joint_freq[(subject, objecT)] * log(
                 float(relation_count * joint) / (indep_freq[subject] * indep_freq[objecT]), 2)
-
             # setting the corpus tensor value
             self.corpus[(subject, predicate, objecT)] = fmi * (float(sum(relevancy)) / len(relevancy))
 
@@ -161,19 +143,14 @@ class NeoMemStore(object):
                     value from 4).
                 5.3) If the new weight is greater or equal 1, set it to 1.0.
                 5.4) Replace the old weight with the new one from step 5.
-                
-            Args:
-                cut_off: Optional. Default: 0.95. The limit by which the 
-                    normalization weight is selected.
-                min_quo: Optional. Default: 0.1. The normalization factor for
-                    the weights that are negative.
+
+        :param cut_off: Optional. Default: 0.95. The limit by which the normalization weight is selected.
+        :param min_quo: Optional. Default: 0.1. The normalization factor for the weights that are negative.
         """
         # get all the values from previous step
         weights = sorted(self.corpus.values())
-
         # take the lowest value of the top percent of weights
         norm_cons = weights[int(cut_off * len(weights)):][0]
-
         # get the lowest positive value and multiply by min_quo
         try:
             min_norm = min([x for x in weights if x > 0]) * min_quo
@@ -223,9 +200,7 @@ class NeoMemStore(object):
         """
         Writes the lexicon dictionary to a file in the format:
             token\tfrequency\n
-            
-            Args:
-                out_file: The file that is being written to.
+        :param out_file: The file that is being written to.
         """
 
         for token, frequency in self.lexicon.items():
@@ -236,26 +211,26 @@ class NeoMemStore(object):
     def lexicon_from_file(self, lexicon_file):
         """
         Loads the lexicon from a file.
-        
-            Args:
-                lexicon_file: The file that is being loaded in.
+        :param lexicon_file: The file that is being loaded in.
         """
-        weird_lines = []
         for line in lexicon_file.read().decode().split("\n"):
             line_split = line.split("\t")
             if len(line_split) != 2:
-                weird_lines.append(line)
                 continue
             token, frequency = line_split
             self.lexicon[token] = int(frequency)
-        print("NUMBER OF WEIRD LINES: ", len(weird_lines), weird_lines)
 
     def sorted(self, ignored=None, limit=0):
+        """
+        Sorts the contents of the lexicon.
+        :param ignored: A regex of words to be ignored.
+        :param limit: How many elements are to be returned.
+        :return: Lexicon, but sorted and with only the specified number of items.
+        """
         # format is [(expression, frequency), (expression2, frequency2), ...]
         sorted_by_value = [x for x in sorted(self.lexicon.items(),
                                              key=operator.itemgetter(1),
                                              reverse=True)]
-
         if limit > 0:
             sorted_by_value = sorted_by_value[:limit]  # from 0 to limit
         elif limit <= 0 and ignored:
