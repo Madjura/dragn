@@ -25,14 +25,14 @@ def add_related_to(relations, relation2prov):
     """
     related = []
     dictionary = defaultdict(lambda: list())
-    relations = defaultdict(lambda: set())
+    relations_d = defaultdict(lambda: set())
     for (subject, predicate, objecT), weight in relations.items():
-        relations[subject].add((predicate, objecT))
+        relations_d[subject].add((predicate, objecT))
         if predicate == "related to":
             related.append(((subject, predicate, objecT), weight))
     # check all "related to" triples
     for (subject, predicate, objecT), weight in related:
-        combined_relations = relations[subject] & relations[objecT]
+        combined_relations = relations_d[subject] & relations_d[objecT]
         prov2relatedscore = defaultdict(lambda: list())
         # get all the overlaps
         for related_relation, related in combined_relations:
