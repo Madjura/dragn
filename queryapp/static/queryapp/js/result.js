@@ -282,7 +282,7 @@ function updateCy(elements) {
                 onClickFunction: function (event) {
                     var target = browserTarget(event);
                     $("#sample-scroll").html("Scrolling for: " + target.id());
-                    provenancesScroll = []
+                    provenancesScroll = [];
                     $(".match-list").each(function() {
                         var flag = false;
                         $(this).children("li").each(function() {

@@ -19,7 +19,7 @@ $(document).ready(function () {
 // When the user clicks on <span> (x), close the modal
     span.onclick = function () {
         modal.style.display = "none";
-    }
+    };
 
     $("#myModal").click(function (event) {
         if (event.target.id == "myModal") {

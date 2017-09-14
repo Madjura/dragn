@@ -18,7 +18,6 @@
 
     /*! Widget: storage - updated 11/26/2016 (v2.28.0) */
     /*global JSON:false */
-    ;
     (function ($, window, document) {
         'use strict';
 
@@ -120,7 +119,6 @@
     })(jQuery, window, document);
 
     /*! Widget: uitheme - updated 12/8/2016 (v2.28.1) */
-    ;
     (function ($) {
         'use strict';
         var ts = $.tablesorter || {};
@@ -327,7 +325,6 @@
     })(jQuery);
 
     /*! Widget: columns */
-    ;
     (function ($) {
         'use strict';
         var ts = $.tablesorter || {};
@@ -411,7 +408,6 @@
      * Requires tablesorter v2.8+ and jQuery 1.7+
      * by Rob Garrison
      */
-    ;
     (function ($) {
         'use strict';
         var tsf, tsfRegex,
@@ -2312,7 +2308,6 @@
      * Requires tablesorter v2.8+ and jQuery 1.4.3+
      * by Rob Garrison
      */
-    ;
     (function ($, window) {
         'use strict';
         var ts = $.tablesorter || {};
@@ -2624,7 +2619,6 @@
 
     /*! Widget: resizable - updated 1/28/2017 (v2.28.5) */
     /*jshint browser:true, jquery:true, unused:false */
-    ;
     (function ($, window) {
         'use strict';
         var ts = $.tablesorter || {};
@@ -3035,7 +3029,6 @@
      * Requires tablesorter v2.16+
      * by Rob Garrison
      */
-    ;
     (function ($) {
         'use strict';
         var ts = $.tablesorter || {};

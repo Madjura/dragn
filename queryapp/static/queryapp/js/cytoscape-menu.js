@@ -64,8 +64,7 @@
             }
 
             return obj;
-        };
-
+        }
         function preventDefaultContextTap() {
             $("#cy-context-menus-cxt-menu").contextmenu(function () {
                 return false;

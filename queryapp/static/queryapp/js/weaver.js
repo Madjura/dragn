@@ -840,7 +840,7 @@
             var Fabric = _dereq_('./fabric');
 
             var weaver = function () { // jshint ignore:line
-                return;
+
             };
 
             weaver.version = '1.2.0';

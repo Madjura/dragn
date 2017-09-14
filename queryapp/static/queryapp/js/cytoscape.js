@@ -2697,7 +2697,7 @@
 
                         return degree;
                     } else {
-                        return;
+
                     }
                 };
             }
@@ -8090,7 +8090,7 @@
                         };
                     }
 
-                    return;
+
                 },
 
                 minZoom: function (zoom) {
@@ -9705,7 +9705,7 @@
                     var ele = nodes[i];
 
                     if (foundByBfs[ele.id()]) {
-                        continue;
+
                     } else {
                         orphanNodes.push(ele);
                     }
@@ -10692,7 +10692,7 @@
                         // s += "\nForceX: " + forceX + " ForceY: " + forceY;
                         // logDebug(s);
 
-                        return;
+
                     };
 
                     /**
@@ -11121,7 +11121,7 @@
 
                         // s += ". No changes in boundaries/position of parent node " + p.id;
                         // logDebug(s);
-                        return;
+
                     };
 
                     var separateComponents = function (layutInfo, options) {
@@ -11544,7 +11544,7 @@
                     var result = findLCA_aux(node1, node2, childGraphIx, layoutInfo);
                     if (0 === result.count) {
                         // Neither node1 nor node2 are present in this subgraph
-                        continue;
+
                     } else if (1 === result.count) {
                         // One of (node1, node2) is present in this subgraph
                         c++;
@@ -11623,7 +11623,7 @@
                 s += '\ntemperature: ' + layoutInfo.temperature;
                 console.debug(s);
 
-                return;
+
                 /* eslint-enable */
             };
 
@@ -15208,7 +15208,7 @@
                         r.hoverData.tapholdTimeout = setTimeout(function () {
 
                             if (r.hoverData.tapholdCancelled) {
-                                return;
+
                             } else {
                                 var ele = r.hoverData.down;
 
@@ -22021,7 +22021,7 @@
                 result[2] = -term1 + r13 * Math.cos((dum1 + 2.0 * Math.PI) / 3.0);
                 result[4] = -term1 + r13 * Math.cos((dum1 + 4.0 * Math.PI) / 3.0);
 
-                return;
+
             };
 
             math.sqdistToQuadraticBezier = function (x, y, x1, y1, x2, y2, x3, y3) {
@@ -22153,7 +22153,7 @@
                         }
 
                     } else {
-                        continue;
+
                     }
 
                 }

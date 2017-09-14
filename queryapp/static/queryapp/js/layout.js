@@ -885,7 +885,7 @@
                             var Fabric = _dereq_('./fabric');
 
                             var weaver = function () { // jshint ignore:line
-                                return;
+
                             };
 
                             weaver.version = '1.2.0';
@@ -1950,7 +1950,7 @@
                 Graph: function (label, directed) {
                     /* Fields. */
                     this.label = label;
-                    this.vertices = new Array();
+                    this.vertices = [];
                     this.directed = directed;
                     this.vertexCount = 0;
 
@@ -1971,8 +1971,8 @@
                  */
                 Vertex: function (label, x, y, style) {
                     this.label = label;
-                    this.edges = new Array();
-                    this.reverseEdges = new Array();
+                    this.edges = [];
+                    this.reverseEdges = [];
                     this.x = x;
                     this.y = y;
                     this.dx = 0;
@@ -2321,7 +2321,7 @@
                     p32 += y;
 
                     // Draw
-                    canvas.fillPolygon(new Array(p11, p21, p31), new Array(p12, p22, p32));
+                    canvas.fillPolygon([p11, p21, p31], [p12, p22, p32]);
                 }
 
                 /**
@@ -2387,13 +2387,13 @@
              *         is only one component.
              */
             foograph.ForceDirectedVertexLayout.prototype.__identifyComponents = function (graph) {
-                var componentCenters = new Array();
-                var components = new Array();
+                var componentCenters = [];
+                var components = [];
 
                 // Depth first search
                 function dfs(vertex) {
-                    var stack = new Array();
-                    var component = new Array();
+                    var stack = [];
+                    var component = [];
                     var centerVertex = new foograph.Vertex("component_center", -1, -1);
                     centerVertex.hidden = true;
                     componentCenters.push(centerVertex);
@@ -2803,8 +2803,6 @@
                         y: pos.y
                     });
                 }
-                ;
-
                 for (var i = edges.length - 1; i >= 0; i--) {
                     var srcNodeId = edges[i].source().id();
                     var tgtNodeId = edges[i].target().id();
@@ -2813,8 +2811,6 @@
                         tgt: tgtNodeId
                     });
                 }
-                ;
-
                 //Decleration
                 var t1 = layout.thread;
 
@@ -2852,7 +2848,7 @@
                             if (typeof node === "number") {
                                 node = i;
                             }
-                            var id = node.id()
+                            var id = node.id();
                             var vertex = vertices[id];
 
                             return {
@@ -4233,7 +4229,7 @@
                     // and if so create circle events, to handle the point of collapse.
                     this.attachCircleEvent(lArc);
                     this.attachCircleEvent(rArc);
-                    return;
+
                 }
             };
 
