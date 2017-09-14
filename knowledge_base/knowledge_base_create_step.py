@@ -101,4 +101,4 @@ def with_graphvizoutput():
 
 if __name__ == "__main__":
     knowledge_base_create(alias="/azatoth.txt")
-    #with_graphvizoutput()
+    # with_graphvizoutput()

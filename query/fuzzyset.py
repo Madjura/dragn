@@ -1,4 +1,3 @@
-import pprint
 import sys
 from _decimal import Decimal
 
@@ -102,7 +101,7 @@ class FuzzySet:
                 if overwrite:
                     self.members[member] = float(degree)
                 else:
-                    if not member in self.members:
+                    if  member not in self.members:
                         self.members[member] = float(degree)
             except ValueError:
                 sys.stderr.write('\nW @ FuzzySet(): invalid membership degree: ' +

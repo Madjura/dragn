@@ -4,7 +4,7 @@ import json
 
 class Graph(object):
     """Simple graph with nodes and edges."""
-    def __init__(self, *, nodes: ["Node"] = None, clean=True):
+    def __init__(self, *, nodes=None, clean=True):
         """
         Constructor.
         :param nodes: Optional. A list of nodes that make up the graph.

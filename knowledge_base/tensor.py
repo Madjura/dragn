@@ -225,9 +225,9 @@ class Tensor:
             self.ridx[rid] = key
             # adding the row ID to the key element value sets
             for (key_dim, key_elem) in [(x, key[x]) for x in range(len(key))]:
-                if not key_dim in self.midx:
+                if key_dim not in self.midx:
                     self.midx[key_dim] = {}
-                if not key_elem in self.midx[key_dim]:
+                if key_elem not in self.midx[key_dim]:
                     self.midx[key_dim][key_elem] = []
                 self.midx[key_dim][key_elem].append(rid)
         # changing the filled end lists in the index to sets

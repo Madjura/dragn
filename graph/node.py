@@ -5,7 +5,7 @@ from graph.edge import Edge
 class Node(object):
     """Node of a graph."""
 
-    def __init__(self,name: str, *, edges: [Edge] = None, color=None, width=None, label_size=None):
+    def __init__(self, name: str, *, edges: [Edge] = None, color=None, width=None, label_size=None):
         """
         Constructor.
         :param name: The name / label of the node.

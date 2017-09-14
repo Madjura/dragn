@@ -7,9 +7,9 @@ class Edge(object):
 
     def __init__(self,
                  *,
-                 start: int = None,
-                 end: int = None,
-                 val: int = 0,
+                 start=None,
+                 end=None,
+                 val=0,
                  color=None):
         """
         Constructor
@@ -17,8 +17,7 @@ class Edge(object):
             Args:
                 start: The source of the edge.
                 end: The target of the edge.
-                value: Optional. The edge weight.
-                color: Optional. The color of the edge. 
+                color: Optional. The color of the edge.
         """
 
         # Check if start and end are set
