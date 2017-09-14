@@ -164,7 +164,7 @@ class NeoMemStore(object):
                 w = 1.0
             self.corpus[key] = w
 
-    def export(self, path=paths.MEMSTORE_PATH_EXPERIMENTAL):
+    def export(self, path=paths.MEMSTORE_PATH):
         """
         Exports the lexicon, relations and corpus and writes them to 
         disk.
@@ -181,7 +181,7 @@ class NeoMemStore(object):
             self.corpus.to_file(crp_f)
         crp_f.close()
 
-    def import_memstore(self, path=paths.MEMSTORE_PATH_EXPERIMENTAL):
+    def import_memstore(self, path=paths.MEMSTORE_PATH):
         """Imports the lexicon, relations and corpus from disk."""
 
         with (gzip.open(path + "/lexicon.tsv.gz", "r")) as lexicon_file:

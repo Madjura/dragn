@@ -89,7 +89,7 @@ def knowledge_base_create(alias=None):
     memstore.incorporate(closenesses)
     memstore.compute_corpus()
     memstore.normalise_corpus()
-    memstore.export(paths.MEMSTORE_PATH_EXPERIMENTAL + alias + "/")
+    memstore.export(paths.MEMSTORE_PATH + alias + "/")
 
 
 def with_graphvizoutput():

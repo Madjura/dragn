@@ -1,3 +1,6 @@
+"""Object representation of the weighted distance between two tokens in a text."""
+
+
 class Closeness(object):
     """
     Object representation to describe how close/relevant two terms are to each
@@ -6,21 +9,20 @@ class Closeness(object):
 
     def __init__(self, term, close_to, closeness, paragraph_id=-1):
         """
-        Constructor
-            
-            Args:
-                term: A term.
-                close_to: Another term that the first one is relevant/close to.
-                closeness: Distance / Relevance the terms have to each other.
-                paragraph_id: Optional. Defaults to -1 when not set.
-                    The ID of the paragraph the terms appear in.
+        Constructor.
+        :param term: A token from a text.
+        :param close_to: A token the first token is close to.
+        :param closeness: The weighted distance between the two.
+        :param paragraph_id: Optional. The ID of the paragraph they appear in.
         """
-
         self.term = term
         self.close_to = close_to
         self.paragraph_id = paragraph_id
         self.closeness = closeness
 
     def __str__(self):
+        """
+        :return: String representation of this Closeness object for better understandability.
+        """
         return "Term: " + self.term + "\nClose to:" + self.close_to + "\nParagraph id:" + str(
             self.paragraph_id) + "\nCloseness:" + str(self.closeness)

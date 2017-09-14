@@ -22,9 +22,7 @@ The following functions were used from the original system:
 
     Those functions were used as a base to develop the new ones in this file.
 """
-
 import gzip
-import json
 import os
 from _collections import defaultdict
 from ast import literal_eval
@@ -47,6 +45,14 @@ class QueryResult(object):
     """
 
     def __init__(self, min_weight=0.5, alias=None, relation_type="all", lesser_edges=True):
+        """
+        Constructor.
+        :param min_weight: Optional. Default: 0.5. The minimum weight relations need to have to be considered.
+        :param alias: The Alias of the texts being queried.
+        :param relation_type: Optional. Default: "all". The type of relations to display.
+        :param lesser_edges: Optional. Default: True. Whether or not edges and relations between nodes that are not
+        in the query are to be considered.
+        """
         self.query = None
         self.lesser_edges = lesser_edges
         self.queried_combined = defaultdict(lambda: set())
@@ -58,31 +64,22 @@ class QueryResult(object):
         self.min_weight = min_weight
         self.visualization_parameters = self.load_parameters()
         print("Loading relation to provenance mapping")
-        self.relation2prov = self.load_relation2prov(
-            path=paths.RELATION_PROVENANCES_PATH + alias + "/r2p.json")
+        self.relation2prov = self.load_relation2prov(path=paths.RELATION_PROVENANCES_PATH + alias + "/r2p.json")
         print("Loading related")
         self.relations = self.load_token2related(path=os.path.join(paths.RELATIONS_PATH + alias, "relations.tsv.gz"),
                                                  relation_type=relation_type)
-        # { relation_triple: [(provenance, weight), ...] }
-        # legacy stuff that is PROBABLY not important
-        # print("Loading relations")
-        # self.relation_sets = self.load_relation_sets(path=paths.RELATION_WEIGHT_PATH + alias)
         self.alias = alias
         self.provenance_dict = None
 
+    # noinspection PyArgumentList
     @staticmethod
     def load_relation2prov(path=None):
         """
         Loads the mapping of relation tuples to the provenances.
-        The format is:
-            (token, related_to, token2): [ (provenance, weight), ...]
-        
-            Args:
-                path: Optional. Default: paths.RELATION_PROVENANCES_PATH.
-                    The path to the file of tuple -> provennces mapping, as
-                    created in index_step.
-            Returns:
-                A dictionary of relation tuple -> provenance mappings.
+        The format is: (token, related_to, token2): [ (provenance, weight), ...]
+        :param path: Optional. Default: paths.RELATION_PROVENANCES_PATH. The path to the file of
+        tuple -> provennces mapping, as created in index_step.
+        :return: A dictionary of relation tripe -> provenance mappings.
         """
         import time
         start_time = time.time()
@@ -114,10 +111,7 @@ class QueryResult(object):
         return defaultdict(lambda: list(), relation2prov)
 
     def prepare_for_query(self):
-        """
-        Returns original FuzzySet containing tokens relevant to the 
-        query.
-        """
+        """Returns FuzzySet containing tokens relevant to the query."""
         query_terms = [x for x in self.query]
         query_relevant = FuzzySet()
         for term in self.query:
@@ -146,18 +140,12 @@ class QueryResult(object):
         Filters the relation tuples by the min_weight specified.
         Relation tuples that are below the specified value will be excluded
         from the result.
-            
-            Args:
-                relevant: A FuzzySet containing the (token, weight) tuples
-                    for the query terms.
-            Returns:
-                A FuzzySet with the values that were below the min_weight
-                threshhold.
+        :param relevant: A FuzzySet containing the (token, weight) tuples for the query terms.
+        :return: A FuzzySet with the values that were below the min_weight threshhold.
         """
         relevant_cut = FuzzySet()
         for token in relevant.cut(self.min_weight):
             relevant_cut[token] = relevant[token]
-        # relevant cut is combined for fear+talk (beyondthewall,book)
         return relevant_cut
 
     @staticmethod
@@ -168,6 +156,8 @@ class QueryResult(object):
             token: [ (token2, weight), ... ]
         This dictionary can be used to access the tokens that are related to
         another token by accessing the dictionary by key.
+        :param path: Optional. Default: paths.RELATION_WEIGHT_PATH. The path where the shortform of relation mappings
+        is stored.
         """
         relations = defaultdict(lambda: list())
         with gzip.open(
@@ -194,10 +184,8 @@ class QueryResult(object):
         """
         provenance_dict = defaultdict(lambda: [0, set()])
         query_relevant = self.prepare_for_query()
-        print("QR: ", query_relevant)
         related_tokens = self.filter_relevant(query_relevant)
         # iterate over the tokens relevant to the query
-        print("RELATED: ", related_tokens)
         for possibly_related in related_tokens:
             # get all relation tuples in which "possibly_related" appears
             for relation_triple in self.relations[possibly_related]:
@@ -217,7 +205,6 @@ class QueryResult(object):
                 flag = True
                 for prov_tuple in self.relation2prov[(subject, predicate, objecT)]:
                     if flag:
-                    # why in graph but not in texts: no text where both appear
                         self.relation_set[(subject, predicate, objecT)] += calculated_relation_weight
                         flag = False
                     for provenance, prov_weight in prov_tuple:
@@ -228,9 +215,8 @@ class QueryResult(object):
     def generate_statement_nodes(self, max_nodes):
         """
         Generates the nodes that exist in the query-graph.
-            
-            Args:
-                max_nodes: The maximum number of nodes.
+        :param max_nodes: The maximum number of nodes.
+        :return: A list of nodes that make up the graph.
         """
         # get and sort the relevant tokens by weight
         token_list = list(self.tokens2weights.items())
@@ -263,10 +249,9 @@ class QueryResult(object):
         """
         Generates the graph object for the query.
         Only the top most relevant nodes and edges are in the graph.
-        
-            Args:
-                max_nodes: The maximum number of nodes in the graph.
-                max_edges: The maximum number of edges in the graph.
+        :param max_nodes: The maximum number of nodes in the graph.
+        :param max_edges: The maximum number of edges in the graph.
+        :return: A Graph object representing the result graph.
         """
         # get all the graph nodes
         nodes = self.generate_statement_nodes(max_nodes)
@@ -297,7 +282,6 @@ class QueryResult(object):
                 nodes[objecT].add_edge_object(back_edge)
                 edge_count += 2
         if self.lesser_edges:
-            print("LESSER EDGES: TRUE")
             for combo in list(combinations(nodes.keys(), 2)):
                 if edge_count >= max_edges:
                     break
@@ -331,13 +315,18 @@ class QueryResult(object):
                         for prov, weight in pt:
                             self.provenance_dict[prov][0] += weight
                             self.provenance_dict[prov][1].add((weight, ss, pp, oo))
-        print(self.provenance_dict)
         self.provenance_set = ProvFuzzySet.from_list_dictionary(self.provenance_dict)
         return Graph(nodes=list(nodes.values()), clean=False)
 
     @staticmethod
     def load_token2related(path=os.path.join(paths.RELATIONS_PATH, "relations.tsv.gz"), relation_type="all"):
-        """Loads the mapping of tokens to the related tokens."""
+        """
+        Loads the mapping of tokens to the related tokens.
+        :param path: Optional. Default: os.path.join(paths.RELATIONS_PATH, "relations.tsv.gz"). The path to where the
+        mapping of triples to provenances is stored.
+        :param relation_type: Optional. Default: "all". The type of relation to be considered.
+        :return: A dictionary containing a mapping of SPO-triples to (provenance, score) tuples.
+        """
         token2related = defaultdict(lambda: list())
         with gzip.open(path, "rb") as f:
             for line in f:
@@ -359,10 +348,7 @@ class QueryResult(object):
 
     @staticmethod
     def load_parameters():
-        """
-        Returns a dictionary of visualization parameters used for the graph.
-        TODO: load from a config file or database
-        """
+        """Returns a dictionary of visualization parameters used for the graph."""
         parameters = {
             "node width": 0.25,
             "node color": "#6699CC",
@@ -374,20 +360,12 @@ class QueryResult(object):
         }
         return parameters
 
-    def check_query_relevance(self, token):
-        expanded_relevancy = set()
-        for check in self.query:
-            if check in token:
-                expanded_relevancy.add(check)
-        return expanded_relevancy
-
-    def check_alias(self, token):
-        for alias in self.aliases.keys():
-            if token in self.aliases[alias]:
-                return alias
-        return token
-
     def get_top_provenances(self, top=10):
+        """
+        Returns the highest scoring provenances, sorted descendingly.
+        :param top: The number of provenances to return.
+        :return: A list of the highest scoring provenances, sorted descendingly.
+        """
         tops = []
         for item in self.provenance_set.sort(reverse=True, limit=top):
             tops.append(item)

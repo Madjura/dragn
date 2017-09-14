@@ -72,7 +72,7 @@ def index_step(alias):
     :return:
     """
     memstore = NeoMemStore()
-    memstore.import_memstore(paths.MEMSTORE_PATH_EXPERIMENTAL + alias)
+    memstore.import_memstore(paths.MEMSTORE_PATH + alias)
     relation_dictionary = make_relation_list(memstore.corpus.items(), alias)
     # make_pagerank(memstore.corpus.items())
     make_relation_weights(relation_dictionary, alias)

@@ -80,7 +80,7 @@ def knowledge_base_compute(top=100, alias=None):
     :return:
     """
     memstore = NeoMemStore()
-    memstore.import_memstore(paths.MEMSTORE_PATH_EXPERIMENTAL + alias)
+    memstore.import_memstore(paths.MEMSTORE_PATH + alias)
     matrix = memstore.corpus.matricise(0)
     analyser = Analyser(memstore, matrix=matrix, trace=True)
     tokens = [x for x in memstore.sorted(ignored=".*_[0-9]+$|related to|close to")]
@@ -95,7 +95,7 @@ def knowledge_base_compute(top=100, alias=None):
                 similarity_dictionary[(subject, "related to", objecT)] = weight
     for key, value in similarity_dictionary.items():
         memstore.corpus[key] = value
-    memstore.export(paths.MEMSTORE_PATH_EXPERIMENTAL + alias + "/")
+    memstore.export(paths.MEMSTORE_PATH + alias + "/")
 
 
 if __name__ == "__main__":
