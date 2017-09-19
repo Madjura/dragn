@@ -1,1 +1,16 @@
 data/
+db.sqlite3
+**.png
+**/migrations/
+allsteps/__pycache__/
+dataapp/__pycache__/
+dragn/__pycache__/
+extract/__pycache__/
+graph/__pycache__/
+index/__pycache__/
+knowledge_base/__pycache__/
+query/__pycache__/
+queryapp/__pycache__/
+text/__pycache__/
+uploadapp/__pycache__/
+util/__pycache__/
