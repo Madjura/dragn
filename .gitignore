@@ -4,6 +4,7 @@ allsteps/allstep.png
 extract/extract_step.png
 knowledge_base/knowledge_base_compute.png
 knowledge_base/knowledge_base_create.png
+index/index_step.png
 query/querystep.png
 **/migrations/
 allsteps/__pycache__/
