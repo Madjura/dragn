@@ -1,6 +1,10 @@
 data/
 db.sqlite3
-**.png
+allsteps/allstep.png
+extract/extract_step.png
+knowledge_base/knowledge_base_compute.png
+knowledge_base/knowledge_base_create.png
+query/querystep.png
 **/migrations/
 allsteps/__pycache__/
 dataapp/__pycache__/
