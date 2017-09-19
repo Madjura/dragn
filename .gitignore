@@ -7,6 +7,8 @@ knowledge_base/knowledge_base_create.png
 index/index_step.png
 query/querystep.png
 **/migrations/
+**/.idea/workspace.xml
+**/.idea/tasks.xml
 allsteps/__pycache__/
 dataapp/__pycache__/
 dragn/__pycache__/
