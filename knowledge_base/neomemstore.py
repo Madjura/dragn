@@ -1,4 +1,4 @@
-"""
+__copyright__ = """
 Copyright (C) 2012 Vit Novacek (vit.novacek@deri.org), Digital Enterprise
 Research Institute (DERI), National University of Ireland Galway (NUIG)
 All rights reserved.
@@ -55,8 +55,8 @@ class NeoMemStore(object):
     def incorporate(self, closenesses):
         """
         Incorporates Closeness objects into this NeoMemStore.
+
         :param closenesses: A list of Closeness objects, as created in  extract_step.
-        :return:
         """
         expressions = []
         # first pass: update lexicon with terms
@@ -76,8 +76,8 @@ class NeoMemStore(object):
             "understand" appears in 42 "X close to Y" relations.
         Used to find the "most relevant" (those that appear in most statements)
         expressions to boost the speed by ignoring the others.
+
         :param items: A list of expressions the lexicon is being updated with.
-        :return:
         """
         for item in items:
             self.lexicon[item] += 1
@@ -200,6 +200,7 @@ class NeoMemStore(object):
         """
         Writes the lexicon dictionary to a file in the format:
             token\tfrequency\n
+
         :param out_file: The file that is being written to.
         """
 
@@ -211,6 +212,7 @@ class NeoMemStore(object):
     def lexicon_from_file(self, lexicon_file):
         """
         Loads the lexicon from a file.
+
         :param lexicon_file: The file that is being loaded in.
         """
         for line in lexicon_file.read().decode().split("\n"):
@@ -223,6 +225,7 @@ class NeoMemStore(object):
     def sorted(self, ignored=None, limit=0):
         """
         Sorts the contents of the lexicon.
+
         :param ignored: A regex of words to be ignored.
         :param limit: How many elements are to be returned.
         :return: Lexicon, but sorted and with only the specified number of items.

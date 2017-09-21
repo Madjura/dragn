@@ -13,10 +13,10 @@ from util import paths
 def generate_relation_values(relations, corpus, alias):
     """
     Generates the file containing the mapping of SPO-triple to (provenance, score).
+
     :param relations: The existing relations.
     :param corpus: The corpus of the memstore created in knowledge_base_compute.
     :param alias: The Alias of the texts that were processed.
-    :return:
     """
     relation2prov, index = generate_relation_provenance_weights(relations, corpus)
     index_to_db(index)
@@ -32,9 +32,9 @@ def make_relation_weights(relation_dictionary, alias):
     """
     Writes the shortform of relations between tokens to a file. The format is:
     token\ttoken2\score
+
     :param relation_dictionary: A dictionary mapping a token to its relations.
     :param alias: The Alias of the texts that were processed.
-    :return:
     """
     term_lines = []
     for token1, related_set in list(relation_dictionary.items()):
@@ -47,8 +47,7 @@ def make_relation_weights(relation_dictionary, alias):
 def make_relation_list(relations, alias):
     """
     Creates a mapping of token: set of relations.
-    Example:
-        Paul: set( (house, close to), (ball, related to), ...)
+
     :param relations: The relations calculated in knowledge_base_compute.
     :param alias: The Alias of the texts that were processed.
     :return: A dictionary mapping tokens to their relation partners and scores.
@@ -68,8 +67,8 @@ def make_relation_list(relations, alias):
 def index_step(alias):
     """
     Performs the index_step step of the dragn pipeline.
+
     :param alias: The Alias of the texts that were processed.
-    :return:
     """
     memstore = NeoMemStore()
     memstore.import_memstore(paths.MEMSTORE_PATH + alias)

@@ -1,0 +1,179 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>allsteps package &#8212; dragn  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="dataapp package" href="dataapp.html" />
+    <link rel="prev" title="extract package" href="extract.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="allsteps-package">
+<h1>allsteps package<a class="headerlink" href="#allsteps-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-allsteps.allsteps">
+<span id="allsteps-allsteps-module"></span><h2>allsteps.allsteps module<a class="headerlink" href="#module-allsteps.allsteps" title="Permalink to this headline">¶</a></h2>
+<p>Allows the execution of all steps in the dragn pipeline.</p>
+<dl class="class">
+<dt id="allsteps.allsteps.FakeAlias">
+<em class="property">class </em><code class="descclassname">allsteps.allsteps.</code><code class="descname">FakeAlias</code><span class="sig-paren">(</span><em>identifier</em><span class="sig-paren">)</span><a class="headerlink" href="#allsteps.allsteps.FakeAlias" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Used for running dragn without starting the Django server.
+Required because the Alias is stored in the database and not accessible properly without the server. This is used as
+a replacement and functions exactly as the normal Alias would, except it does not come from the database, neither
+is it stored there</p>
+<dl class="method">
+<dt id="allsteps.allsteps.FakeAlias.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#allsteps.allsteps.FakeAlias.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Blank method to bypass the Django database regarding the Alias System.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="allsteps.allsteps.all_steps">
+<code class="descclassname">allsteps.allsteps.</code><code class="descname">all_steps</code><span class="sig-paren">(</span><em>texts</em>, <em>query=None</em>, <em>language='english'</em>, <em>alias=None</em><span class="sig-paren">)</span><a class="headerlink" href="#allsteps.allsteps.all_steps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs all steps in the pipeline, up to and including query_step.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>texts</strong> – A list of texts to be processed.</li>
+<li><strong>query</strong> – Optional. The query to be performed, if query_step execution is intended.</li>
+<li><strong>language</strong> – Optional. Default: English. The language of the texts.</li>
+<li><strong>alias</strong> – The Alias used for the text(s).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allsteps.allsteps.with_graphvizoutput">
+<code class="descclassname">allsteps.allsteps.</code><code class="descname">with_graphvizoutput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#allsteps.allsteps.with_graphvizoutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs all_steps with GraphvizOutput, producing a call graph of all functions.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-allsteps">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-allsteps" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">dragn</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="extract.html">extract package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">allsteps package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-allsteps.allsteps">allsteps.allsteps module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-allsteps">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dataapp.html">dataapp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dragn.html">dragn package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extract.html">extract package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="graph.html">graph package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_step.html">index package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="knowledge_base.html">knowledge_base package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="query.html">query package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="queryapp.html">queryapp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text.html">text package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uploadapp.html">uploadapp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="util.html">util package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="extract.html" title="previous chapter">extract package</a></li>
+      <li>Next: <a href="dataapp.html" title="next chapter">dataapp package</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Thomas Huber.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/allsteps.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

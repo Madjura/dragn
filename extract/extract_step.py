@@ -21,7 +21,6 @@ def make_folders(alias=None):
     Creates the folders required for using the system.
     The path to the folders can be found in the "util" package.
     :param alias: The Alias of the texts.
-    :return:
     """
     for path in paths.ALL:
         if not alias:
@@ -59,18 +58,7 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english", texts: [s
                     - Check the distance (math.abs()) of the distances
                     - If it is below the threshold (default 5), add
                         the following to the current weight:
-                        1/(1 + distance)
-
-                        Example for "Paul" and "the":
-                            Position "0" from "Paul" and "0" from "the"
-                            abs(0 - 0) = 0, < 5
-                            w += 1/(1+0) = 1
-                            ----------------
-                            Position "0" from "Paul" and "1" from "the"
-                            abs(0 - 1) = 1 < 5
-                            w += 1/(1+1) = 1.5
-                        Therefore "Paul" and "the" are on average 1.5 sentences
-                        apart.
+                            1/(1 + distance)
                     - If it is above the threshold, continue with the next
                         position
                     - After all positional combinations are checked, create
@@ -89,9 +77,8 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english", texts: [s
     :param text_path: The path to the folder where the files are.
     :param language: Optional. Default: "english". The language of the texts.
     :param texts: Optional. A list of strings of filenames to be processed. If not provided, all texts in the system
-    will be used.
+        will be used.
     :param alias: Optional. The Alias of the collection of texts.
-    :return:
     """
     # iterate over texts
     closeness = []
@@ -138,10 +125,7 @@ def extract_step(text_path: str = paths.TEXT_PATH, language="english", texts: [s
 
 
 def with_graphviz_output():
-    """
-    Runs extract_step with GraphvizOutput, producing a call graph of all functions.
-    :return:
-    """
+    """Runs extract_step with GraphvizOutput, producing a call graph of all functions."""
     graphviz = GraphvizOutput()
     graphviz.output_file = 'extract_step.png'
 

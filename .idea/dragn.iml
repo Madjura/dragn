@@ -15,6 +15,10 @@
     <orderEntry type="jdk" jdkName="Python 3.6.1 (E:\Python36\python36.exe)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
+  <component name="ReSTService">
+    <option name="workdir" value="E:\workspace\dragn" />
+    <option name="DOC_DIR" value="E:\workspace\dragn" />
+  </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Django" />
     <option name="TEMPLATE_FOLDERS">

@@ -1,0 +1,756 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>knowledge_base package &#8212; dragn  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="query package" href="query.html" />
+    <link rel="prev" title="index package" href="index_step.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="knowledge-base-package">
+<h1>knowledge_base package<a class="headerlink" href="#knowledge-base-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-knowledge_base.analyser">
+<span id="knowledge-base-analyser-module"></span><h2>knowledge_base.analyser module<a class="headerlink" href="#module-knowledge_base.analyser" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="knowledge_base.analyser.Analyser">
+<em class="property">class </em><code class="descclassname">knowledge_base.analyser.</code><code class="descname">Analyser</code><span class="sig-paren">(</span><em>mem=True</em>, <em>trace=False</em>, <em>matrix=None</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.analyser.Analyser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="docutils">
+<dt>Basic class for matrix perspective analysis, offering the following services:</dt>
+<dd><ul class="first last simple">
+<li>clustering of the input matrix rows</li>
+<li>learning of rules from the perspective and its compressed counterpart</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="knowledge_base.analyser.Analyser.similar_to">
+<code class="descname">similar_to</code><span class="sig-paren">(</span><em>subject: str</em>, <em>top=100</em>, <em>minsim=0.001</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.analyser.Analyser.similar_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates tokens similar to a given one.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-knowledge_base.knowledge_base_compute_step">
+<span id="knowledge-base-knowledge-base-compute-step-module"></span><h2>knowledge_base.knowledge_base_compute_step module<a class="headerlink" href="#module-knowledge_base.knowledge_base_compute_step" title="Permalink to this headline">¶</a></h2>
+<p>knowledge_base_compute_step of the dragn pipeline. Calculates the Cosine Similarity based on the FMI value from
+the previous step.</p>
+<dl class="function">
+<dt id="knowledge_base.knowledge_base_compute_step.knowledge_base_compute">
+<code class="descclassname">knowledge_base.knowledge_base_compute_step.</code><code class="descname">knowledge_base_compute</code><span class="sig-paren">(</span><em>top=100</em>, <em>alias=None</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.knowledge_base_compute_step.knowledge_base_compute" title="Permalink to this definition">¶</a></dt>
+<dd><p>In this step, expressions related to other expressions are identified and
+stored in the NeoMemStore.
+The format is:</p>
+<blockquote>
+<div>&lt;expression&gt; related to &lt;other expression&gt;: Value</div></blockquote>
+<p>This uses the Analyser class to perform the calculations and produce that format.</p>
+<dl class="docutils">
+<dt>Detailed explanation:</dt>
+<dd><ol class="first last arabic">
+<li><dl class="first docutils">
+<dt>The memstore from the previous step (knowledge_base_create())</dt>
+<dd><p class="first last">is loaded.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>The perspective is computed:</dt>
+<dd><p class="first">2.1) The corpus is converted to a matrix.
+2.2) The format is:</p>
+<blockquote class="last">
+<div><p>token (close to, other_token) -&gt; weight</p>
+</div></blockquote>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>The Analyser is created. This is used to calculate the “related to”</dt>
+<dd><p class="first last">relations.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>The top memstore lexicon elements are calculated:</dt>
+<dd><p class="first">4.1) The lexicon is sorted by frequency values, descending.
+4.2) Frequencies of tokens that are relation statements (close to,</p>
+<blockquote>
+<div><p>related to) or provenances are ignored.</p>
+</div></blockquote>
+<p>4.3) The average of the remaining frequencies is calculated.
+4.4) All the tokens with above-average frequency are returned in</p>
+<blockquote class="last">
+<div><p>a list.</p>
+</div></blockquote>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>The top elements from 4) are iterated over:</dt>
+<dd><dl class="first last docutils">
+<dt>5.1) For each token, the tokens that are similar are calculated.</dt>
+<dd><dl class="first last docutils">
+<dt>5.1.1) The basis for this are the sparse-representation of the</dt>
+<dd><p class="first">matrix from 2) and the “inverse” of that that is calculated
+in the same step.
+The format of the sparse is:</p>
+<blockquote>
+<div><p>{token: {(relation, token): weight, …} }</p>
+</div></blockquote>
+<dl class="last docutils">
+<dt>The format of the inverse is:</dt>
+<dd><p class="first last">(relation, token: [tokens]</p>
+</dd>
+</dl>
+</dd>
+<dt>5.1.2) The row from the sparse matrix for the token is</dt>
+<dd><p class="first">collected.
+Example:</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>sparse[Paul] =</dt>
+<dd><p class="first last">{(close to, ball): 0.8, (close to, roof): 0.7, …}</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd>
+<dt>5.1.3) The length of the row is calculated:</dt>
+<dd><p class="first last">sqrt(sum(weights)^2)</p>
+</dd>
+<dt>5.1.4) The possibly related tokens are collected from the</dt>
+<dd><p class="first">inverse and iterated over.
+5.1.4.1) The row for the token is collected from the sparse.
+5.1.4.2) For each expression ((close to, token)), check</p>
+<blockquote>
+<div><p>if it also appears in the row from 5.1.2).</p>
+</div></blockquote>
+<dl class="docutils">
+<dt>5.1.4.3) If it does, multiply the values from the rows</dt>
+<dd><p class="first last">and keep them in a variable and add the statements
+to a list.</p>
+</dd>
+</dl>
+<p>5.1.4.4) Add the square of the compared row to a variable.
+5.1.4.5) After 5.1.4.2), take the square root of the value</p>
+<blockquote>
+<div><p>from 5.1.4.4) to get the length.</p>
+</div></blockquote>
+<dl class="last docutils">
+<dt>5.1.4.6) If sum of the products from 5.1.4.3) divided by</dt>
+<dd><p class="first">the length from the previous step multiplied by the sum
+is above the threshhold, add that value and the current
+token/expression to a list of results:</p>
+<blockquote>
+<div><p>[(value, token from 5.1.4))]</p>
+</div></blockquote>
+<p class="last">This is used to indicate how closely related the token
+from 5.1) and the current one are.</p>
+</dd>
+</dl>
+</dd>
+<dt>5.1.5) Sort the list from 5.1.4.6) by values, descending, and</dt>
+<dd><p class="first last">return a list of tuples of the relation value and the token,
+relative to the one from step 5.1).</p>
+</dd>
+</dl>
+</dd>
+<dt>5.2) For each “related to” relation from 5.1.5), add that</dt>
+<dd><dl class="first last docutils">
+<dt>relation to a dictionary:</dt>
+<dd><p class="first last">(token, “related to”, other_token): value</p>
+</dd>
+</dl>
+</dd>
+<dt>5.3) Finally, add the “related to” relations to the corpus of</dt>
+<dd><p class="first last">the memstore.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Write the memstore, now containing the “related to” relations,</dt>
+<dd><p class="first last">to the disk.</p>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>top</strong> – Optional. Default: 100. How many of the highest scoring relations are to be exmained for similarity.</li>
+<li><strong>alias</strong> – The Alias of the texts that are being processed.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-knowledge_base.knowledge_base_create_step">
+<span id="knowledge-base-knowledge-base-create-step-module"></span><h2>knowledge_base.knowledge_base_create_step module<a class="headerlink" href="#module-knowledge_base.knowledge_base_create_step" title="Permalink to this headline">¶</a></h2>
+<p>knowledge_base_create_step of the dragn pipeline. Calculates the FMI between the extracted tokens from the previous
+step.</p>
+<dl class="function">
+<dt id="knowledge_base.knowledge_base_create_step.knowledge_base_create">
+<code class="descclassname">knowledge_base.knowledge_base_create_step.</code><code class="descname">knowledge_base_create</code><span class="sig-paren">(</span><em>alias=None</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.knowledge_base_create_step.knowledge_base_create" title="Permalink to this definition">¶</a></dt>
+<dd><p>NeoMemStore is built in this step, based on the texts from the text_extract
+step.
+After this step, NeoMemStore holds normalised “closeness values”:</p>
+<blockquote>
+<div>&lt;expression&gt; close to &lt;other expression&gt;: normalised value</div></blockquote>
+<p>For details regarding the normalization, see the compute_corpus() and
+normalise_corpus() methods.</p>
+<dl class="docutils">
+<dt>Detailed explanation of steps:</dt>
+<dd><ol class="first last arabic">
+<li><dl class="first docutils">
+<dt>Load the Closeness objects from extract_step() into the memstore.</dt>
+<dd><dl class="first last docutils">
+<dt>1.1) The lexicon is updated with the frequencies of each relation</dt>
+<dd><p class="first">statement.
+The lexicon is just a simple index that holds the frequencies
+of the tokens.
+Example:</p>
+<blockquote class="last">
+<div><p>“Paul” close to “ball”
+Would update the lexicon like so:
+lexicon[“Paul”] += 1
+lexicon[“close to”] += 1
+(the frequency for “close to” is not relevant)
+lexicon[“ball”] += 1</p>
+</div></blockquote>
+</dd>
+<dt>1.2) Update the sources with tuples of the tokens, their relation,</dt>
+<dd><p class="first">and the paragraph ID. The value is Closeness.closeness, as
+calculcated in extract_step().
+All the values are taken from the Closeness objects.
+Example:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>Closeness:</dt>
+<dd><p class="first last">term = Paul
+close_to = ball
+closeness = 0.8
+paragraph_id = ball_3.txt</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="last docutils">
+<dt>Would update the sources like so:</dt>
+<dd><p class="first last">corpus[(“Paul”, “close to”, “ball”, “ball_3.txt”)] = 0.8</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Computation of the corpus:</dt>
+<dd><dl class="first docutils">
+<dt>2.1) Get the number of relation tuples from sources, as calculated</dt>
+<dd><p class="first last">in 1.2).</p>
+</dd>
+<dt>2.2) Calculate the independent frequency of each token in the</dt>
+<dd><p class="first last">tuples.</p>
+</dd>
+</dl>
+<p>2.3) Calculate the joint frequency of each pair of tokens.
+2.4) For each tuple:</p>
+<blockquote class="last">
+<div><p>2.4.1) Get all the Closeness.closeness values.
+2.4.2) Calculate the combined joint frequency of the tokens.
+2.4.3) Calculate the mutual information score, multiplied</p>
+<blockquote>
+<div><p>by the joint frequency from 2.3).</p>
+</div></blockquote>
+<dl class="docutils">
+<dt>2.4.4) Update the corpus with the tuple of</dt>
+<dd><p class="first last">(token, relation, token)
+Example: (“Paul”, “close to”, “ball”)
+and the value as the score from 2.4.3), normalized
+by multiplying it with the sum of sum of frequencies from
+2.3), divided by the number of frequencies from 2.3).</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Normalization of the corpus:</dt>
+<dd><p class="first">3.1) Get the calculated corpus weights from compute_corpus()
+3.2) Get the top (1-X)*100% of weights.</p>
+<blockquote>
+<div><p>X is based on cut_off, default is 0.95.
+For that value, the top 5% weights are considered.</p>
+</div></blockquote>
+<dl class="docutils">
+<dt>3.3) Get the lowest weight value from step 2).</dt>
+<dd><dl class="first last docutils">
+<dt>Example:</dt>
+<dd><p class="first last">Assume the weights are a list from 1 to 100.
+Step 2 would get a list from 96 to 100:
+[96, 97, 98, 99, 100], the 5% top values.
+The lowest value would be 96.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>3.4) Get the lowest, non-negative weight and multiply it by min_quo.
+3.5) Then, for each corpus weight:</p>
+<blockquote class="last">
+<div><p>3.5.1) Divide by the value from 3).
+3.5.2) If the new weight is negative, set it instead to the</p>
+<blockquote>
+<div><p>value from 4).</p>
+</div></blockquote>
+<p>3.5.3) If the new weight is greater or equal 1, set it to 1.0.
+3.5.4) Replace the old weight with the new one from step 5.</p>
+</div></blockquote>
+</dd>
+</dl>
+</li>
+<li><p class="first">Then write the memstore object to the disk.</p>
+</li>
+</ol>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>alias</strong> – The Alias of the texts that are being processed.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="knowledge_base.knowledge_base_create_step.with_graphvizoutput">
+<code class="descclassname">knowledge_base.knowledge_base_create_step.</code><code class="descname">with_graphvizoutput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.knowledge_base_create_step.with_graphvizoutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs index_step with GraphvizOutput, producing a call graph of all functions.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-knowledge_base.neomemstore">
+<span id="knowledge-base-neomemstore-module"></span><h2>knowledge_base.neomemstore module<a class="headerlink" href="#module-knowledge_base.neomemstore" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="knowledge_base.neomemstore.NeoMemStore">
+<em class="property">class </em><code class="descclassname">knowledge_base.neomemstore.</code><code class="descname">NeoMemStore</code><a class="headerlink" href="#knowledge_base.neomemstore.NeoMemStore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Used to store / hold relevant “metadata”: Which expressions exist, how 
+often they appear in the texts, weighted expressions for further 
+processing.</p>
+<dl class="method">
+<dt id="knowledge_base.neomemstore.NeoMemStore.compute_corpus">
+<code class="descname">compute_corpus</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.neomemstore.NeoMemStore.compute_corpus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the corpus based on the relation tuples.
+The corpus is a dictionary mapping the relation tuples to their mutual
+information score, multiplied by their joint frequency.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.neomemstore.NeoMemStore.export">
+<code class="descname">export</code><span class="sig-paren">(</span><em>path='E:\\workspace\\data\\memstoreexperimental\\'</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.neomemstore.NeoMemStore.export" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exports the lexicon, relations and corpus and writes them to 
+disk.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.neomemstore.NeoMemStore.import_memstore">
+<code class="descname">import_memstore</code><span class="sig-paren">(</span><em>path='E:\\workspace\\data\\memstoreexperimental\\'</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.neomemstore.NeoMemStore.import_memstore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports the lexicon, relations and corpus from disk.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.neomemstore.NeoMemStore.incorporate">
+<code class="descname">incorporate</code><span class="sig-paren">(</span><em>closenesses</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.neomemstore.NeoMemStore.incorporate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Incorporates Closeness objects into this NeoMemStore.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>closenesses</strong> – A list of Closeness objects, as created in  extract_step.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.neomemstore.NeoMemStore.lexicon_from_file">
+<code class="descname">lexicon_from_file</code><span class="sig-paren">(</span><em>lexicon_file</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.neomemstore.NeoMemStore.lexicon_from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the lexicon from a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>lexicon_file</strong> – The file that is being loaded in.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.neomemstore.NeoMemStore.lexicon_to_file">
+<code class="descname">lexicon_to_file</code><span class="sig-paren">(</span><em>out_file</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.neomemstore.NeoMemStore.lexicon_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Writes the lexicon dictionary to a file in the format:</dt>
+<dd>token       frequency</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>out_file</strong> – The file that is being written to.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.neomemstore.NeoMemStore.normalise_corpus">
+<code class="descname">normalise_corpus</code><span class="sig-paren">(</span><em>cut_off=0.95</em>, <em>min_quo=0.1</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.neomemstore.NeoMemStore.normalise_corpus" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Normalizes the corpus as follows:</dt>
+<dd><ol class="first last arabic">
+<li><p class="first">Get the calculated corpus weights from compute_corpus()</p>
+</li>
+<li><dl class="first docutils">
+<dt>Get the top (1-X)*100% of weights.</dt>
+<dd><p class="first last">X is based on cut_off, default is 0.95.
+For that value, the top 5% weights are considered.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Get the lowest weight value from step 2).</dt>
+<dd><dl class="first last docutils">
+<dt>Example:</dt>
+<dd><p class="first last">Assume the weights are a list from 1 to 100.
+Step 2 would get a list from 96 to 100:
+[96, 97, 98, 99, 100], the 5% top values.
+The lowest value would be 96.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</li>
+<li><p class="first">Get the lowest, non-negative weight and multiply it by min_quo.</p>
+</li>
+<li><dl class="first docutils">
+<dt>Then, for each corpus weight:</dt>
+<dd><p class="first">5.1) Divide by the value from 3).
+5.2) If the new weight is negative, set it instead to the</p>
+<blockquote>
+<div><p>value from 4).</p>
+</div></blockquote>
+<p class="last">5.3) If the new weight is greater or equal 1, set it to 1.0.
+5.4) Replace the old weight with the new one from step 5.</p>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>cut_off</strong> – Optional. Default: 0.95. The limit by which the normalization weight is selected.</li>
+<li><strong>min_quo</strong> – Optional. Default: 0.1. The normalization factor for the weights that are negative.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.neomemstore.NeoMemStore.sorted">
+<code class="descname">sorted</code><span class="sig-paren">(</span><em>ignored=None</em>, <em>limit=0</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.neomemstore.NeoMemStore.sorted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sorts the contents of the lexicon.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ignored</strong> – A regex of words to be ignored.</li>
+<li><strong>limit</strong> – How many elements are to be returned.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Lexicon, but sorted and with only the specified number of items.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.neomemstore.NeoMemStore.update_lexicon">
+<code class="descname">update_lexicon</code><span class="sig-paren">(</span><em>items: [&lt;class 'str'&gt;]</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.neomemstore.NeoMemStore.update_lexicon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to fill the lexicon with how often each expression 
+appears in “close to” relations.
+Example:</p>
+<blockquote>
+<div>[understand] = 42
+“understand” appears in 42 “X close to Y” relations.</div></blockquote>
+<p>Used to find the “most relevant” (those that appear in most statements)
+expressions to boost the speed by ignoring the others.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>items</strong> – A list of expressions the lexicon is being updated with.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-knowledge_base.tensor">
+<span id="knowledge-base-tensor-module"></span><h2>knowledge_base.tensor module<a class="headerlink" href="#module-knowledge_base.tensor" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="knowledge_base.tensor.Tensor">
+<em class="property">class </em><code class="descclassname">knowledge_base.tensor.</code><code class="descname">Tensor</code><span class="sig-paren">(</span><em>rank</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.tensor.Tensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A sparse, dictionary-like implementation of square (cube, hyper-cube, etc.) 
+tensors, including basic operations allowing for linear combinations 
+(implemented in parallel).</p>
+<dl class="method">
+<dt id="knowledge_base.tensor.Tensor.density">
+<code class="descname">density</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.tensor.Tensor.density" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.tensor.Tensor.dim_size">
+<code class="descname">dim_size</code><span class="sig-paren">(</span><em>dim</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.tensor.Tensor.dim_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.tensor.Tensor.from_file">
+<code class="descname">from_file</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.tensor.Tensor.from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Importing a tensor from a filename or a file-like object (tab-separated
+values).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.tensor.Tensor.get_sparse_dict">
+<code class="descname">get_sparse_dict</code><span class="sig-paren">(</span><em>col2row=True</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.tensor.Tensor.get_sparse_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.tensor.Tensor.has_key">
+<code class="descname">has_key</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.tensor.Tensor.has_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.tensor.Tensor.index">
+<code class="descname">index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.tensor.Tensor.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;TODO - write up the documentation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.tensor.Tensor.items">
+<code class="descname">items</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.tensor.Tensor.items" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.tensor.Tensor.keys">
+<code class="descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.tensor.Tensor.keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.tensor.Tensor.lex_size">
+<code class="descname">lex_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.tensor.Tensor.lex_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.tensor.Tensor.matricise">
+<code class="descname">matricise</code><span class="sig-paren">(</span><em>pivot_dim</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.tensor.Tensor.matricise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a matrix representation of the tensor, using the given dimension
+as a pivot. The result is a tensor of rank 2 with keys in the form 
+(dim_p,(dim_0,…,dim_(p-1),dim_(p+1),…,dim_rank)) and values 
+representing the corresponding original tensor values.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.tensor.Tensor.normalise">
+<code class="descname">normalise</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.tensor.Tensor.normalise" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.tensor.Tensor.query">
+<code class="descname">query</code><span class="sig-paren">(</span><em>query</em>, <em>qtype='AND'</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.tensor.Tensor.query" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;TODO - write up the documentation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.tensor.Tensor.query_and">
+<code class="descname">query_and</code><span class="sig-paren">(</span><em>query</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.tensor.Tensor.query_and" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;TODO - write up the documentation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.tensor.Tensor.query_or">
+<code class="descname">query_or</code><span class="sig-paren">(</span><em>query</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.tensor.Tensor.query_or" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;TODO - write up the documentation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.tensor.Tensor.tab_separated">
+<code class="descname">tab_separated</code><span class="sig-paren">(</span><em>split_into=3</em>, <em>last_done=0</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.tensor.Tensor.tab_separated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a string with tab-separated values representing the tensor.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.tensor.Tensor.to_file">
+<code class="descname">to_file</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.tensor.Tensor.to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exporting a lexicon to a filename or file-like object (tab-separated 
+values).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="knowledge_base.tensor.Tensor.values">
+<code class="descname">values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#knowledge_base.tensor.Tensor.values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-knowledge_base">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-knowledge_base" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">dragn</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="extract.html">extract package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="allsteps.html">allsteps package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataapp.html">dataapp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dragn.html">dragn package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extract.html">extract package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="graph.html">graph package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_step.html">index package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">knowledge_base package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-knowledge_base.analyser">knowledge_base.analyser module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-knowledge_base.knowledge_base_compute_step">knowledge_base.knowledge_base_compute_step module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-knowledge_base.knowledge_base_create_step">knowledge_base.knowledge_base_create_step module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-knowledge_base.neomemstore">knowledge_base.neomemstore module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-knowledge_base.tensor">knowledge_base.tensor module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-knowledge_base">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="query.html">query package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="queryapp.html">queryapp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text.html">text package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uploadapp.html">uploadapp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="util.html">util package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index_step.html" title="previous chapter">index package</a></li>
+      <li>Next: <a href="query.html" title="next chapter">query package</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Thomas Huber.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/knowledge_base.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

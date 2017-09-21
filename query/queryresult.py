@@ -1,4 +1,4 @@
-"""
+__copyright__ = """
 Copyright (C) 2012 Vit Novacek (vit.novacek@deri.org), Digital Enterprise
 Research Institute (DERI), National University of Ireland Galway (NUIG)
 All rights reserved.
@@ -47,11 +47,12 @@ class QueryResult(object):
     def __init__(self, min_weight=0.5, alias=None, relation_type="all", lesser_edges=True):
         """
         Constructor.
+
         :param min_weight: Optional. Default: 0.5. The minimum weight relations need to have to be considered.
         :param alias: The Alias of the texts being queried.
         :param relation_type: Optional. Default: "all". The type of relations to display.
         :param lesser_edges: Optional. Default: True. Whether or not edges and relations between nodes that are not
-        in the query are to be considered.
+            in the query are to be considered.
         """
         self.query = None
         self.lesser_edges = lesser_edges
@@ -77,8 +78,9 @@ class QueryResult(object):
         """
         Loads the mapping of relation tuples to the provenances.
         The format is: (token, related_to, token2): [ (provenance, weight), ...]
+
         :param path: Optional. Default: paths.RELATION_PROVENANCES_PATH. The path to the file of
-        tuple -> provennces mapping, as created in index_step.
+            tuple -> provennces mapping, as created in index_step.
         :return: A dictionary of relation tripe -> provenance mappings.
         """
         import time
@@ -140,6 +142,7 @@ class QueryResult(object):
         Filters the relation tuples by the min_weight specified.
         Relation tuples that are below the specified value will be excluded
         from the result.
+
         :param relevant: A FuzzySet containing the (token, weight) tuples for the query terms.
         :return: A FuzzySet with the values that were below the min_weight threshhold.
         """
@@ -156,8 +159,9 @@ class QueryResult(object):
             token: [ (token2, weight), ... ]
         This dictionary can be used to access the tokens that are related to
         another token by accessing the dictionary by key.
+
         :param path: Optional. Default: paths.RELATION_WEIGHT_PATH. The path where the shortform of relation mappings
-        is stored.
+            is stored.
         """
         relations = defaultdict(lambda: list())
         with gzip.open(
@@ -215,6 +219,7 @@ class QueryResult(object):
     def generate_statement_nodes(self, max_nodes):
         """
         Generates the nodes that exist in the query-graph.
+
         :param max_nodes: The maximum number of nodes.
         :return: A list of nodes that make up the graph.
         """
@@ -249,6 +254,7 @@ class QueryResult(object):
         """
         Generates the graph object for the query.
         Only the top most relevant nodes and edges are in the graph.
+
         :param max_nodes: The maximum number of nodes in the graph.
         :param max_edges: The maximum number of edges in the graph.
         :return: A Graph object representing the result graph.
@@ -322,8 +328,9 @@ class QueryResult(object):
     def load_token2related(path=os.path.join(paths.RELATIONS_PATH, "relations.tsv.gz"), relation_type="all"):
         """
         Loads the mapping of tokens to the related tokens.
+
         :param path: Optional. Default: os.path.join(paths.RELATIONS_PATH, "relations.tsv.gz"). The path to where the
-        mapping of triples to provenances is stored.
+            mapping of triples to provenances is stored.
         :param relation_type: Optional. Default: "all". The type of relation to be considered.
         :return: A dictionary containing a mapping of SPO-triples to (provenance, score) tuples.
         """
@@ -363,6 +370,7 @@ class QueryResult(object):
     def get_top_provenances(self, top=10):
         """
         Returns the highest scoring provenances, sorted descendingly.
+
         :param top: The number of provenances to return.
         :return: A list of the highest scoring provenances, sorted descendingly.
         """

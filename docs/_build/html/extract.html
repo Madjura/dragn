@@ -1,0 +1,379 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>extract package &#8212; dragn  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="allsteps package" href="allsteps.html" />
+    <link rel="prev" title="Welcome to dragn’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="extract-package">
+<h1>extract package<a class="headerlink" href="#extract-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="extract-extract-step-module">
+<h2>extract.extract_step module<a class="headerlink" href="#extract-extract-step-module" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-extract.extract_step"></span><p>Allows the execution of extract_step.
+In this step the texts are pre-processed, they are tokenized and POS-tags are assigned.</p>
+<dl class="function">
+<dt id="extract.extract_step.extract_step">
+<code class="descclassname">extract.extract_step.</code><code class="descname">extract_step</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#extract.extract_step.extract_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processes all files in a given folder.
+The process is as follows:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p class="first">Read the content of the file</p>
+</li>
+<li><dl class="first docutils">
+<dt>Split the content into Paragraph objects (each Paragraph has a list</dt>
+<dd><p class="first last">of containing sentences)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>For each paragraph:</dt>
+<dd><p class="first">3.1) POS-tag the sentences
+3.2) Map the tokens to the sentence-position in the paragraph</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>Example:</dt>
+<dd><dl class="first last docutils">
+<dt>Paragraph:</dt>
+<dd><p class="first last">Paul threw the red ball. The ball landed on the roof.</p>
+</dd>
+<dt>Sentences:</dt>
+<dd><p class="first last">[Paul threw the red ball., The ball landed on the roof.]</p>
+</dd>
+<dt>Tokens:</dt>
+<dd><p class="first last">[Paul, threw, the, red, ball, landed, on, roof]</p>
+</dd>
+<dt>Mapping:</dt>
+<dd><p class="first last">[Paul: (0), threw: (0), the: (0, 1), …]</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="last docutils">
+<dt>3.3) Generate the “Closeness” for each combination of tokens</dt>
+<dd><dl class="first last docutils">
+<dt>The weighting of the “Closeness” is calculated like so:</dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt>For each combination of tokens, check all combinations</dt>
+<dd><p class="first last">of positions.</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">Check the distance (math.abs()) of the distances</p>
+</li>
+<li><dl class="first docutils">
+<dt>If it is below the threshold (default 5), add</dt>
+<dd><dl class="first last docutils">
+<dt>the following to the current weight:</dt>
+<dd><p class="first last">1/(1 + distance)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>If it is above the threshold, continue with the next</dt>
+<dd><p class="first last">position</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>After all positional combinations are checked, create</dt>
+<dd><p class="first">a “Closeness” object for the two tokens, with the weight
+being the value that was calculated as above IF the
+weight is above the threshold (1/3). If it is not,
+continue with the next token.</p>
+<p class="last">In the example above the weight would be 1.5, so a
+new Closeness object would be created and added to the
+list.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt>3.4) Add the resulting list from 3.3) to a list and continue with</dt>
+<dd><p class="first last">the next paragraph</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Write the resulting list of “Closeness” objects for each text</dt>
+<dd><p class="first last">to the disk.</p>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>text_path</strong> – The path to the folder where the files are.</li>
+<li><strong>language</strong> – Optional. Default: “english”. The language of the texts.</li>
+<li><strong>texts</strong> – Optional. A list of strings of filenames to be processed. If not provided, all texts in the system
+will be used.</li>
+<li><strong>alias</strong> – Optional. The Alias of the collection of texts.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="extract.extract_step.make_folders">
+<code class="descclassname">extract.extract_step.</code><code class="descname">make_folders</code><span class="sig-paren">(</span><em>alias=None</em><span class="sig-paren">)</span><a class="headerlink" href="#extract.extract_step.make_folders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the folders required for using the system.
+The path to the folders can be found in the “util” package.
+:param alias: The Alias of the texts.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="extract.extract_step.with_graphviz_output">
+<code class="descclassname">extract.extract_step.</code><code class="descname">with_graphviz_output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#extract.extract_step.with_graphviz_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs extract_step with GraphvizOutput, producing a call graph of all functions.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-extract.text_extract">
+<span id="extract-text-extract-module"></span><h2>extract.text_extract module<a class="headerlink" href="#module-extract.text_extract" title="Permalink to this headline">¶</a></h2>
+<p>Functions that help with the extraction of paragraphs and Noun Phrases from texts.</p>
+<dl class="function">
+<dt id="extract.text_extract.calculate_weighted_distance">
+<code class="descclassname">extract.text_extract.</code><code class="descname">calculate_weighted_distance</code><span class="sig-paren">(</span><em>token2sentences</em>, <em>*</em>, <em>paragraph_id=&lt;class 'str'&gt;</em>, <em>distance_threshold=5</em>, <em>weight_threshold=0.3333333333333333</em><span class="sig-paren">)</span><a class="headerlink" href="#extract.text_extract.calculate_weighted_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the weighted distance between tokens given an inverse index mapping the tokens to the sentences they
+appear in. The distance is calculated by summing up 1/(1+distance) for each combination of positions of two tokens.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>token2sentences</strong> – The inverse index mapping tokens to the sentences they appear in.</li>
+<li><strong>paragraph_id</strong> – The ID of the paragraph currently being processed, the one the sentences belong to.</li>
+<li><strong>distance_threshold</strong> – Optional. Default: 5. The maximum distance in sentences that token can be apart to still
+be considered.</li>
+<li><strong>weight_threshold</strong> – Optional. Default: 1/3. The minimum weight two tokens need to have to be considered.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A list of Closeness objects, representing the weighted distance between pairs of tokens.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="extract.text_extract.extract_from_sentences">
+<code class="descclassname">extract.text_extract.</code><code class="descname">extract_from_sentences</code><span class="sig-paren">(</span><em>sentences</em>, <em>add_verbs=True</em>, <em>language='english'</em><span class="sig-paren">)</span><a class="headerlink" href="#extract.text_extract.extract_from_sentences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processes Sentence objects to calculate contained Noun Phrases based on a given grammar and maps them to the
+sentences they occur in.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sentences</strong> – A list of Sentence objects.</li>
+<li><strong>add_verbs</strong> – Optional. Default: True. Whether or not verbs are to be added to the mapping.</li>
+<li><strong>language</strong> – Optional. Default: English. The langue of the sentences.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A dictionary mapping tokens to the sentence IDs of the sentences they appear in.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="extract.text_extract.get_cooccurence">
+<code class="descclassname">extract.text_extract.</code><code class="descname">get_cooccurence</code><span class="sig-paren">(</span><em>chunk_trees</em>, <em>ignore_stopwords=True</em>, <em>language='english'</em><span class="sig-paren">)</span><a class="headerlink" href="#extract.text_extract.get_cooccurence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses a chunk tree and gets co-occurance of terms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>chunk_trees</strong> – Tree from the NLTK RegexParser, generated over POS-tagged sentences using the provided grammar.</li>
+<li><strong>ignore_stopwords</strong> – Optional. Default: True. Whether stopwords are to be ignored or not.</li>
+<li><strong>language</strong> – Optional. Default: English. The language of the texts over which the chunk trees were generated.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A list of co-occuring tokens and a simple parse tree generated over the leaves of  the chunks of the
+provided one.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="extract.text_extract.pos_tag">
+<code class="descclassname">extract.text_extract.</code><code class="descname">pos_tag</code><span class="sig-paren">(</span><em>text</em><span class="sig-paren">)</span><a class="headerlink" href="#extract.text_extract.pos_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tokenize a given text and generates a list of Sentence objects.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>text</strong> – Tokenizes a given text and generates a list of Sentence objects, with the appropiate POS-tags added.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list of Sentence objects representing the sentences in the text.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="extract.text_extract.split_paragraphs">
+<code class="descclassname">extract.text_extract.</code><code class="descname">split_paragraphs</code><span class="sig-paren">(</span><em>text</em><span class="sig-paren">)</span><a class="headerlink" href="#extract.text_extract.split_paragraphs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a text and collects the paragraphs of the text.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>text</strong> – The content of a text file.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list of strings, where each element is a paragraph of the input text.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-extract">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-extract" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">dragn</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">extract package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#extract-extract-step-module">extract.extract_step module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-extract.text_extract">extract.text_extract module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-extract">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="allsteps.html">allsteps package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataapp.html">dataapp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dragn.html">dragn package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">extract package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#extract-extract-step-module">extract.extract_step module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-extract.text_extract">extract.text_extract module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-extract">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="graph.html">graph package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_step.html">index package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="knowledge_base.html">knowledge_base package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="query.html">query package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="queryapp.html">queryapp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text.html">text package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uploadapp.html">uploadapp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="util.html">util package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to dragn’s documentation!</a></li>
+      <li>Next: <a href="allsteps.html" title="next chapter">allsteps package</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Thomas Huber.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/extract.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

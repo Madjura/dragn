@@ -81,7 +81,6 @@ def knowledge_base_create(alias=None):
                 3.5.4) Replace the old weight with the new one from step 5.
         4) Then write the memstore object to the disk.
     :param alias: The Alias of the texts that are being processed.
-    :return:
     """
     memstore = NeoMemStore()
     # closenesses are calculcated in extract_step
@@ -93,6 +92,7 @@ def knowledge_base_create(alias=None):
 
 
 def with_graphvizoutput():
+    """Runs index_step with GraphvizOutput, producing a call graph of all functions."""
     graphviz = GraphvizOutput()
     graphviz.output_file = 'knowledge_base_create.png'
 

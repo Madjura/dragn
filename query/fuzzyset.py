@@ -1,3 +1,24 @@
+__copyright__ = """
+Copyright (C) 2012 Vit Novacek (vit.novacek@deri.org), Digital Enterprise
+Research Institute (DERI), National University of Ireland Galway (NUIG)
+All rights reserved.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+ProvFuzzySet was newly added.
+"""
+
 import sys
 from _decimal import Decimal
 
@@ -183,8 +204,15 @@ class FuzzySet:
     
     
 class ProvFuzzySet(FuzzySet):
+    """FuzzySet used to normalize the scores of provenances in regards to user queries."""
     @staticmethod
     def from_list_dictionary(list_dictionary):
+        """
+        Generates a new ProvFuzzySet from a dictionary of lists.
+
+        :param list_dictionary: A dictionary of lists.
+        :return: A ProvFuzzySet representing the dictionary.
+        """
         membership = ProvFuzzySet()
         try:
             normalisation = Decimal(max([x[0] for x in list_dictionary.values()]))
@@ -202,6 +230,12 @@ class ProvFuzzySet(FuzzySet):
         return membership
     
     def __setitem__(self, member, degree):
+        """
+        Adds an item.
+
+        :param member: The element being added.
+        :param degree: The degree of membership.
+        """
         if degree == 0:
             if member in self.members:
                 del self.members[member]
@@ -214,8 +248,14 @@ class ProvFuzzySet(FuzzySet):
                 self.members[member] = (degree, value)
                 
     def sort(self, reverse=False, limit=0):
-        # iterator over items sorted from the least to most relevant (or reverse)
+        """
+        Returns a sorted version of this ProvFuzzySet.
 
+        :param reverse: Optional. Default: False. Whether the order is to be descending, by membership.
+        :param limit: Optional. Default: 0. The number of limits to return.
+        :return: An iterator to iterate over the sorted contents.
+        """
+        # iterator over items sorted from the least to most relevant (or reverse)
         l = [(x, d) for x, d in list(self.members.items())]
         l.sort(key=lambda x: x[1], reverse=reverse)
         i = 0

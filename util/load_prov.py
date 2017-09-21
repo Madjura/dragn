@@ -8,6 +8,7 @@ from util import paths
 def load_prov(name):
     """
     Loads the contents of a paragraph by name.
+    
     :param name: The name of the paragraph.
     :raises FileNotFoundError: If no such file can be found.
     :return: The content of that paragraph.

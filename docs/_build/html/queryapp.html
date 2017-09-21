@@ -1,0 +1,433 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>queryapp package &#8212; dragn  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="text package" href="text.html" />
+    <link rel="prev" title="query package" href="query.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="queryapp-package">
+<h1>queryapp package<a class="headerlink" href="#queryapp-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-queryapp.admin">
+<span id="queryapp-admin-module"></span><h2>queryapp.admin module<a class="headerlink" href="#module-queryapp.admin" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-queryapp.apps">
+<span id="queryapp-apps-module"></span><h2>queryapp.apps module<a class="headerlink" href="#module-queryapp.apps" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="queryapp.apps.QueryappConfig">
+<em class="property">class </em><code class="descclassname">queryapp.apps.</code><code class="descname">QueryappConfig</code><span class="sig-paren">(</span><em>app_name</em>, <em>app_module</em><span class="sig-paren">)</span><a class="headerlink" href="#queryapp.apps.QueryappConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.apps.config.AppConfig</span></code></p>
+<dl class="attribute">
+<dt id="queryapp.apps.QueryappConfig.name">
+<code class="descname">name</code><em class="property"> = 'queryapp'</em><a class="headerlink" href="#queryapp.apps.QueryappConfig.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-queryapp.forms">
+<span id="queryapp-forms-module"></span><h2>queryapp.forms module<a class="headerlink" href="#module-queryapp.forms" title="Permalink to this headline">¶</a></h2>
+<p>Forms for the queryapp. Contains forms for queries and processing texts.</p>
+<dl class="class">
+<dt id="queryapp.forms.ProcessForm">
+<em class="property">class </em><code class="descclassname">queryapp.forms.</code><code class="descname">ProcessForm</code><span class="sig-paren">(</span><em>text_choices=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#queryapp.forms.ProcessForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.forms.forms.Form</span></code></p>
+<p>Form to initate the processing of texts with.</p>
+<dl class="attribute">
+<dt id="queryapp.forms.ProcessForm.base_fields">
+<code class="descname">base_fields</code><em class="property"> = OrderedDict([('texts', &lt;django.forms.fields.MultipleChoiceField object&gt;), ('language', &lt;django.forms.fields.CharField object&gt;)])</em><a class="headerlink" href="#queryapp.forms.ProcessForm.base_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="queryapp.forms.ProcessForm.declared_fields">
+<code class="descname">declared_fields</code><em class="property"> = OrderedDict([('texts', &lt;django.forms.fields.MultipleChoiceField object&gt;), ('language', &lt;django.forms.fields.CharField object&gt;)])</em><a class="headerlink" href="#queryapp.forms.ProcessForm.declared_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="queryapp.forms.ProcessForm.media">
+<code class="descname">media</code><a class="headerlink" href="#queryapp.forms.ProcessForm.media" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="queryapp.forms.QueryForm">
+<em class="property">class </em><code class="descclassname">queryapp.forms.</code><code class="descname">QueryForm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#queryapp.forms.QueryForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.forms.forms.Form</span></code></p>
+<p>Form for the user queries.</p>
+<dl class="attribute">
+<dt id="queryapp.forms.QueryForm.base_fields">
+<code class="descname">base_fields</code><em class="property"> = OrderedDict([('query', &lt;django.forms.fields.CharField object&gt;), ('max_nodes', &lt;django.forms.fields.IntegerField object&gt;), ('max_edges', &lt;django.forms.fields.IntegerField object&gt;), ('top_text_samples', &lt;django.forms.fields.IntegerField object&gt;), ('lesser_edges', &lt;django.forms.fields.BooleanField object&gt;), ('texts', &lt;django.forms.fields.ChoiceField object&gt;)])</em><a class="headerlink" href="#queryapp.forms.QueryForm.base_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="queryapp.forms.QueryForm.clean_query">
+<code class="descname">clean_query</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#queryapp.forms.QueryForm.clean_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleans the query field.
+:return: The cleaned data.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="queryapp.forms.QueryForm.declared_fields">
+<code class="descname">declared_fields</code><em class="property"> = OrderedDict([('query', &lt;django.forms.fields.CharField object&gt;), ('max_nodes', &lt;django.forms.fields.IntegerField object&gt;), ('max_edges', &lt;django.forms.fields.IntegerField object&gt;), ('top_text_samples', &lt;django.forms.fields.IntegerField object&gt;), ('lesser_edges', &lt;django.forms.fields.BooleanField object&gt;), ('texts', &lt;django.forms.fields.ChoiceField object&gt;)])</em><a class="headerlink" href="#queryapp.forms.QueryForm.declared_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="queryapp.forms.QueryForm.media">
+<code class="descname">media</code><a class="headerlink" href="#queryapp.forms.QueryForm.media" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-queryapp.models">
+<span id="queryapp-models-module"></span><h2>queryapp.models module<a class="headerlink" href="#module-queryapp.models" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="queryapp.models.Text">
+<em class="property">class </em><code class="descclassname">queryapp.models.</code><code class="descname">Text</code><span class="sig-paren">(</span><em>id</em>, <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#queryapp.models.Text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></code></p>
+<dl class="exception">
+<dt id="queryapp.models.Text.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#queryapp.models.Text.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="queryapp.models.Text.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#queryapp.models.Text.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="queryapp.models.Text.id">
+<code class="descname">id</code><a class="headerlink" href="#queryapp.models.Text.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="queryapp.models.Text.name">
+<code class="descname">name</code><a class="headerlink" href="#queryapp.models.Text.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="queryapp.models.Text.objects">
+<code class="descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#queryapp.models.Text.objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="queryapp.models.Text.textsalias_set">
+<code class="descname">textsalias_set</code><a class="headerlink" href="#queryapp.models.Text.textsalias_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the forward and reverse sides of
+a many-to-many relation.</p>
+<p>In the example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Pizza</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">toppings</span> <span class="o">=</span> <span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Topping</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;pizzas&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">pizza.toppings</span></code> and <code class="docutils literal"><span class="pre">topping.pizzas</span></code> are <code class="docutils literal"><span class="pre">ManyToManyDescriptor</span></code>
+instances.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="queryapp.models.TextsAlias">
+<em class="property">class </em><code class="descclassname">queryapp.models.</code><code class="descname">TextsAlias</code><span class="sig-paren">(</span><em>id</em>, <em>identifier</em>, <em>processed</em><span class="sig-paren">)</span><a class="headerlink" href="#queryapp.models.TextsAlias" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></code></p>
+<dl class="exception">
+<dt id="queryapp.models.TextsAlias.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#queryapp.models.TextsAlias.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="queryapp.models.TextsAlias.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#queryapp.models.TextsAlias.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="queryapp.models.TextsAlias.for_texts">
+<em class="property">static </em><code class="descname">for_texts</code><span class="sig-paren">(</span><em>texts</em><span class="sig-paren">)</span><a class="headerlink" href="#queryapp.models.TextsAlias.for_texts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="queryapp.models.TextsAlias.id">
+<code class="descname">id</code><a class="headerlink" href="#queryapp.models.TextsAlias.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="queryapp.models.TextsAlias.identifier">
+<code class="descname">identifier</code><a class="headerlink" href="#queryapp.models.TextsAlias.identifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="queryapp.models.TextsAlias.objects">
+<code class="descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#queryapp.models.TextsAlias.objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="queryapp.models.TextsAlias.processed">
+<code class="descname">processed</code><a class="headerlink" href="#queryapp.models.TextsAlias.processed" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="queryapp.models.TextsAlias.texts">
+<code class="descname">texts</code><a class="headerlink" href="#queryapp.models.TextsAlias.texts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the forward and reverse sides of
+a many-to-many relation.</p>
+<p>In the example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Pizza</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">toppings</span> <span class="o">=</span> <span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Topping</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;pizzas&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">pizza.toppings</span></code> and <code class="docutils literal"><span class="pre">topping.pizzas</span></code> are <code class="docutils literal"><span class="pre">ManyToManyDescriptor</span></code>
+instances.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-queryapp.tests">
+<span id="queryapp-tests-module"></span><h2>queryapp.tests module<a class="headerlink" href="#module-queryapp.tests" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-queryapp.views">
+<span id="queryapp-views-module"></span><h2>queryapp.views module<a class="headerlink" href="#module-queryapp.views" title="Permalink to this headline">¶</a></h2>
+<p>Views for the queryapp. Responsible for handling all user interactions regarding queries.</p>
+<dl class="function">
+<dt id="queryapp.views.get_provenance">
+<code class="descclassname">queryapp.views.</code><code class="descname">get_provenance</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#queryapp.views.get_provenance" title="Permalink to this definition">¶</a></dt>
+<dd><p>View to display the contents of a certain paragraph.
+Used by the Distant Reader to show previous or next paragraphs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> – A Django request object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The contents of the selected (previous or next) paragraph in JSON format.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="queryapp.views.load_and_prepare_provenance">
+<code class="descclassname">queryapp.views.</code><code class="descname">load_and_prepare_provenance</code><span class="sig-paren">(</span><em>tops</em>, <em>alias</em><span class="sig-paren">)</span><a class="headerlink" href="#queryapp.views.load_and_prepare_provenance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads provenances and generates a list of tuples of name, score and content of those provenances.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tops</strong> – The provenances/paragraphs being loaded.</li>
+<li><strong>alias</strong> – The Alias of the queried texts.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A list of tuples of name, score and content of the provenances.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="queryapp.views.markup_samples">
+<code class="descclassname">queryapp.views.</code><code class="descname">markup_samples</code><span class="sig-paren">(</span><em>samples</em>, <em>nodes</em><span class="sig-paren">)</span><a class="headerlink" href="#queryapp.views.markup_samples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processes the content of the found provenances; emboldens words that appear in the graph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>samples</strong> – The provenances with their name, score and content.</li>
+<li><strong>nodes</strong> – The label/name of the nodes in the graph.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A list containing tuples in the format (name, score, content, contained words) of the provenances.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="queryapp.views.process">
+<code class="descclassname">queryapp.views.</code><code class="descname">process</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#queryapp.views.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>View to process a text or multiple with the pipeline.
+Note that this can take very long to finish, depending on the total size of the text(s).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> – A Django request object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A rendered view showing the texts that were processed.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="queryapp.views.query">
+<code class="descclassname">queryapp.views.</code><code class="descname">query</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#queryapp.views.query" title="Permalink to this definition">¶</a></dt>
+<dd><p>View for a simple user query.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> – A Django request object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A rendered page showing the result of the query.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-queryapp">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-queryapp" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">dragn</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="extract.html">extract package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="allsteps.html">allsteps package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataapp.html">dataapp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dragn.html">dragn package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extract.html">extract package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="graph.html">graph package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_step.html">index package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="knowledge_base.html">knowledge_base package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="query.html">query package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">queryapp package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-queryapp.admin">queryapp.admin module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-queryapp.apps">queryapp.apps module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-queryapp.forms">queryapp.forms module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-queryapp.models">queryapp.models module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-queryapp.tests">queryapp.tests module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-queryapp.views">queryapp.views module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-queryapp">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="text.html">text package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uploadapp.html">uploadapp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="util.html">util package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="query.html" title="previous chapter">query package</a></li>
+      <li>Next: <a href="text.html" title="next chapter">text package</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Thomas Huber.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/queryapp.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

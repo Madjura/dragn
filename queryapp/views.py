@@ -16,6 +16,7 @@ from util import paths
 def query(request):
     """
     View for a simple user query.
+
     :param request: A Django request object.
     :return: A rendered page showing the result of the query.
     """
@@ -58,6 +59,7 @@ def query(request):
 def load_and_prepare_provenance(tops, alias):
     """
     Loads provenances and generates a list of tuples of name, score and content of those provenances.
+
     :param tops: The provenances/paragraphs being loaded.
     :param alias: The Alias of the queried texts.
     :return: A list of tuples of name, score and content of the provenances.
@@ -72,6 +74,7 @@ def load_and_prepare_provenance(tops, alias):
 def markup_samples(samples, nodes):
     """
     Processes the content of the found provenances; emboldens words that appear in the graph.
+
     :param samples: The provenances with their name, score and content.
     :param nodes: The label/name of the nodes in the graph.
     :return: A list containing tuples in the format (name, score, content, contained words) of the provenances.
@@ -95,6 +98,7 @@ def process(request):
     """
     View to process a text or multiple with the pipeline.
     Note that this can take very long to finish, depending on the total size of the text(s).
+
     :param request: A Django request object.
     :return: A rendered view showing the texts that were processed.
     """
@@ -134,6 +138,7 @@ def get_provenance(request):
     """
     View to display the contents of a certain paragraph.
     Used by the Distant Reader to show previous or next paragraphs.
+
     :param request: A Django request object.
     :return: The contents of the selected (previous or next) paragraph in JSON format.
     """

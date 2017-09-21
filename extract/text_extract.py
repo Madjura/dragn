@@ -1,4 +1,5 @@
-"""
+"""Functions that help with the extraction of paragraphs and Noun Phrases from texts."""
+__copyright__ = """
 Copyright (C) 2012 Vit Novacek (vit.novacek@deri.org), Digital Enterprise
 Research Institute (DERI), National University of Ireland Galway (NUIG)
 All rights reserved.
@@ -37,9 +38,10 @@ from text.closeness import Closeness
 from text.sentence import Sentence
 
 
-def split_paragraphs(text: str) -> [str]:
+def split_paragraphs(text):
     """
     Takes a text and collects the paragraphs of the text.
+
     :param text: The content of a text file.
     :return: A list of strings, where each element is a paragraph of the input text.
     """
@@ -61,9 +63,10 @@ def split_paragraphs(text: str) -> [str]:
     return paragraphs
 
 
-def pos_tag(text: str) -> [Sentence]:
+def pos_tag(text):
     """
     Tokenize a given text and generates a list of Sentence objects.
+
     :param text: Tokenizes a given text and generates a list of Sentence objects, with the appropiate POS-tags added.
     :return: A list of Sentence objects representing the sentences in the text.
     """
@@ -78,10 +81,11 @@ def pos_tag(text: str) -> [Sentence]:
     return sentences
 
 
-def extract_from_sentences(sentences, add_verbs=True, language="english") -> {str, list}:
+def extract_from_sentences(sentences, add_verbs=True, language="english"):
     """
     Processes Sentence objects to calculate contained Noun Phrases based on a given grammar and maps them to the
     sentences they occur in.
+
     :param sentences: A list of Sentence objects.
     :param add_verbs: Optional. Default: True. Whether or not verbs are to be added to the mapping.
     :param language: Optional. Default: English. The langue of the sentences.
@@ -127,11 +131,12 @@ def extract_from_sentences(sentences, add_verbs=True, language="english") -> {st
 def get_cooccurence(chunk_trees, ignore_stopwords=True, language="english"):
     """
     Parses a chunk tree and gets co-occurance of terms.
+
     :param chunk_trees: Tree from the NLTK RegexParser, generated over POS-tagged sentences using the provided grammar.
     :param ignore_stopwords: Optional. Default: True. Whether stopwords are to be ignored or not.
     :param language: Optional. Default: English. The language of the texts over which the chunk trees were generated.
     :return: A list of co-occuring tokens and a simple parse tree generated over the leaves of  the chunks of the
-    provided one.
+        provided one.
     """
     triples = []
     simple_trees = []
@@ -166,16 +171,15 @@ def get_cooccurence(chunk_trees, ignore_stopwords=True, language="english"):
     return triples, simple_trees
 
 
-def calculate_weighted_distance(token2sentences: dict, *, paragraph_id: object = str, distance_threshold: int = 5,
-                                weight_threshold: float = 1 / 3) -> object:
+def calculate_weighted_distance(token2sentences, *, paragraph_id=str, distance_threshold=5, weight_threshold=1/3):
     """
     Calculates the weighted distance between tokens given an inverse index mapping the tokens to the sentences they
-    appear in.
-    The distance is calculated by summing up 1/(1+distance) for each combination of positions of two tokens.
+    appear in. The distance is calculated by summing up 1/(1+distance) for each combination of positions of two tokens.
+
     :param token2sentences: The inverse index mapping tokens to the sentences they appear in.
     :param paragraph_id: The ID of the paragraph currently being processed, the one the sentences belong to.
     :param distance_threshold: Optional. Default: 5. The maximum distance in sentences that token can be apart to still
-    be considered.
+            be considered.
     :param weight_threshold: Optional. Default: 1/3. The minimum weight two tokens need to have to be considered.
     :return: A list of Closeness objects, representing the weighted distance between pairs of tokens.
     """

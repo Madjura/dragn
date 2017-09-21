@@ -1,0 +1,432 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>query package &#8212; dragn  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="queryapp package" href="queryapp.html" />
+    <link rel="prev" title="knowledge_base package" href="knowledge_base.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="query-package">
+<h1>query package<a class="headerlink" href="#query-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-query.fuzzyset">
+<span id="query-fuzzyset-module"></span><h2>query.fuzzyset module<a class="headerlink" href="#module-query.fuzzyset" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="query.fuzzyset.FuzzySet">
+<em class="property">class </em><code class="descclassname">query.fuzzyset.</code><code class="descname">FuzzySet</code><span class="sig-paren">(</span><em>elements=None</em><span class="sig-paren">)</span><a class="headerlink" href="#query.fuzzyset.FuzzySet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A simplistic (but efficient) implementation of a fuzzy set class and the
+basic operations (union, intersection, subtraction and complement) according
+to the standard definitions.</p>
+<dl class="method">
+<dt id="query.fuzzyset.FuzzySet.complement">
+<code class="descname">complement</code><span class="sig-paren">(</span><em>universe=set()</em><span class="sig-paren">)</span><a class="headerlink" href="#query.fuzzyset.FuzzySet.complement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="query.fuzzyset.FuzzySet.cut">
+<code class="descname">cut</code><span class="sig-paren">(</span><em>alpha=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#query.fuzzyset.FuzzySet.cut" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="query.fuzzyset.FuzzySet.from_dictionary">
+<em class="property">static </em><code class="descname">from_dictionary</code><span class="sig-paren">(</span><em>dictionary</em><span class="sig-paren">)</span><a class="headerlink" href="#query.fuzzyset.FuzzySet.from_dictionary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a FuzzySet from a dictionary.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>Args:</dt>
+<dd>dictionary: A dictionary in which the values are numerical.</dd>
+<dt>Returns:</dt>
+<dd>A FuzzySet object with normalised weights based on the input
+dictionary.</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="query.fuzzyset.FuzzySet.items">
+<code class="descname">items</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#query.fuzzyset.FuzzySet.items" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="query.fuzzyset.FuzzySet.keys">
+<code class="descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#query.fuzzyset.FuzzySet.keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="query.fuzzyset.FuzzySet.sort">
+<code class="descname">sort</code><span class="sig-paren">(</span><em>reverse=False</em>, <em>limit=0</em><span class="sig-paren">)</span><a class="headerlink" href="#query.fuzzyset.FuzzySet.sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="query.fuzzyset.FuzzySet.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>elements</em>, <em>overwrite=True</em><span class="sig-paren">)</span><a class="headerlink" href="#query.fuzzyset.FuzzySet.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="query.fuzzyset.FuzzySet.values">
+<code class="descname">values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#query.fuzzyset.FuzzySet.values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="query.fuzzyset.ProvFuzzySet">
+<em class="property">class </em><code class="descclassname">query.fuzzyset.</code><code class="descname">ProvFuzzySet</code><span class="sig-paren">(</span><em>elements=None</em><span class="sig-paren">)</span><a class="headerlink" href="#query.fuzzyset.ProvFuzzySet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#query.fuzzyset.FuzzySet" title="query.fuzzyset.FuzzySet"><code class="xref py py-class docutils literal"><span class="pre">query.fuzzyset.FuzzySet</span></code></a></p>
+<p>FuzzySet used to normalize the scores of provenances in regards to user queries.</p>
+<dl class="staticmethod">
+<dt id="query.fuzzyset.ProvFuzzySet.from_list_dictionary">
+<em class="property">static </em><code class="descname">from_list_dictionary</code><span class="sig-paren">(</span><em>list_dictionary</em><span class="sig-paren">)</span><a class="headerlink" href="#query.fuzzyset.ProvFuzzySet.from_list_dictionary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a new ProvFuzzySet from a dictionary of lists.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>list_dictionary</strong> – A dictionary of lists.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A ProvFuzzySet representing the dictionary.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="query.fuzzyset.ProvFuzzySet.sort">
+<code class="descname">sort</code><span class="sig-paren">(</span><em>reverse=False</em>, <em>limit=0</em><span class="sig-paren">)</span><a class="headerlink" href="#query.fuzzyset.ProvFuzzySet.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a sorted version of this ProvFuzzySet.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>reverse</strong> – Optional. Default: False. Whether the order is to be descending, by membership.</li>
+<li><strong>limit</strong> – Optional. Default: 0. The number of limits to return.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">An iterator to iterate over the sorted contents.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-query.queryresult">
+<span id="query-queryresult-module"></span><h2>query.queryresult module<a class="headerlink" href="#module-query.queryresult" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="query.queryresult.QueryResult">
+<em class="property">class </em><code class="descclassname">query.queryresult.</code><code class="descname">QueryResult</code><span class="sig-paren">(</span><em>min_weight=0.5</em>, <em>alias=None</em>, <em>relation_type='all'</em>, <em>lesser_edges=True</em><span class="sig-paren">)</span><a class="headerlink" href="#query.queryresult.QueryResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Wrapper over the processed text files to produce a graph in JSON
+format that can be displayed to the user.</p>
+<dl class="method">
+<dt id="query.queryresult.QueryResult.filter_relevant">
+<code class="descname">filter_relevant</code><span class="sig-paren">(</span><em>relevant: query.fuzzyset.FuzzySet</em><span class="sig-paren">)</span><a class="headerlink" href="#query.queryresult.QueryResult.filter_relevant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filters the relation tuples by the min_weight specified.
+Relation tuples that are below the specified value will be excluded
+from the result.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>relevant</strong> – A FuzzySet containing the (token, weight) tuples for the query terms.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A FuzzySet with the values that were below the min_weight threshhold.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="query.queryresult.QueryResult.generate_statement_graph">
+<code class="descname">generate_statement_graph</code><span class="sig-paren">(</span><em>max_nodes</em>, <em>max_edges</em><span class="sig-paren">)</span><a class="headerlink" href="#query.queryresult.QueryResult.generate_statement_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates the graph object for the query.
+Only the top most relevant nodes and edges are in the graph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>max_nodes</strong> – The maximum number of nodes in the graph.</li>
+<li><strong>max_edges</strong> – The maximum number of edges in the graph.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A Graph object representing the result graph.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="query.queryresult.QueryResult.generate_statement_nodes">
+<code class="descname">generate_statement_nodes</code><span class="sig-paren">(</span><em>max_nodes</em><span class="sig-paren">)</span><a class="headerlink" href="#query.queryresult.QueryResult.generate_statement_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates the nodes that exist in the query-graph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>max_nodes</strong> – The maximum number of nodes.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list of nodes that make up the graph.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="query.queryresult.QueryResult.get_top_provenances">
+<code class="descname">get_top_provenances</code><span class="sig-paren">(</span><em>top=10</em><span class="sig-paren">)</span><a class="headerlink" href="#query.queryresult.QueryResult.get_top_provenances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the highest scoring provenances, sorted descendingly.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>top</strong> – The number of provenances to return.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list of the highest scoring provenances, sorted descendingly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="query.queryresult.QueryResult.load_parameters">
+<em class="property">static </em><code class="descname">load_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#query.queryresult.QueryResult.load_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary of visualization parameters used for the graph.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="query.queryresult.QueryResult.load_relation2prov">
+<em class="property">static </em><code class="descname">load_relation2prov</code><span class="sig-paren">(</span><em>path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#query.queryresult.QueryResult.load_relation2prov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the mapping of relation tuples to the provenances.
+The format is: (token, related_to, token2): [ (provenance, weight), …]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> – Optional. Default: paths.RELATION_PROVENANCES_PATH. The path to the file of
+tuple -&gt; provennces mapping, as created in index_step.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A dictionary of relation tripe -&gt; provenance mappings.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="query.queryresult.QueryResult.load_relation_sets">
+<em class="property">static </em><code class="descname">load_relation_sets</code><span class="sig-paren">(</span><em>path='E:\\workspace\\data\\expressionsexperimental'</em><span class="sig-paren">)</span><a class="headerlink" href="#query.queryresult.QueryResult.load_relation_sets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the processed relationsets from index_step.
+Returns a dictionary mapping tokens to a list of tuples in the format:</p>
+<blockquote>
+<div>token: [ (token2, weight), … ]</div></blockquote>
+<p>This dictionary can be used to access the tokens that are related to
+another token by accessing the dictionary by key.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> – Optional. Default: paths.RELATION_WEIGHT_PATH. The path where the shortform of relation mappings
+is stored.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="query.queryresult.QueryResult.load_token2related">
+<em class="property">static </em><code class="descname">load_token2related</code><span class="sig-paren">(</span><em>path='E:\\workspace\\data\\relations\\relations.tsv.gz'</em>, <em>relation_type='all'</em><span class="sig-paren">)</span><a class="headerlink" href="#query.queryresult.QueryResult.load_token2related" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the mapping of tokens to the related tokens.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> – Optional. Default: os.path.join(paths.RELATIONS_PATH, “relations.tsv.gz”). The path to where the
+mapping of triples to provenances is stored.</li>
+<li><strong>relation_type</strong> – Optional. Default: “all”. The type of relation to be considered.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A dictionary containing a mapping of SPO-triples to (provenance, score) tuples.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="query.queryresult.QueryResult.populate_dictionaries">
+<code class="descname">populate_dictionaries</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#query.queryresult.QueryResult.populate_dictionaries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepares the ranking of tokens / relations for use with the graph.</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Get all tokens possibly relevant to the query</li>
+<li>Get all triples related to the token in some way</li>
+<li>Filter out those that don’t have relevance to the query or that token</li>
+<li>Get the degree of membership of the token &lt;-&gt; the query</li>
+<li>Multiply the membership with the weight from the triple</li>
+<li>Add that value to a dict for the related token and the matching queryterm (used to calculate nodes)</li>
+<li>Get the provenance, weight tuple for the relation triple</li>
+<li>Weight the provenance by the prov weight * relation weight * membership</li>
+</ol>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="query.queryresult.QueryResult.prepare_for_query">
+<code class="descname">prepare_for_query</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#query.queryresult.QueryResult.prepare_for_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns FuzzySet containing tokens relevant to the query.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-query.querystep">
+<span id="query-querystep-module"></span><h2>query.querystep module<a class="headerlink" href="#module-query.querystep" title="Permalink to this headline">¶</a></h2>
+<p>dragn queries.</p>
+<dl class="function">
+<dt id="query.querystep.query">
+<code class="descclassname">query.querystep.</code><code class="descname">query</code><span class="sig-paren">(</span><em>user_query=None</em>, <em>alias=None</em>, <em>lesser_edges=True</em><span class="sig-paren">)</span><a class="headerlink" href="#query.querystep.query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a query over texts as specified by the Alias.
+:param user_query: The query of the user.
+:param alias: The Alias of the texts.
+:param lesser_edges: Whether relations between nodes that are not in the query are to be considered.
+:return: A QueryResult object with the query performed.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="query.querystep.with_graphvizoutput">
+<code class="descclassname">query.querystep.</code><code class="descname">with_graphvizoutput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#query.querystep.with_graphvizoutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs query_step with GraphvizOutput, producing a call graph of all functions.
+:return:</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-query">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-query" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">dragn</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="extract.html">extract package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="allsteps.html">allsteps package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataapp.html">dataapp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dragn.html">dragn package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extract.html">extract package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="graph.html">graph package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_step.html">index package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="knowledge_base.html">knowledge_base package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">query package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-query.fuzzyset">query.fuzzyset module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-query.queryresult">query.queryresult module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-query.querystep">query.querystep module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-query">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="queryapp.html">queryapp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text.html">text package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uploadapp.html">uploadapp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="util.html">util package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="knowledge_base.html" title="previous chapter">knowledge_base package</a></li>
+      <li>Next: <a href="queryapp.html" title="next chapter">queryapp package</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Thomas Huber.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/query.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

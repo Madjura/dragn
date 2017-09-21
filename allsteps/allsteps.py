@@ -14,6 +14,7 @@ from query import querystep
 def all_steps(texts, query=None, language="english", alias=None):
     """
     Performs all steps in the pipeline, up to and including query_step.
+
     :param texts: A list of texts to be processed.
     :param query: Optional. The query to be performed, if query_step execution is intended.
     :param language: Optional. Default: English. The language of the texts.
@@ -40,10 +41,7 @@ def all_steps(texts, query=None, language="english", alias=None):
 
 
 def with_graphvizoutput():
-    """
-    Runs all_steps with GraphvizOutput, producing a call graph of all functions.
-    :return:
-    """
+    """Runs all_steps with GraphvizOutput, producing a call graph of all functions."""
     graphviz = GraphvizOutput()
     graphviz.output_file = "allstep.png"
     with PyCallGraph(output=graphviz):
@@ -56,17 +54,13 @@ class FakeAlias(object):
     Used for running dragn without starting the Django server.
     Required because the Alias is stored in the database and not accessible properly without the server. This is used as
     a replacement and functions exactly as the normal Alias would, except it does not come from the database, neither
-    is it stored there.
-    Mostly used for debugging.
+    is it stored there
     """
     def __init__(self, identifier):
         self.identifier = identifier
 
     def save(self):
-        """
-        Blank method to bypass the Django database regarding the Alias System.
-        :return:
-        """
+        """Blank method to bypass the Django database regarding the Alias System."""
         pass
 
 
