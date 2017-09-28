@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 This class is based on the Analyser class of the original system.
 The following functions were used from the original system:
     - similarTo (renamed to similar_to)
+Comments were added.
 """
 
 import math
