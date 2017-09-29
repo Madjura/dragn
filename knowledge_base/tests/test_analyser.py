@@ -3,7 +3,6 @@ import unittest
 
 import math
 
-from extract.text_extract import split_paragraphs, pos_tag, extract_from_sentences
 from knowledge_base.analyser import Analyser
 from knowledge_base.tensor import Tensor
 
@@ -24,6 +23,7 @@ class TextAnalyser(unittest.TestCase):
         analyser = Analyser(matrix=matrix, trace=True)
         similar = analyser.similar_to("tree", top=10)
         for (similar_token, similarity) in similar:
+            # apple example taken directly from thesis
             if similar_token == "apple":
                 assert math.isclose(similarity, 0.3/(1.08*1.03), abs_tol=0.001)
             if similar_token == "leaf":

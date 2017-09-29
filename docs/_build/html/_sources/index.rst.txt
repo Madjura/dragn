@@ -10,6 +10,7 @@ Welcome to dragn's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   installation
    extract
    allsteps
    dataapp

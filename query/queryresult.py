@@ -64,11 +64,15 @@ class QueryResult(object):
         # minimum weight that relations must have to be considered
         self.min_weight = min_weight
         self.visualization_parameters = self.load_parameters()
-        print("Loading relation to provenance mapping")
-        self.relation2prov = self.load_relation2prov(path=paths.RELATION_PROVENANCES_PATH + alias + "/r2p.json")
-        print("Loading related")
-        self.relations = self.load_token2related(path=os.path.join(paths.RELATIONS_PATH + alias, "relations.tsv.gz"),
-                                                 relation_type=relation_type)
+        if alias:
+            print("Loading relation to provenance mapping")
+            self.relation2prov = self.load_relation2prov(path=paths.RELATION_PROVENANCES_PATH + alias + "/r2p.json")
+            print("Loading related")
+            self.relations = self.load_token2related(
+                path=os.path.join(paths.RELATIONS_PATH + alias, "relations.tsv.gz"), relation_type=relation_type)
+        else:
+            self.relation2prov = None
+            self.relations = None
         self.alias = alias
         self.provenance_dict = None
 
@@ -264,10 +268,10 @@ class QueryResult(object):
         token_list = list(self.relation_set.items())
         edge_count = 0
         token_list.sort(key=lambda x: x[1], reverse=True)
-        for relation_tuple, _ in token_list:
+        for relation_triple, _ in token_list:
             if edge_count >= max_edges:
                 break
-            subject, predicate, objecT = relation_tuple
+            subject, predicate, objecT = relation_triple
             if subject in nodes and objecT in nodes:
                 if predicate in self.visualization_parameters["edge color"]:
                     edge_color = self.visualization_parameters["edge color"][predicate]
