@@ -20,7 +20,7 @@ from queryapp.views import query, process, get_provenance
 from uploadapp.views import UploadView
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
+    url(r'^admin/', admin.site.urls, name="admin"),
     url(r'^query/$', query, name="query"),
     url(r'^upload/$', UploadView.as_view(), name="upload"),
     url(r'^process/$', process, name="process"),

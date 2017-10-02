@@ -4,31 +4,37 @@
     {% load static %}
     <meta charset="utf-8">
     <title>{% block title %}Budget{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'dragn/css/navigation.css' %}"/>
 </head>
 
 <body>
 <div id="nav">
-    <a class="hover" href="{% url 'index' %}">Main</a>
-    {% if request.user.is_superuser %}
-        <a class="hover" href="{% url 'upload' %}">Upload texts</a>
-        <a class="hover" href="{% url 'process' %}">Process texts</a>
-    {% endif %}
+    <div id="nav-links">
+        <a class="menulink" href="{% url 'index' %}">Main</a>
+        {% if request.user.is_superuser %}
+            <a class="menulink" href="{% url 'upload' %}">Upload texts</a>
+            <a class="menulink" href="{% url 'process' %}">Process texts</a>
+        {% else %}
+            <a class="menulink" href="{% url 'admin:index' %}">Login</a>
+        {% endif %}
 
-    {% if queryform %}
-        <div id="form">
-            <form action="{% url 'query' %}" method="post" id="query-form">
-                {% csrf_token %}
+        {% if queryform %}
+            <div id="form-div">
+                <form action="{% url 'query' %}" method="post" id="query-form">
+                    {% csrf_token %}
 
-                {% for field in queryform %}
-                    <label for="{{ field.auto_id }}">{{ field.label }}</label> {{ field }}
-                {% endfor %}
-                <input type="submit" class="ajax" value="Search" name="search">
-            </form>
-        </div>
-    {% endif %}
-
-    <span id="sample-scroll">Scrolling for: Currently nothing</span> <button id="sample-next">Next text</button> <button id="sample-previous">Previous text</button><br>
-    <button id="to-top">Scroll back to top</button>
+                    {% for field in queryform %}
+                        <label for="{{ field.auto_id }}">{{ field.label }}</label> {{ field }}
+                    {% endfor %}
+                    <input type="submit" class="ajax" value="Search" name="search">
+                </form>
+            </div>
+        {% endif %}
+    </div>
+    <div id="nav-scroll">
+        <span id="sample-scroll">Scrolling for: Currently nothing</span> <button id="sample-next">Next text</button> <button id="sample-previous">Previous text</button><br>
+        <button id="to-top">Scroll back to top</button>
+    </div>
 </div>
 
 <div id="content">
