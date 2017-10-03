@@ -853,7 +853,7 @@
                     table.tBodies[0].innerHTML = "";
                 }
             };
-        };
+        },
     });
 
     // extend plugin scope
