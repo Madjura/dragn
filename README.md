@@ -17,5 +17,7 @@ Only superusers have permission to upload and process new texts.
 
 
 ## Documentation
-A documentation is included in the repository:
-`docs/_build/html/index.html`
+A documentation is included in the repository:<br/>
+`docs/_build/html/index.html`<br/>
+Or hosted on Github:<br/>
+[Documentation](https://madjura.github.io/dragn/)
