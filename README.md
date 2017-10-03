@@ -9,7 +9,7 @@ Lastly, the results of the query are displayed to the user, whereas in the origi
 ## Installation
 In the `util` package, set the paths in `paths.py`. Because dragn uses Django, it is suggested to follow the Django deployment guides:<br/>
 [Deployment checklist](https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/)<br/>
-[Deploy with wsgi](https://docs.djangoproject.com/en/1.11/howto/deployment/wsgi/)
+[Deploy with wsgi](https://docs.djangoproject.com/en/1.11/howto/deployment/wsgi/)<br/>
 After starting the server that dragn is running on, create a new superuser:
 `python manage.py createsuperuser`<br/>
 Use that user to login on the main page of dragn when opening it in the browser.<br/>
