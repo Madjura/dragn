@@ -1,0 +1,237 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>index package &#8212; dragn  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="knowledge_base package" href="knowledge_base.html" />
+    <link rel="prev" title="graph package" href="graph.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="index-package">
+<h1>index package<a class="headerlink" href="#index-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-index.helpers">
+<span id="index-helpers-module"></span><h2>index.helpers module<a class="headerlink" href="#module-index.helpers" title="Permalink to this headline">¶</a></h2>
+<p>Helper methods for index_step.</p>
+<dl class="function">
+<dt id="index.helpers.add_related_to">
+<code class="descclassname">index.helpers.</code><code class="descname">add_related_to</code><span class="sig-paren">(</span><em>relations</em>, <em>relation2prov</em><span class="sig-paren">)</span><a class="headerlink" href="#index.helpers.add_related_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates “related to” relations.
+:param relations: Relations that were already found.
+:param relation2prov: The dictionary mapping relations to the provenance.
+:return: A dictionary containing the “related to” relations.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="index.helpers.generate_relation_provenance_weights">
+<code class="descclassname">index.helpers.</code><code class="descname">generate_relation_provenance_weights</code><span class="sig-paren">(</span><em>sources</em>, <em>relations</em><span class="sig-paren">)</span><a class="headerlink" href="#index.helpers.generate_relation_provenance_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates the mapping of predicate tuples to provenance with their score therein.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="index.helpers.index_to_db">
+<code class="descclassname">index.helpers.</code><code class="descname">index_to_db</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#index.helpers.index_to_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the inverted index to the database.
+:param index: The index.
+:return:</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-index.index_step">
+<span id="index-index-step-module"></span><h2>index.index_step module<a class="headerlink" href="#module-index.index_step" title="Permalink to this headline">¶</a></h2>
+<p>index_step of the dragn pipeline. Generates and writes files containing the results of the processing.</p>
+<dl class="function">
+<dt id="index.index_step.generate_relation_values">
+<code class="descclassname">index.index_step.</code><code class="descname">generate_relation_values</code><span class="sig-paren">(</span><em>relations</em>, <em>corpus</em>, <em>alias</em><span class="sig-paren">)</span><a class="headerlink" href="#index.index_step.generate_relation_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates the file containing the mapping of SPO-triple to (provenance, score).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>relations</strong> – The existing relations.</li>
+<li><strong>corpus</strong> – The corpus of the memstore created in knowledge_base_compute.</li>
+<li><strong>alias</strong> – The Alias of the texts that were processed.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="index.index_step.index_step">
+<code class="descclassname">index.index_step.</code><code class="descname">index_step</code><span class="sig-paren">(</span><em>alias</em><span class="sig-paren">)</span><a class="headerlink" href="#index.index_step.index_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs the index_step step of the dragn pipeline.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>alias</strong> – The Alias of the texts that were processed.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="index.index_step.make_relation_list">
+<code class="descclassname">index.index_step.</code><code class="descname">make_relation_list</code><span class="sig-paren">(</span><em>relations</em>, <em>alias</em><span class="sig-paren">)</span><a class="headerlink" href="#index.index_step.make_relation_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a mapping of token: set of relations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>relations</strong> – The relations calculated in knowledge_base_compute.</li>
+<li><strong>alias</strong> – The Alias of the texts that were processed.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A dictionary mapping tokens to their relation partners and scores.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="index.index_step.make_relation_weights">
+<code class="descclassname">index.index_step.</code><code class="descname">make_relation_weights</code><span class="sig-paren">(</span><em>relation_dictionary</em>, <em>alias</em><span class="sig-paren">)</span><a class="headerlink" href="#index.index_step.make_relation_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the shortform of relations between tokens to a file. The format is:
+token       token2score</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>relation_dictionary</strong> – A dictionary mapping a token to its relations.</li>
+<li><strong>alias</strong> – The Alias of the texts that were processed.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-index">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-index" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">dragn</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extract.html">extract package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="allsteps.html">allsteps package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataapp.html">dataapp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dragn.html">dragn package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extract.html">extract package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="graph.html">graph package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">index package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-index.helpers">index.helpers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-index.index_step">index.index_step module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-index">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="knowledge_base.html">knowledge_base package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="query.html">query package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="queryapp.html">queryapp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text.html">text package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uploadapp.html">uploadapp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="util.html">util package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="graph.html" title="previous chapter">graph package</a></li>
+      <li>Next: <a href="knowledge_base.html" title="next chapter">knowledge_base package</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Thomas Huber.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/index_step.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

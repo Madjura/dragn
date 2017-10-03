@@ -1,0 +1,245 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>graph package &#8212; dragn  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="index package" href="index_step.html" />
+    <link rel="prev" title="dragn package" href="dragn.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="graph-package">
+<h1>graph package<a class="headerlink" href="#graph-package" title="Permalink to this headline">¶</a></h1>
+<p><em>hello world</em></p>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-graph.edge">
+<span id="graph-edge-module"></span><h2>graph.edge module<a class="headerlink" href="#module-graph.edge" title="Permalink to this headline">¶</a></h2>
+<p>Edges/Vertices in the dragn graph system.</p>
+<dl class="class">
+<dt id="graph.edge.Edge">
+<em class="property">class </em><code class="descclassname">graph.edge.</code><code class="descname">Edge</code><span class="sig-paren">(</span><em>*</em>, <em>start=None</em>, <em>end=None</em>, <em>val=0</em>, <em>color=None</em><span class="sig-paren">)</span><a class="headerlink" href="#graph.edge.Edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Edges of a graph.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-graph.exceptions">
+<span id="graph-exceptions-module"></span><h2>graph.exceptions module<a class="headerlink" href="#module-graph.exceptions" title="Permalink to this headline">¶</a></h2>
+<p>Exceptions in the dragn graph system.</p>
+<dl class="exception">
+<dt id="graph.exceptions.DuplicateEdgeError">
+<em class="property">exception </em><code class="descclassname">graph.exceptions.</code><code class="descname">DuplicateEdgeError</code><a class="headerlink" href="#graph.exceptions.DuplicateEdgeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+<p>Exception used to indicate the same edge is being added twice to a graph.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="graph.exceptions.MissingSourceEndError">
+<em class="property">exception </em><code class="descclassname">graph.exceptions.</code><code class="descname">MissingSourceEndError</code><a class="headerlink" href="#graph.exceptions.MissingSourceEndError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+<p>Exception used to indicate an edge is missing either the target or source.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-graph.graph">
+<span id="graph-graph-module"></span><h2>graph.graph module<a class="headerlink" href="#module-graph.graph" title="Permalink to this headline">¶</a></h2>
+<p>Graphs in the dragn graph system.</p>
+<dl class="class">
+<dt id="graph.graph.Graph">
+<em class="property">class </em><code class="descclassname">graph.graph.</code><code class="descname">Graph</code><span class="sig-paren">(</span><em>*</em>, <em>nodes=None</em>, <em>clean=True</em><span class="sig-paren">)</span><a class="headerlink" href="#graph.graph.Graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Simple graph with nodes and edges.</p>
+<dl class="method">
+<dt id="graph.graph.Graph.to_json">
+<code class="descname">to_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#graph.graph.Graph.to_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the graph into RFC4627 compliant JSON. 
+The resulting JSON string is intended to be used with 
+Cytoscape.js 3.0.0 (<a class="reference external" href="http://js.cytoscape.org/">http://js.cytoscape.org/</a>) and can be loaded into
+it to display the graph.
+:return An RFC4627 compliant JSON string for use with Cytoscape.js.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="graph-node-module">
+<h2>graph.node module<a class="headerlink" href="#graph-node-module" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-graph.node"></span><p>Nodes in the dragn graph system.</p>
+<dl class="class">
+<dt id="graph.node.CytoNode">
+<em class="property">class </em><code class="descclassname">graph.node.</code><code class="descname">CytoNode</code><a class="headerlink" href="#graph.node.CytoNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#graph.node.Node" title="graph.node.Node"><code class="xref py py-class docutils literal"><span class="pre">graph.node.Node</span></code></a></p>
+<p>Special node that checks for duplicate edges when adding an edge.
+Required for use with Cytoscape.js.
+This is required because otherwise the “related to” and “close to” edges
+overlap.</p>
+<dl class="method">
+<dt id="graph.node.CytoNode.add_edge_object">
+<code class="descname">add_edge_object</code><span class="sig-paren">(</span><em>edge: graph.edge.Edge</em><span class="sig-paren">)</span><a class="headerlink" href="#graph.node.CytoNode.add_edge_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an edge to the node.
+This function checks whether a duplicate edge already exists. This
+can happen because a node can be “close to” and “related to” another
+node at the same time. In that case, there same edge exists twice.
+To handle this in Cytoscape.js, the duplicate edges are dyed magenta
+instead of red (related to) or blue (close to).
+:param edge: The edge that is being added.
+:return:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="graph.node.Node">
+<em class="property">class </em><code class="descclassname">graph.node.</code><code class="descname">Node</code><a class="headerlink" href="#graph.node.Node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Node of a graph.</p>
+<dl class="method">
+<dt id="graph.node.Node.add_edge">
+<code class="descname">add_edge</code><span class="sig-paren">(</span><em>target</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#graph.node.Node.add_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an edge to this node.
+:param target: The target of the edge.
+:param value: The weight of this edge.
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="graph.node.Node.add_edge_object">
+<code class="descname">add_edge_object</code><span class="sig-paren">(</span><em>edge: graph.edge.Edge</em><span class="sig-paren">)</span><a class="headerlink" href="#graph.node.Node.add_edge_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an edge to this node.
+:param edge: The edge.
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="graph.node.Node.get_edge">
+<code class="descname">get_edge</code><span class="sig-paren">(</span><em>*</em>, <em>end: int = None</em><span class="sig-paren">)</span><a class="headerlink" href="#graph.node.Node.get_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the edge from this node to the target node.
+:param end: The end node.
+:return: The edge from this node to the target node, or None if no such edge exists.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-graph">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-graph" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">dragn</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extract.html">extract package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="allsteps.html">allsteps package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataapp.html">dataapp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dragn.html">dragn package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extract.html">extract package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">graph package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-graph.edge">graph.edge module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-graph.exceptions">graph.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-graph.graph">graph.graph module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#graph-node-module">graph.node module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-graph">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index_step.html">index package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="knowledge_base.html">knowledge_base package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="query.html">query package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="queryapp.html">queryapp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text.html">text package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uploadapp.html">uploadapp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="util.html">util package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="dragn.html" title="previous chapter">dragn package</a></li>
+      <li>Next: <a href="index_step.html" title="next chapter">index package</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Thomas Huber.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/graph.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
