@@ -1,4 +1,5 @@
 __copyright__ = """
+Copyright (C) 2017 Thomas Huber <huber150@stud.uni-passau.de, madjura@gmail.com>
 Copyright (C) 2012 Vit Novacek (vit.novacek@deri.org), Digital Enterprise
 Research Institute (DERI), National University of Ireland Galway (NUIG)
 All rights reserved.
@@ -16,12 +17,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-This class is based on the Analyser class of the original system.
-The following functions were used from the original system:
-    - similarTo (renamed to similar_to)
-Comments were added.
+// Modifications made to the original code by Vit Novacek
+----------------
+2017, Thomas Huber
+* March: reworked to use string representation for everything instead of int<->string mapping for tokens
+* April: reworked to use NeoMemstore instead of Skimmr memstore
+* April: removed __del__, getMostSpecificTerms functions
+* April: similarTo renamed to similar_to
+* May: removed code for perspectives, only one is used
+* comment and variable naming cleanup
 """
-
 import math
 
 

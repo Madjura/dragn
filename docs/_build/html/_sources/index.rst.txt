@@ -11,6 +11,7 @@ Welcome to dragn's documentation!
    :caption: Contents:
 
    installation
+   license
    extract
    allsteps
    dataapp

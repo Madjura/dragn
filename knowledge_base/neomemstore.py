@@ -1,4 +1,5 @@
 __copyright__ = """
+Copyright (C) 2017 Thomas Huber <huber150@stud.uni-passau.de, madjura@gmail.com>
 Copyright (C) 2012 Vit Novacek (vit.novacek@deri.org), Digital Enterprise
 Research Institute (DERI), National University of Ireland Galway (NUIG)
 All rights reserved.
@@ -15,14 +16,19 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+    
+// Modifications made to the original code by Vit Novacek
 This class is based on the MemStore class of the original system.
-The following functions were used from the original system:
-    - computeCorpus (renamed to compute_corpus)
-    - normaliseCorpus (renamed to normalise_corpus)
-    - sorted
-
-    Those functions were used as a base to develop the new ones in this file.
+----------------
+2017, Thomas Huber
+* March: renamed Memstore to NeoMemstore to show it is different from the original
+* April: reworked export and importMemstore to be more readable and efficient
+* April: renamed computeCorpus, normaliseCorpus and getSparseDict to compute_corpus, normalise_corpus, get_sparse_dict
+* April: changed sorted function to filter out when below the average
+* May: exception handling when no min weight can be found in normalise_corpus
+* May: removed perspectives and perspective types, computePerspective
+* October: removed perspective types list, unused
+* comment and variable naming cleanup
 """
 import gzip
 import operator
@@ -32,8 +38,6 @@ from math import log
 
 from knowledge_base.tensor import Tensor
 from util import paths
-
-PERSP_TYPES = ['LAxLIRA']
 
 
 class NeoMemStore(object):
@@ -231,9 +235,7 @@ class NeoMemStore(object):
         :return: Lexicon, but sorted and with only the specified number of items.
         """
         # format is [(expression, frequency), (expression2, frequency2), ...]
-        sorted_by_value = [x for x in sorted(self.lexicon.items(),
-                                             key=operator.itemgetter(1),
-                                             reverse=True)]
+        sorted_by_value = [x for x in sorted(self.lexicon.items(), key=operator.itemgetter(1), reverse=True)]
         if limit > 0:
             sorted_by_value = sorted_by_value[:limit]  # from 0 to limit
         elif limit <= 0 and ignored:

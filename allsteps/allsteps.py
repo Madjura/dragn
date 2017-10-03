@@ -1,6 +1,23 @@
 #!/usr/bin/env python3
-"""
-Allows the execution of all steps in the dragn pipeline.
+"""Allows the execution of all steps in the dragn pipeline."""
+__copyright__ = """
+Copyright (C) 2017 Thomas Huber <huber150@stud.uni-passau.de, madjura@gmail.com>
+Copyright (C) 2012 Vit Novacek (vit.novacek@deri.org), Digital Enterprise
+Research Institute (DERI), National University of Ireland Galway (NUIG)
+All rights reserved.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from extract.extract_step import extract_step, make_folders
 from index.index_step import index_step
@@ -40,12 +57,19 @@ def all_steps(texts, query=None, language="english", alias=None):
         querystep.query(query)
 
 
-def with_graphvizoutput():
-    """Runs all_steps with GraphvizOutput, producing a call graph of all functions."""
+def with_graphvizoutput(texts, query=None, language="english", alias=None):
+    """
+    Runs all_steps with GraphvizOutput, producing a call graph of all functions
+
+    :param texts: A list of texts to be processed.
+    :param query: Optional. The query to be performed, if query_step execution is intended.
+    :param language: Optional. Default: English. The language of the texts.
+    :param alias: The Alias used for the text(s).
+    """
     graphviz = GraphvizOutput()
     graphviz.output_file = "allstep.png"
     with PyCallGraph(output=graphviz):
-        all_steps(["cult", "fish", "water", "fear"])
+        all_steps(texts, query, language, alias)
 
 
 # noinspection PyMethodMayBeStatic
@@ -54,7 +78,7 @@ class FakeAlias(object):
     Used for running dragn without starting the Django server.
     Required because the Alias is stored in the database and not accessible properly without the server. This is used as
     a replacement and functions exactly as the normal Alias would, except it does not come from the database, neither
-    is it stored there
+    is it stored there.
     """
     def __init__(self, identifier):
         self.identifier = identifier

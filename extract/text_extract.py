@@ -1,5 +1,6 @@
 """Functions that help with the extraction of paragraphs and Noun Phrases from texts."""
 __copyright__ = """
+Copyright (C) 2017 Thomas Huber <huber150@stud.uni-passau.de, madjura@gmail.com>
 Copyright (C) 2012 Vit Novacek (vit.novacek@deri.org), Digital Enterprise
 Research Institute (DERI), National University of Ireland Galway (NUIG)
 All rights reserved.
@@ -17,12 +18,19 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-The following functions were used from the original system:
-    - get_cooc (renamed to get_cooccurence)
-    - text2cooc (renamed to extract_from_sentences)
-    - gen_src (renamed to calculate_weighted_distance)
-
-    Those functions were used as a base to develop the new ones in this file.
+// Modifications made to the original code by Vit Novacek
+----------------
+2017, Thomas Huber
+- get_cooc: 
+    * renamed to get_cooccurence
+    * modified check of whether or not a string is purely non-alphanumeric to be more readable and effective
+- text2cooc: 
+    * renamed to extract_from_sentences
+    * added noun phrase grammar to function instead of being global
+- gen_src:
+    * renamed to calculate_weighted_distance
+    * updated to use Closeness objects to represent weighted distance
+* comment and variable naming cleanup
 """
 import math
 from _collections import OrderedDict, defaultdict
@@ -113,10 +121,8 @@ def extract_from_sentences(sentences, add_verbs=True, language="english"):
         # trying to parse the sentence_id into a top-level chunk tree
         tree = parser_cmp.parse(pos_dictionary[sentence_id])
         # getting the top-level tree triples and decomposing the NPs
-        cmp_triples, simple_trees = get_cooccurence([tree], ignore_stopwords=False,
-                                                    language=language)
-        smp_triples, _ = get_cooccurence(simple_trees, ignore_stopwords=True,
-                                         language=language)
+        cmp_triples, simple_trees = get_cooccurence([tree], ignore_stopwords=False, language=language)
+        smp_triples, _ = get_cooccurence(simple_trees, ignore_stopwords=True, language=language)
         # updating the inverse occurrence index with NPs 
         for subject, _, objecT in cmp_triples + smp_triples:
             if subject.lower() not in term2sentence_id:

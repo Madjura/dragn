@@ -1,6 +1,6 @@
-"""Exceptions in the dragn graph system."""
-__copyright__ = """
 Copyright (C) 2017 Thomas Huber <huber150@stud.uni-passau.de, madjura@gmail.com>
+Copyright (C) 2012 Vit Novacek (vit.novacek@deri.org), Digital Enterprise
+Research Institute (DERI), National University of Ireland Galway (NUIG)
 All rights reserved.
 
 This program is free software: you can redistribute it and/or modify
@@ -15,20 +15,3 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""
-
-
-class DuplicateEdgeError(Exception):
-    """
-    Exception used to indicate the same edge is being added twice to a graph.
-    """
-
-    pass
-
-
-class MissingSourceEndError(Exception):
-    """
-    Exception used to indicate an edge is missing either the target or source.
-    """
-
-    pass

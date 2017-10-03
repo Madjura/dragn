@@ -1,4 +1,5 @@
 __copyright__ = """
+Copyright (C) 2017 Thomas Huber <huber150@stud.uni-passau.de, madjura@gmail.com>
 Copyright (C) 2012 Vit Novacek (vit.novacek@deri.org), Digital Enterprise
 Research Institute (DERI), National University of Ireland Galway (NUIG)
 All rights reserved.
@@ -16,11 +17,14 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-This class is based on the MemStoreQueryResult class of the original system.
-The following functions were used from the original system:
-    - populate_dictionaries
-
-    Those functions were used as a base to develop the new ones in this file.
+// Modifications made to the code of the original system by Vit Novacek
+----------------
+2017, Thomas Huber
+* May: load_suid2stmt renamed to load_token2related
+* May: added support for dragn graph system
+* May: populate_dictionaries completely rebuilt
+* May: prepare_for_query completely rebuilt
+* May: filter_relevant completely rebuilt
 """
 import gzip
 import os
@@ -168,8 +172,7 @@ class QueryResult(object):
             is stored.
         """
         relations = defaultdict(lambda: list())
-        with gzip.open(
-                os.path.join(path, "relationsets.tsv.gz"), "rb") as f:
+        with gzip.open(os.path.join(path, "relationsets.tsv.gz"), "rb") as f:
             for line in f:
                 line_split = line.decode().split("\t")
                 token, token2, weight = line_split
