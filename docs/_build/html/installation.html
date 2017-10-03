@@ -48,6 +48,12 @@ Because <em>dragn</em> uses Django, it is suggested to follow the Django deploym
 <li><a class="reference external" href="https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/">Deployment checklist</a></li>
 <li><a class="reference external" href="https://docs.djangoproject.com/en/1.11/howto/deployment/wsgi/">Deploy with wsgi</a></li>
 </ul>
+<p>After starting the server that dragn is running on, create a new superuser:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">manage</span><span class="o">.</span><span class="n">py</span> <span class="n">createsuperuser</span>
+</pre></div>
+</div>
+<p>Use that user to login on the main page of dragn when opening it in the browser.
+Only superusers have permission to upload and process new texts.</p>
 </div>
 
 
