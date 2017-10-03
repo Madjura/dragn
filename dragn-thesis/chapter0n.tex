@@ -1,0 +1,21 @@
+\chapter{Conclusion}
+This project has showcased how the task of Distant Reading can be accomplished using a tool, by building upon an existing work in the area and improving the functionality to support domain experts working on tasks related to Distant Reading or text analysis in general. In this final chapter my contributions and findings will be summarised as well as possible future additions or improvements outlined.
+%%=========================================
+\section{Summary}
+The objective of this thesis was to highlight the usefulness of machine tools in a Distant Reading or text analysis context as well as to detail how such a task can be accomplished using modern technologies by building upon an existing system developed by Vit Novacek \cite{novavcek2014skimmr}. To do so, the system architecture as well as the required steps and the processes and algorithms performed in those steps were explained in detail. First, the texts are tokenised (see chapter \ref{sec:extract}), after which a modified PMI between the tokens is calculated as shown in chapter \ref{sec:kbcreate}. After that, the calculated values are used to find the Cosine Similarity between the tokens to have two relations that can be shown to the user, as detailed in chapter \ref{sec:kbcompute}. The data is then organised into files to use with the front end (chapter \ref{sec:indexstep}) and lastly the calculation of the user queries is outlined in chapter \ref{sec:querystep}.\\
+The usefulness of the system was emphasised by examining a use case, the King James version of the Bible, as seen in chapter \ref{usecase}. A simple query of 'jesus' was used as the initial query. The result of the query was then used as the basis for further queries related to the respective previous one, to get understanding of the relation between characters and to find text passages containing those characters. Specifically, in many of the paragraphs found for the query 'jesus' a character named 'Elias' was mentioned. \textbf{dragn} could then be used to find out more about the relation between Jesus and Elias as well as help find passages explaining who Elias was and what made him noteworthy. The Distant Reader functionality played a part in this, it allowed us to read paragraphs before and after a given paragraph found as a result of the query to get additional information without having to read entire chapters or the entire book. Thus, Distant Reading was made possible by using a tool, \textbf{dragn}.\\
+A short discussion and possible future work will be outlined in the final chapter.
+%%=========================================
+\section{Discussion and recommendations for further work}
+\label{sec:furtherwork}
+As shown as part of the thesis, \textbf{dragn} can be used to accomplish basic and more advanced Distant Reading tasks. Possible improvements and continuations of this work are as follows:
+\begin{itemize}
+\item extraction of all Named Entities and showing the relations between them in the result graph
+\item side-by-side comparison of the result of multiple queries over different Aliases (\ref{sec:alias})
+\item highlighting unusually highly or lowly correlated pairs in texts by comparing the same relations to values in previously processed texts
+\item different weighting of query terms
+\item generation of a summary of a text with the aids of the calculated FMI and Cosine Similarity values and Distributional Semantics techniques
+\item finding relations between Noun Phrases specifically, such as "apple IS A fruit"
+\end{itemize}
+The full power of this tool can best be judged by members of the humanities and literary science areas. It should be tremendously helpful when used as an aid for different projects. As discussed in chapter \ref{sec:indexstep}, the relations calculated by the tool are written to file and the reader is encouraged to experiment with the data independently of the front end.
+%%=========================================

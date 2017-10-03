@@ -1,0 +1,43 @@
+%%===================================
+\documentclass[12pt]{report}
+\usepackage{ramsstyle}
+\usepackage{csquotes}
+\usepackage{draftwatermark}
+\SetWatermarkText{DRAFT}
+\SetWatermarkScale{2}
+\hypersetup{citecolor=blue} % TODO: set to black for printing
+%%===================================
+\begin{document}
+
+\include{front} % This is the titlepage
+\setcounter{page}{0}
+\pagenumbering{roman}
+\include{abstract}
+\include{acknowledgment}
+\renewcommand{\contentsname}{Table of Contents}
+\tableofcontents
+\listoffigures
+\listoftables
+\renewcommand{\lstlistlistingname}{Table of Code Snippets}
+\lstlistoflistings
+\cleardoublepage
+\setcounter{page}{0}
+\pagenumbering{arabic}
+\include{chapter01}
+\include{chapter02}
+\include{chapter03}
+\include{chapter0n}
+
+% Include more chapters as required.
+%%=========================================
+\appendix
+\include{acronyms}
+\include{gitrepo}
+% Include more appendices as required.
+%%=========================================
+\bibliographystyle{alpha}
+\addcontentsline{toc}{chapter}{\bibname}
+\bibliography{refs}
+%%=============================================
+\include{affidavit}
+\end{document}

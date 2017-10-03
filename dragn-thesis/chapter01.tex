@@ -1,0 +1,54 @@
+%This is chapter 1
+%%=========================================
+%% Defining listings.
+\lstset{
+emph={def,for,each,in,if,elif,else,while,return,True,False,bool,do}, 
+emphstyle={\textbf}, 
+captionpos=b,
+literate=%
+  {Ö}{{\"O}}1
+  {Ä}{{\"A}}1
+  {Ü}{{\"U}}1
+  {ß}{{\ss}}1
+  {ü}{{\"u}}1
+  {ä}{{\"a}}1
+  {ö}{{\"o}}1
+}
+%%=========================================
+\chapter{Introduction}
+Digital texts have and are still becoming increasingly more common. Whereas in the past the majority of texts were physical, with the ongoing digitisation of literature but also the inclusion of a digital version for new works becoming standard there now exists a great wealth of corpora usable for machine processing, and the number will increase only further. This of course opens up new possibilities for the Computer Science and (Digital) Humanities research. However, dealing with a large number of texts by hand can be difficult bordering on the impossible. Even analysing a single book by hand takes up a significant amount of time. So one has to ask: \textit{How can one process the information contained in text collections large and small in a reasonable way?} Italian literary scholar Franco Moretti suggests an approach named "Distant Reading" in  \cite{moretti16}. As opposed to Close Reading, processing and extracting information from single texts in detail, the idea behind Distant Reading is to not handle each text individually, but a collection of texts as a whole. The content is aggregated and analysed not in detail, but rather more generally. The insight gained from Distant Reading is less detailed as opposed to Close Reading, however this allows the processing of multiple texts in the time it would take to read a single text closely. Distant Reading cannot replace the need to read texts to understand them fully. Instead, it lets the reader gain a superficial overview of a collection of texts or a subset thereof and use that understanding to preemptively filter out certain works that are not relevant to answering a certain (research) question.
+
+%%=========================================
+\section{Motivation}
+Distant Reading makes it possible to process and analyse large amounts of text or rather data. The technique allows one to gain insight into texts that would otherwise be very laborious to obtain. To further support the user, a visualisation of the results is desirable. In \cite{moretti13} (p. 214-218) the author describes his procedure to plot a network of interactions between the characters in \textit{Hamlet}.
+By having access to a network of connected characters or words in general in a text one can quickly gain understanding of the therein contained information and preemptively increase the understanding of the context by being able to see relations between words in the text.\\
+Finding relations between words or phrases in text however is complicated. One has to define how such a relation is built or formed and then extract them from, generally a large, corpus. The thesis builds upon the  work of Vit Novacek \cite{novavcek2014skimmr}, who finds relations by the Pointwise Mutual Information (PMI) and the Cosine Similarity between words. His system can be used to find links (from here on called \textit{relations}) between words in a text.\\
+My system builds upon his existing work to create a new system named \textbf{dragn} that allows users to more efficiently find relations in texts and to understand the nature of the relation better. The original system shows the relations but not the weight (how closely related the words are as a numeric value). Further it does not allow easy access to text passages relevant to the words that were queried for. The greatest limitation is the user interface, which does not let the user understand clearly and easily how or why a link between two words exists. To improve the quality of the output a new front end has been developed and the code of the original system been updated to be up to the state-of-the-art. My system keeps the information about corpora it has processed and lets the user select the corpus they want to work on.\\
+Distributional semantics techniques are used to process the text into formats that can be employed by the front end and the results displayed to the user. As this thesis builds upon an existing work, it is not a new approach. The main contribution of this thesis to the usage of distributional semantics in a Distant Reading context is the modernisation of the existing system and improving the usability of the tool, especially for users from a non-technical background, to support and improve research in the field of literary sciences.\\
+The basis of the system is the implementation of a pipeline of four steps, each with readable and usable output. Each step produces independent files that allow users from a technical background to work with the result of the individual steps.\\
+A modified PMI score sets the basis for the system. The PMI is a measure to describe how strongly correlated two events are, that is, to say whether they co-occur more often or less often than they would by chance. The PMI is calculated for each pair of tokens in all sentences of the corpus. High PMI scores demonstrate that the tokens appear more frequently together and thus a relation between them can be assumed. Generally speaking it measures the statistical (in)dependence of two events. For this thesis the PMI is used to measure the statistical independence of two text fragments (tokens): The higher the score, the higher the dependence and thus the more related they are. The lower the score, the lower the relation between the two; a score of zero indicates independence while a negative score indicates that two tokens co-occur less frequently than would be expected.\\
+The PMI is further used to calculate tokens that are related to another one without having to co-occur directly.\\
+As a simple example: \textit{apple} appears often near \textit{tree}, \textit{leaf} appears often near \textit{tree}. \textit{Apple} and \textit{tree} would have a high PMI and so would \textit{leaf} and \textit{tree}, therefore a relation between \textit{apple} and \textit{leaf} also exists, even though their PMI might be low.\\
+Finding such relations or calculating the PMI can be a monumental task for even just a single, albeit medium- to large-sized, text. Using \textbf{dragn}, the system developed for this thesis, makes that easy. Additionally the system allows the user to find links between tokens that would be unexpected thanks to the graphical interface.\\
+\textbf{dragn} supports tasks in the literary sciences and Humanities by helping find connections between words of not just single texts, but arbitrarily sized collections.
+
+%%=========================================
+\section{Objectives}
+The main objective of this Bachelor's project is to show how Distant Reading can be performed using a machine context and how this task can accomplished more effectively and efficiently when using a tool as opposed to doing so by hand. To achieve the objective, the existing back end of the \textit{skimmr} system developed by \cite {novavcek2014skimmr} was used as a foundation and improved upon. \textit{Skimmr} is a tool that accomplishes the aforementioned tasks. My contributions are a rebuilt system using modern technologies, an analysis and explanation of how the system works and the development of a new interface to increase usability of the system for the intended task and expand the suitability of the original system in regards to the context of Distant Reading.\\
+Ultimately, the system will provide the following functionality:
+\begin{itemize}
+\item Calculating the PMI of tokens in arbitrarily sized collections of texts.
+\item Calculating tokens related to other tokens, using Cosine Similarity.
+\item Easy querying of processed texts.
+\item Exploration of links in the graphical output of user queries.
+\item Context reading by having easy access to following and previous text passages found as a result of a query.
+\end{itemize}
+The system developed for this thesis is not intended to be a finalised, perfected version, but rather a solid foundation for further, more advanced research using \textbf{dragn}.\\
+An example use case scenario will be outlined as part of this thesis. The bible will be processed by the system, intuitive queries performed on the result and interesting links found by the system will be explored.
+
+%%=========================================
+\section{Approach}
+To accomplish the main objectives of this thesis, the original system has been rebuilt and the structure of the system will be outlined before providing proof-of-concept by examining a use case.
+%%=========================================
+\section{Structure of the Report}
+The rest of the report is structured as follows. Chapter 2 gives a generalised overview of the system's steps followed by detailed explanation in the sub chapters. The third chapter contains an example use case to demonstrate the capabilities of the system and how it can be used as a foundation for research in the Humanities and more specifically literary sciences. In the final chapter a summary of contributions and possible further works are highlighted.
