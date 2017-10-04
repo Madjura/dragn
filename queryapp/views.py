@@ -30,7 +30,7 @@ def query(request):
             # check if edges between non-query nodes are to be considered
             lesser_edges = queryform.cleaned_data["lesser_edges"]
             # perform the calculation of the query
-            result = querystep.query(queryform.cleaned_data["query"], alias="\\"+alias.identifier,
+            result = querystep.query(queryform.cleaned_data["query"], alias="/"+alias.identifier,
                                      lesser_edges=lesser_edges)
             # generate the result graph
             graph = result.generate_statement_graph(queryform.cleaned_data["max_nodes"],
