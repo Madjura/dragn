@@ -54,6 +54,28 @@ Because <em>dragn</em> uses Django, it is suggested to follow the Django deploym
 </div>
 <p>Use that user to login on the main page of dragn when opening it in the browser.
 Only superusers have permission to upload and process new texts.</p>
+<p>Then, create and initialize the database, see the Django docs if you want to use a legacy database: <br />
+<cite>python manage.py makemigrations</cite> <br />
+<cite>python manage.py migrate</cite> <br />
+If you get an error message when opening the page in your browser, run additionally: <br />
+<cite>python manage.py makemigrations queryapp</cite> <br />
+It is unknown why this sometimes causes problems and sometimes not. <br />
+Then create a new superuser: <br />
+<cite>python manage.py createsuperuser</cite> and follow the instructions. <br />
+Use that user to login on the main page of dragn when opening it in the browser. <br />
+Only superusers have permission to upload and process new texts. <br />
+After that, you need some <cite>nltk</cite> (<a class="reference external" href="http://www.nltk.org/">http://www.nltk.org/</a>) resources. To get them, run the following in a console (command prompt on Windows, terminal on Ubuntu for example): <br />
+<cite>$ python</cite> <br />
+<cite>&gt;&gt;&gt; import nltk</cite> <br />
+<cite>&gt;&gt;&gt; nltk.download()</cite> <br />
+Download the resources:
+* punkt
+* averaged perceptron
+* wordnet
+* stopwords</p>
+<p>Alternatively you can select <cite>all</cite> and download all the resources. <br />
+As the directory for the resources, choose one that your server running the system can find. Using Apache2 on Ubuntu 14.04 for example, that would be <cite>/var/www/nltk_data</cite>. If you are unsure, refer to the documentation of your server or try to run the system and check the error message for the directories it searched to find the resources, then move them there.</p>
+<p>The system works only with .txt files with UTF-8 encoding. As it is not possible to automatically and perfectly detect the encoding of a text file and convert it the user must take care of this on their end and ensure the correct encoding. Encodings other than UTF-8 might work but will most likely not.</p>
 </div>
 
 
