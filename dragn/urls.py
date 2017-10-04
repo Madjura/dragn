@@ -25,5 +25,6 @@ urlpatterns = [
     url(r'^upload/$', UploadView.as_view(), name="upload"),
     url(r'^process/$', process, name="process"),
     url(r'^provenance/$', get_provenance, name="get_provenance"),
-    url(r'$', query, name="index"),
+    url(r'^index/$', query, name="index"),
+    url(r'^$', query),
 ]

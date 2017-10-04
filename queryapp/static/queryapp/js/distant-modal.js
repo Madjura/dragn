@@ -70,9 +70,10 @@ function show_modal(target) {
         console.log("Error while getting paragraph.");
         return;
     }
+    var provUrl = $("#provenance-helper").html();
     $.ajax({
         type: "POST",
-        url: '/provenance/',
+        url: provUrl,
         data: {"provenance": provenance, "alias": $("#alias-name").html(), "matches": matches},
         datatype: "json",
         success: function(data) {

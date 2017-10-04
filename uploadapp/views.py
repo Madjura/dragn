@@ -1,5 +1,6 @@
 """Views for the uploadapp. Responsible for file uploads."""
 from django.core.files.storage import FileSystemStorage
+from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
 
 from uploadapp.forms import UploadForm
@@ -15,7 +16,7 @@ class UploadView(FormView):
     template_name = 'uploadapp/upload.html'
     # upload form
     form_class = UploadForm
-    success_url = '/upload'
+    success_url = reverse_lazy('upload')
 
     def form_valid(self, form):
         """
