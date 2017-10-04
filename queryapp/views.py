@@ -30,14 +30,14 @@ def query(request):
             # check if edges between non-query nodes are to be considered
             lesser_edges = queryform.cleaned_data["lesser_edges"]
             # perform the calculation of the query
-            result = querystep.query(queryform.cleaned_data["query"], alias="/"+alias.identifier,
+            result = querystep.query(queryform.cleaned_data["query"], alias=alias.identifier,
                                      lesser_edges=lesser_edges)
             # generate the result graph
             graph = result.generate_statement_graph(queryform.cleaned_data["max_nodes"],
                                                     queryform.cleaned_data["max_edges"])
             # get the content of the found paragraphs
             samples = load_and_prepare_provenance(result.get_top_provenances(
-                queryform.cleaned_data["top_text_samples"]), alias="/"+alias.identifier)
+                queryform.cleaned_data["top_text_samples"]), alias=alias.identifier)
             # get names/labels of the nodes in the result graph
             nodes = [x.name for x in graph.nodes]
             # generate stuff for display in the template
@@ -66,7 +66,7 @@ def load_and_prepare_provenance(tops, alias):
     """
     texts = []
     for name, score in tops:
-        with open(paths.PARAGRAPH_CONTENT_PATH + alias + "/{}".format(name), "r", encoding="utf8") as text:
+        with open(os.path.join(paths.PARAGRAPH_CONTENT_PATH, alias, name), "r", encoding="utf8") as text:
             texts.append((name, score, text.read()))
     return texts
 

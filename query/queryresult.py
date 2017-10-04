@@ -70,10 +70,11 @@ class QueryResult(object):
         self.visualization_parameters = self.load_parameters()
         if alias:
             print("Loading relation to provenance mapping")
-            self.relation2prov = self.load_relation2prov(path=paths.RELATION_PROVENANCES_PATH + alias + "/r2p.json")
+            self.relation2prov = self.load_relation2prov(path=os.path.join(paths.RELATION_PROVENANCES_PATH, alias,
+                                                                           "r2p.json"))
             print("Loading related")
             self.relations = self.load_token2related(
-                path=os.path.join(paths.RELATIONS_PATH + alias, "relations.tsv.gz"), relation_type=relation_type)
+                path=os.path.join(paths.RELATIONS_PATH, alias, "relations.tsv.gz"), relation_type=relation_type)
         else:
             self.relation2prov = None
             self.relations = None
