@@ -28,7 +28,7 @@ from pycallgraph.pycallgraph import PyCallGraph
 from query import querystep
 
 
-def all_steps(texts, query=None, language="english", alias=None):
+def all_steps(texts, query=None, language="english", alias=None, task=None):
     """
     Performs all steps in the pipeline, up to and including query_step.
 
@@ -39,20 +39,33 @@ def all_steps(texts, query=None, language="english", alias=None):
     :return:
     """
     alias_object = alias
-    alias = "/" + alias.identifier
+    if task:
+        alias = "/" + alias
+    else:
+        alias = "/" + alias.identifier
     print("MAKING FOLDERS")
     make_folders(alias=alias)
+    if task:
+        task.update_state(state="EXTRACT")
     print("FOLDERS DONE, EXTRACT STEP")
     extract_step(texts=texts, language=language, alias=alias)
+    if task:
+        task.update_state(state="KB CREATE")
     print("EXTRACT STEP DONE, KB CREATE")
-    knowledge_base_create(alias=alias)
+    if task:
+        knowledge_base_create(alias=alias)
     print("KB CREATE DONE, KB COMPUTE")
+    if task:
+        task.update_state(state="KB COMPUTE")
     knowledge_base_compute(alias=alias)
     print("KB COMPUTE DONE, INDEX")
+    if task:
+        task.update_state(state="INDEX")
     index_step(alias=alias)
     print("INDEX DONE")
-    alias_object.processed = True
-    alias_object.save()
+    if not task:
+        alias_object.processed = True
+        alias_object.save()
     if query:
         querystep.query(query)
 

@@ -1,14 +1,20 @@
+# -*- coding: utf-8 -*-
 """Views for the queryapp. Responsible for handling all user interactions regarding queries."""
 import os
 import re
 
+from celery.bin.control import inspect
+from django.contrib import messages
+from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.views.generic import FormView, ListView
 
 from allsteps.allsteps import all_steps
+from dragn import settings
 from query import querystep
-from queryapp.forms import QueryForm, ProcessForm
+from queryapp.forms import QueryForm, ProcessForm, TaskStatusForm
 from queryapp.models import Text, TextsAlias
 from util import paths
 
@@ -103,6 +109,8 @@ def process(request):
     :return: A rendered view showing the texts that were processed.
     """
     texts = []
+    context = {}
+    form = TaskStatusForm()
     for file in os.listdir(paths.TEXT_PATH):
         if os.path.isfile(os.path.join(paths.TEXT_PATH, file)):
             texts.append(file)
@@ -127,10 +135,18 @@ def process(request):
                 for text in text_objects:
                     alias.texts.add(text)
             # perform all steps in the pipeline
-            all_steps(processform.cleaned_data["texts"], language=processform.cleaned_data["language"],
-                      alias=alias)
+            if settings.USE_CELERY:
+                from .tasks import all_steps_task
+                alias = alias.identifier
+                task_id = all_steps_task.delay(processform.cleaned_data["texts"], processform.cleaned_data["language"],
+                                               alias)
+                context["task"] = task_id
+            else:
+                print("NO CELERY")
+                all_steps(processform.cleaned_data["texts"], language=processform.cleaned_data["language"], alias=alias)
     processform = ProcessForm(text_choices=texts)
-    context = {"processform": processform}
+    context["processform"] = processform
+    context["statusform"] = form
     return render(request, "queryapp/process.html", context)
 
 
@@ -177,6 +193,30 @@ def get_provenance(request):
     data["matches"] = ";".join(matches)
     return JsonResponse(data)
 
+
+def check_all_steps_task_status(request):
+    """
+    View to check the status of a task running on/with Celery.
+    :param request:
+    :return:
+    """
+    context = {}
+    if request.method == "POST":
+        print("METHOD POST")
+        form = TaskStatusForm(request.POST)
+        if form.is_valid():
+            task = form.cleaned_data["task"]
+            from celery.result import AsyncResult
+            from .tasks import all_steps_task
+            result = AsyncResult(id=task, app=all_steps_task)
+            print("STATE OF RESULT: ", result.state)
+            context["task"] = task
+            context["statusform"] = form
+            context["state"] = result.state
+        else:
+            print("NOT VALID")
+            print(form.errors)
+    return render(request, "queryapp/process.html", context)
 
 if __name__ == "__main__":
     markup_samples(["Harry visited Hagrid and Harry."], ["harry_and_ron", "ron"])

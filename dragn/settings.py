@@ -122,3 +122,6 @@ STATICFILES_DIRS = (
 )
 
 MEDIA_ROOT = "../data/texts"
+
+USE_CELERY = True
+CELERY_BROKER_URL = 'amqp://localhost'

@@ -37,9 +37,17 @@ Download the resources:
 * stopwords
 
 Alternatively you can select `all` and download all the resources. |br|
-As the directory for the resources, choose one that your server running the system can find. Using Apache2 on Ubuntu 14.04 for example, that would be `/var/www/nltk_data`. If you are unsure, refer to the documentation of your server or try to run the system and check the error message for the directories it searched to find the resources, then move them there.
+As the directory for the resources, choose one that your server running the system can find. Using Apache2 on Ubuntu 14.04 for example, that would be `/var/www/nltk_data`. If you are unsure, refer to the documentation of your server or try to run the system and check the error message for the directories it searched to find the resources, then move them there.|br|
 
 The system works only with .txt files with UTF-8 encoding. As it is not possible to automatically and perfectly detect the encoding of a text file and convert it the user must take care of this on their end and ensure the correct encoding. Encodings other than UTF-8 might work but will most likely not.
+
+The following steps are optional but recommended. |br|
+Install Celery and RabbitMQ. Follow the instructions found in the documentation for Celery: http://docs.celeryproject.org/en/latest/getting-started/first-steps-with-celery.html#first-steps |br|
+Turn on the usage of Celery in `settings.py`. Then, in the toplevel project folder (the one containing `manage.py`), run: |br|
+`celery -A dragn worker -l info -P eventlet --pool=solo` in a console/terminal of your choice. |br|
+If you do not want to or can not use Celery on your system, you can simply keep the `USE_CELERY` settings in `settings.py` set to `False`. |br|
+Celery is used to allow you to check at what stage the processing of your texts is. After selecting texts for processing, you will see a task id on the processing page. Enter that in the form and submit it to see at which stage of the pipeline your text(s) are. |br|
+
 
 
 

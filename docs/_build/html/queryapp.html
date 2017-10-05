@@ -121,6 +121,27 @@
 
 </dd></dl>
 
+<dl class="class">
+<dt id="queryapp.forms.TaskStatusForm">
+<em class="property">class </em><code class="descclassname">queryapp.forms.</code><code class="descname">TaskStatusForm</code><span class="sig-paren">(</span><em>data=None</em>, <em>files=None</em>, <em>auto_id='id_%s'</em>, <em>prefix=None</em>, <em>initial=None</em>, <em>error_class=&lt;class 'django.forms.utils.ErrorList'&gt;</em>, <em>label_suffix=None</em>, <em>empty_permitted=False</em>, <em>field_order=None</em>, <em>use_required_attribute=None</em><span class="sig-paren">)</span><a class="headerlink" href="#queryapp.forms.TaskStatusForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.forms.forms.Form</span></code></p>
+<dl class="attribute">
+<dt id="queryapp.forms.TaskStatusForm.base_fields">
+<code class="descname">base_fields</code><em class="property"> = OrderedDict([('task', &lt;django.forms.fields.CharField object&gt;)])</em><a class="headerlink" href="#queryapp.forms.TaskStatusForm.base_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="queryapp.forms.TaskStatusForm.declared_fields">
+<code class="descname">declared_fields</code><em class="property"> = OrderedDict([('task', &lt;django.forms.fields.CharField object&gt;)])</em><a class="headerlink" href="#queryapp.forms.TaskStatusForm.declared_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="queryapp.forms.TaskStatusForm.media">
+<code class="descname">media</code><a class="headerlink" href="#queryapp.forms.TaskStatusForm.media" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-queryapp.models">
 <span id="queryapp-models-module"></span><h2>queryapp.models module<a class="headerlink" href="#module-queryapp.models" title="Permalink to this headline">¶</a></h2>
@@ -249,6 +270,14 @@ class built by <code class="docutils literal"><span class="pre">create_forward_m
 <div class="section" id="module-queryapp.views">
 <span id="queryapp-views-module"></span><h2>queryapp.views module<a class="headerlink" href="#module-queryapp.views" title="Permalink to this headline">¶</a></h2>
 <p>Views for the queryapp. Responsible for handling all user interactions regarding queries.</p>
+<dl class="function">
+<dt id="queryapp.views.check_all_steps_task_status">
+<code class="descclassname">queryapp.views.</code><code class="descname">check_all_steps_task_status</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#queryapp.views.check_all_steps_task_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>View to check the status of a task running on/with Celery.
+:param request:
+:return:</p>
+</dd></dl>
+
 <dl class="function">
 <dt id="queryapp.views.get_provenance">
 <code class="descclassname">queryapp.views.</code><code class="descname">get_provenance</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#queryapp.views.get_provenance" title="Permalink to this definition">¶</a></dt>
@@ -420,7 +449,7 @@ Note that this can take very long to finish, depending on the total size of the 
       &copy;2017, Thomas Huber.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |

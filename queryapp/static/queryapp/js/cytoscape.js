@@ -12590,8 +12590,7 @@
                     // rstyle.dirtyEvents = null;
                 }
 
-                this.recalculateEdgeProjections(edges);
-                this.recalculateLabelProjections(nodes, edges);
+                this.recalculateEdgeProjections(edges); this.recalculateLabelProjections(nodes, edges);
 
                 // update edge data from projections
                 for (var i = 0; i < edges.length; i++) {

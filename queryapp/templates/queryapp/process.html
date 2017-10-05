@@ -1,15 +1,33 @@
 {% extends "base.html" %}
 {% block content %}
 {% load static %}
+<script src="{% static 'queryapp/js/process.js' %}"></script>
 <link rel="stylesheet" type="text/css" href="{% static 'queryapp/css/process.css' %}"/>
 <link rel="stylesheet" type="text/css" href="{% static 'queryapp/css/result.css' %}"/>
 
-<form action="{% url 'process' %}" method="post" id="process-form">
-    {% csrf_token %}
-    {% for field in processform %}
-        <label for="{{ field.auto_id }}">{{ field.label }}</label> {{ field }}<br/>
-    {% endfor %}
-    <input type="submit" value="Process" name="process">
-</form>
+{% if processform %}
+    <form action="{% url 'process' %}" method="post" id="process-form">
+        {% csrf_token %}
+        {% for field in processform %}
+            <label for="{{ field.auto_id }}">{{ field.label }}</label> {{ field }}<br/>
+        {% endfor %}
+        <input id="process-submit" type="submit" value="Process" name="process">
+    </form>
+{% endif %}
+
+{% if task %}
+    <form action="{% url 'all_steps_status' %}" method="post" id="status-form">
+        {% csrf_token %}
+        {% for field in  statusform %}
+            <label for="{{ field.auto_id }}">{{ field.label }}</label> {{ field }}<br/>
+        {% endfor %}
+        <input type="submit" value="Check status">
+    </form>
+    {% if state %}
+        <span>Task status: {{ state }}</span>
+    {% endif %}
+    <br/>
+    <span>Your task: {{ task }}</span>
+{% endif %}
 
 {% endblock %}

@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
-from queryapp.views import query, process, get_provenance
+from queryapp.views import query, process, get_provenance, check_all_steps_task_status
 from uploadapp.views import UploadView
 
 urlpatterns = [
@@ -26,5 +26,6 @@ urlpatterns = [
     url(r'^process/$', process, name="process"),
     url(r'^provenance/$', get_provenance, name="get_provenance"),
     url(r'^index/$', query, name="index"),
+    url(r'^status/$', check_all_steps_task_status, name="all_steps_status"),
     url(r'^$', query),
 ]

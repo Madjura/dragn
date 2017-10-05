@@ -59,3 +59,7 @@ class ProcessForm(forms.Form):
         super().__init__(*args, **kwargs)
         if text_choices:
             self.fields["texts"].choices = [(text, text) for text in text_choices]
+
+
+class TaskStatusForm(forms.Form):
+    task = forms.CharField(max_length=100)
