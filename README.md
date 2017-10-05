@@ -43,7 +43,7 @@ The following steps are optional but recommended.<br/>
 Install Celery and RabbitMQ. Follow the instructions found in the documentation for Celery:<br/> http://docs.celeryproject.org/en/latest/getting-started/first-steps-with-celery.html#first-steps<br/> 
 Turn on the usage of Celery in settings.py. Then, in the toplevel project folder (the one containing manage.py), run:<br/> 
 `celery -A dragn worker -l info -P eventlet –pool=solo` in a console/terminal of your choice.<br/> 
-If you do not want to or can not use Celery on your system, you can simply keep the USE_CELERY settings in settings.py set to False.<br/> 
+If you do not want to or can not use Celery on your system, you can simply keep the `USE_CELERY` settings in `settings.py` set to False.<br/> 
 Celery is used to allow you to check at what stage the processing of your texts is. After selecting texts for processing, you will see a task id on the processing page. Enter that in the form and submit it to see at which stage of the pipeline your text(s) are.<br/>
 
 
