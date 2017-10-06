@@ -10,6 +10,11 @@ Lastly, the results of the query are displayed to the user, whereas in the origi
 In the `util` package, set the paths in `paths.py`. Because dragn uses Django, it is suggested to follow the Django deployment guides:<br/>
 [Deployment checklist](https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/)<br/>
 [Deploy with wsgi](https://docs.djangoproject.com/en/1.11/howto/deployment/wsgi/)<br/>
+Do not forget to check how to handle static files (Javascript and CSS):<br/>
+[Managing static files (e.g. images, JavaScript, CSS)](https://docs.djangoproject.com/en/1.11/howto/static-files/)<br/>
+The easiest way to handle the static files is to follow just this step:<br/>
+[Deployment](https://docs.djangoproject.com/en/1.11/howto/static-files/#deployment)<br/>
+
 Then, create and initialize the database, see the Django docs if you want to use a legacy database:<br/>
 `python manage.py makemigrations`<br/>
 `python manage.py migrate`<br/>
