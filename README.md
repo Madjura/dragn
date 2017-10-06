@@ -7,6 +7,7 @@ An arbitrary number of texts can be used and processed by the system. First the 
 Lastly, the results of the query are displayed to the user, whereas in the original system the results were static, "dragn" provides the data in JSON format and an interactive graph to easily allow experts to export and import the result data in their own systems.
 
 ## Installation
+Python 3.5 or higher.<br/>
 In the `util` package, set the paths in `paths.py`. Because dragn uses Django, it is suggested to follow the Django deployment guides:<br/>
 [Deployment checklist](https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/)<br/>
 [Deploy with wsgi](https://docs.djangoproject.com/en/1.11/howto/deployment/wsgi/)<br/>
