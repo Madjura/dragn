@@ -36,6 +36,7 @@ def all_steps(texts, query=None, language="english", alias=None, task=None):
     :param query: Optional. The query to be performed, if query_step execution is intended.
     :param language: Optional. Default: English. The language of the texts.
     :param alias: The Alias used for the text(s).
+    :param task: Optional. Used when running the system with Celery to update the current state.
     :return:
     """
     alias_object = alias
@@ -43,24 +44,24 @@ def all_steps(texts, query=None, language="english", alias=None, task=None):
         alias = "/" + alias
     else:
         alias = "/" + alias.identifier
-    print("MAKING FOLDERS")
+    print("MAKING FOLDERS. This is very fast!")
     make_folders(alias=alias)
     if task:
-        task.update_state(state="EXTRACT")
+        task.update_state(state="extract_step. Step 1/4")
     print("FOLDERS DONE, EXTRACT STEP")
     extract_step(texts=texts, language=language, alias=alias)
     if task:
-        task.update_state(state="KB CREATE")
+        task.update_state(state="knowledge_base_create_step. Step 2/4.")
     print("EXTRACT STEP DONE, KB CREATE")
     if task:
         knowledge_base_create(alias=alias)
     print("KB CREATE DONE, KB COMPUTE")
     if task:
-        task.update_state(state="KB COMPUTE")
+        task.update_state(state="knowledge_base_compute_step. Step 3/4. This step can take a long time!")
     knowledge_base_compute(alias=alias)
     print("KB COMPUTE DONE, INDEX")
     if task:
-        task.update_state(state="INDEX")
+        task.update_state(state="index_step. Step 4/4.")
     index_step(alias=alias)
     print("INDEX DONE")
     if not task:
