@@ -12,12 +12,12 @@ The emphasis of this chapter is not only on the internal part of the system, the
 
 %%=========================================
 \section{Architecture Overview}\label{overview}
-The original system, skimmr (\cite{novavcek2014skimmr}) is written in Python 2.7, whereas \textbf{dragn} is written in Python 3.5. The main "support" framework of the system is Django 1.10.6, which is mostly used to lessen the burden on the user when setting up the system on a network and to easily provide an interactive interface to the user. The system was built with the deployment on a (research) network in mind to allow multiple people to use it for work at once.\\
+The original system, Skimmr \cite{novavcek2014skimmr} is written in Python 2.7, whereas \textbf{dragn} is written in Python 3.5. The main "support" framework of the system is Django 1.10.6, which is mostly used to lessen the burden on the user when setting up the system on a network and to easily provide an interactive interface to the user. The system was built with the deployment on a (research) network in mind to allow multiple people to use it for work at once.\\
 For the interaction part specifically, another framework is used: \textit{Cytoscape.js} \cite{doi:10.1093/bioinformatics/btv557}. It allows the display of graphs from JSON (Javascript Object Notation) data and supports exporting the result graphs as JSON as well, allowing users to use the results more easily in complex ways.\\
 The core of the system is built upon four steps (five if including the queries):
 \begin{itemize}
     \item extract\_step - Extracts paragraphs and tokens from texts, applies POS-tags and builds an inverted index of sentences.
-    \item knowledge\_base\_create\_step - Calculates a modified PMI, the FMI, (for more details, see \ref{sec:fmi}) over all tokens in the texts.
+    \item knowledge\_base\_create\_step - Calculates a modified PMI, the FMI, (for more details, see chapter \ref{sec:fmi}) over all tokens in the texts.
     \item knowledge\_base\_compute\_step - Calculates Cosine Similarity over tokens from the texts using the FMI values.
     \item index\_step - Brings the results of the previous two steps in a more easily accessible format.
     \item query\_step - Performs the user's queries on the data and produces a graph in JSON format for use with \textit{Cytoscape.js}.
@@ -45,7 +45,7 @@ tree & story2.txt, story3.txt, story49.txt
 \end{table}
 For this inverted index, \textit{apple} appears in documents \textit{story.txt}, \textit{story2.txt} and \textit{story2.txt7}.\\
 Data structured in this way allows easy and quick access to texts containing certain words.\\
-In \textbf{dragn}, such an index is used to bolden all tokens appearing in paragraphs relevant to the query that also appear in the result graph. For more details, see \ref{sec:resultgraph}.
+In \textbf{dragn}, such an index is used to bolden all tokens appearing in paragraphs relevant to the query that also appear in the result graph. For more details, see chapter \ref{sec:resultgraph}.
 
 %%=================================
 \subsection{Alias System}
@@ -66,7 +66,7 @@ story.txt & story.txt
 \end{tabular}
 \end{table}
 \\
-In this example, the user can select "story.txt" as the Alias and perform queries on the processed files of the document "story.txt" without having to make the system process the text beforehand, because that has already been done.\\
+In this example based on table \ref{table:alias-example}, the user can select "story.txt" as the Alias and perform queries on the processed files of the document "story.txt" without having to make the system process the text beforehand, because that has already been done.\\
 The Alias System is especially advantageous when multiple users are working with the system. Previously processed permutations of texts created by other users are selectable as an Alias and can immediately be queried.\\
 Due the separation of processed files into different sub-directories as per their Alias the individual permutations queries on a specific Alias experience no slowdown from the other Aliases, as would be the case without a separation into multiple files. In that case, either a single massive file would have to be loaded and the relevant upshot of the previous processing of files be filtered out to get only the content relevant to the current texts or complex database queries doing the same would need to be performed.\\
 The core of the system is to find information like "apple is connected to tree", but to also allow the user to understand why that connection has been found and where this connection becomes apparent in texts. However, the user might be interested to see the connections of a certain word to other words in a single or multiple specific texts and compare them. "Apple" might appear often near "tree" in a botanical text and have a high PMI, but in a different text their PMI might be low.\\
@@ -147,7 +147,7 @@ As we read the next line, we have the continuation of the grammar:
 We continue to read the sentence and see that \textit{outside Passau} satisfies this next line of the grammar. Therefore \textit{little yellow fruit outside Passau} is a Noun Phrase we extracted from the sentence using the compound grammar.\\
 The two lines that were omitted for this example work in exactly the same way, the Noun Phrases we can extract would simply be longer and more complex.\\
 \subsubsection{Usage of the extracted Noun Phrases in dragn and distance calculation}
-In \textbf{dragn} the grammars are used to extract the Noun Phrases from each sentence. As the system processes each paragraph for each text individually, we have access to the sentences and can use them to map the extracted Noun Phrases to the sentences they appear in to create what is essentially an inverted positional index. As Noun Phrases can be made up of multiple words, they allow the user to more finegrainedly perform queries, instead of simply searching for "fruit" it becomes possible to search for "red fruit" as an example. Extracting Noun Phrases makes it possible to search for relations only between Noun Phrases and find more specific relations, such as "apple IS A red fruit". For more details, refer to the suggestions for further work \ref{sec:furtherwork}.
+In \textbf{dragn} the grammars are used to extract the Noun Phrases from each sentence. As the system processes each paragraph for each text individually, we have access to the sentences and can use them to map the extracted Noun Phrases to the sentences they appear in to create what is essentially an inverted positional index. As Noun Phrases can be made up of multiple words, they allow the user to more finegrainedly perform queries, instead of simply searching for "fruit" it becomes possible to search for "red fruit" as an example. Extracting Noun Phrases makes it possible to search for relations only between Noun Phrases and find more specific relations, such as "apple IS A red fruit". For more details, refer to the suggestions for further work in chapter \ref{sec:furtherwork}.
 \begin{table}[h!]
 \centering
 \caption{Inverted positional index}
@@ -160,10 +160,10 @@ rocket & 20\\
 \end{tabular}
 \end{table}
 \\
-As the overall goal is to find tokens in text that are related to each other in some way, it is a good idea to filter out combinations that are very unlikely to be linked. Consider the simple Noun Phrases "apple", which appears in the first sentence, and "rocket", which occurs twenty sentences later. A link between those two words is very unlikely due to their distance in sentences. For that reason, a weighted distance score is calculated.\\
+As the overall goal is to find tokens in text that are related to each other in some way, it is a good idea to filter out combinations that are very unlikely to be linked. Consider the simple Noun Phrases "apple", which appears in the first sentence, and "rocket", which occurs twenty sentences later (see table \ref{table:inverted-posindex}). A semantic link between those two words is very unlikely due to their distance in sentences. For that reason, a weighted distance score is calculated.\\
 The general idea behind this is that words that are very far apart are unlikely to be related. Therefore, we use the positional index that was created while extracting the Noun Phrases to filter out pairs that cannot be related.\\
 Calculating the score is simple. For each combination of lexical units from the positional index, we look at all the positions of the two where the distance is below five sentences. If the distance is too big, for example ten sentences, they are very unlikely to be related. We continue with the calculation of their weighted distance, which is \(w += 1/(1 + distance\). The further apart they are, the lower the update to their weighted distance. If their weighted distance is above the threshold of \(1/3\) the pair is added to a list for further processing in the next step, where the PMI between the two is being calculated.\\
-For the data in \ref{table:inverted-posindex} we would thus get the following result for \textit{apple} and \textit{little yellow fruit}:
+For the data in table \ref{table:inverted-posindex} we would thus get the following result for \textit{apple} and \textit{little yellow fruit}:
 \begin{equation}\label{gather:weighteddistance}
 \begin{aligned}
 w &= \frac{1}{1+0} = 1 \text{ (positions 0 and 0)} \\ 
@@ -175,7 +175,7 @@ It is easy to see that the higher the distance, the lower the change to the weig
 
 %==============kb create
 \section{Calculation of modified PMI between words - FMI}\label{sec:kbcreate}
-In this step the modified PMI is calculated over the units from the texts. The basis for that are the extracted \textit{<token> close to <token2>} triples calculated as per \ref{sec:extract}, from here on referred to as SPO- or \textit{Subject-Predicate-Object} triples as per the naming conventions in the original system developed by \cite{novavcek2014skimmr}. If their textual origin, the \textit{provenance} is included, they will be referred to as \textit{SPOP-tuple}.\\
+In this step the modified PMI is calculated over the units from the texts. The basis for that are the extracted \textit{<token> close to <token2>} triples calculated as per chapter \ref{sec:extract}, from here on referred to as SPO- or \textit{Subject-Predicate-Object} triples as per the naming conventions in the original system developed by \cite{novavcek2014skimmr}. If their textual origin, the \textit{provenance} is included, they will be referred to as \textit{SPOP-tuple}.\\
 
 %====pmi subjection
 \subsection{FMI - PMI with emphasis on the frequency and weighted distance}
@@ -238,7 +238,7 @@ apple & tree & 0.6 & story.txt\_2 \\ \hline
 tree & roof & 0.7 & story.txt\_1
 \end{tabular}
 \end{table}\\
-The first line means "apple" has a weighted distance (\ref{gather:weighteddistance}) of 1.2 to "roof" in \textit{story.txt\_1}, which itself means "the first paragraph of the file story.txt".\\
+The first line in table \ref{table:extract-example} means "apple" has a weighted distance (\ref{gather:weighteddistance}) of 1.2 to "roof" in \textit{story.txt\_1}, which itself means "the first paragraph of the file story.txt".\\
 We will use "tree" and "leaf" as the example for the calculation.\\
 \begin{equation}\label{gather:fmiexample}
 \begin{aligned}
@@ -253,10 +253,10 @@ This modified FMI is useful precisely because of those properties. The PMI does 
 
 %=====usage of PMI in dragn
 \subsection{Normalisation of the FMI values}
-The extracted weighted distances from extract\_step \ref{sec:extract} are used to calculate the FMI values as described in the previous chapter \ref{sec:fmi}. The result is a dictionary mapping the SPO-triples to their FMI score. \\
+The extracted weighted distances as described in chapter \ref{sec:extract} are used to calculate the FMI values as described in the previous chapter \ref{sec:fmi}. The result is a dictionary mapping the SPO-triples to their FMI score. \\
 The calculated FMI values are then normalised. For that, the SPO-triples are sorted by their FMI value. The lowest value of the 5\% of top FMI scores is then used as the normalisation value. The values are all normalised to a value between a minimum value, default being 0.1, and 1 as the upper limit. The normalisation performed is a simple division of the FMI value by the normalisation value.\\
 This procedure results in lower normalised FMI values for the bottom 95\% of values and a higher normalised value for the top 5\%. This is intentional to have the top values be weighted even higher. Doing this emphasises those top results more when performing the query.\\
-The normalised values are then written to the disk with the help of the Alias System \ref{sec:alias} and used to calculate the words or phrases that are related to another word or phrase not directly through their FMI value, but through co-occurrence of of a word or phrase that has a high FMI value with the original.\\
+The normalised values are then written to the disk with the help of the Alias System as shown in chapter \ref{sec:alias} and used to calculate the words or phrases that are related to another word or phrase not directly through their FMI value, but through co-occurrence of of a word or phrase that has a high FMI value with the original.\\
 The calculated triples are written to the disk and then used to build a vector space and calculate the Cosine Similarity in the next step.
 
 %=======kb compute
@@ -277,7 +277,7 @@ fruit & 0 & 0 & 0.4 & 0\\
 \end{tabular}
 \end{table}\\
 
-It is constructed by iterating over the SPO-triples we calculated in the previous step. The way this matrix is read is as follows:\\
+It is constructed by iterating over the SPO-triples we calculated in the previous step. The way the matrix as represented in table \ref{table:sparse} is read is as follows:\\
 \centerline{tree is close to leaf with an FMI value of 0.6 (row 3)}\\
 
 
@@ -336,7 +336,7 @@ cos(x, y) &= \frac{x_1 * y_1 + x_2 * y_2 + ... x_n * y_n}{|x|*|y|} = \\
 &= \frac{x_1^2 + x_2^2 + ... + x_n^2}{x_1^2 + x_2^2 + ... + x_n^2} = 1
 \end{flalign*}
 Therefore for two tokens that have the exact same FMI values and thus co-occurrences with the same distances their similarity value will be one, indicating they are functionally identical in this context.\\
-The Cosine Similarity can be used to calculate similarity between documents as described in \cite{singhal2001modern}, however as shown in this chapter one can calculate the similarity between vectors of FMI values. The result we get here is a similarity score calculated between two phrases or words in a text, based on their FMI values, which as explained in \ref{sec:kbcreate} is based on the co-occurrence of phrases in a text. The Cosine Similarity in this context is therefore grounded in the co-occurrence of two phrases not with each other, but with tokens in texts they both co-occur with. Their similarity increases \\
+The Cosine Similarity can be used to calculate similarity between documents as described in \cite{singhal2001modern}, however as shown in this chapter one can calculate the similarity between vectors of FMI values. The result we get here is a similarity score calculated between two phrases or words in a text, based on their FMI values, which as explained in chapter \ref{sec:kbcreate} is based on the co-occurrence of phrases in a text. The Cosine Similarity in this context is therefore grounded in the co-occurrence of two phrases not with each other, but with tokens in texts they both co-occur with. Their similarity increases \\
 A similarity scoring function is useful in the context of Distant Reading, for given words appearing in texts we want to find words or phrases that are related in some way. This system makes the assumption that words with word vectors pointing in similar directions (thus having a high Cosine Similarity) are related to each other. For their similarity to be high, they need to have high FMI for the same words. In simpler terms, if two words co-occur often with the same words but not each other, the assumption is made that they are related.\\
 The FMI value that is used as the score value for the similarity computation connects two phrases or words when they co-occur in a text. By using those values as the basis for the calculations we can find phrases that are similar by checking which words they share a high FMI value with, or in other words, how big the angle between the two vectors of FMI values is.\\
 Ultimately we find phrases that share common FMI values. If a word co-occurs with other words often, and a second word co-occurs with the same words and a comparable frequency, we establish a relation between the two with the method discussed in this chapter. Those two words appear near the same words often, so we can assume the two words themselves are related. This gives us a less-intuitive way of finding connections between words in texts, that would be hard to accomplish by hand.\\
@@ -348,7 +348,7 @@ The ability to expand and build upon \textbf{dragn} is one of the core goals of 
 The subsection titles refer to function names in the system.
 \subsection{Creation of SPO-triples list}
 \label{sec:makerelationlist}
-First the SPOP-tuples as created in \ref{sec:kbcreate} are loaded. They are in the format:
+First the SPOP-tuples as created in chapter \ref{sec:kbcreate} are loaded. They are in the format:
 \begin{align*}
     \text{<subject> <predicate> <object>, score}
 \end{align*}
@@ -358,7 +358,7 @@ The format is, where \textit{\\t} is the tab character:
 \begin{lstlisting}
 subject\tpredicate\tobject\tscore
 \end{lstlisting}
-By loading this file and parsing the data one can have access to all the relations that were calculated over a set of texts. The Alias System \ref{sec:alias} makes it possible to keep the files created for collections of texts and compare the results, as an example usage.
+By loading this file and parsing the data one can have access to all the relations that were calculated over a set of texts. The Alias System as outlined in chapter \ref{sec:alias} makes it possible to keep the files created for collections of texts and compare the results, as an example usage.
 
 \subsection{Creation of SPO shortlist}
 \label{makerelationweights}
@@ -426,11 +426,11 @@ Now that the files are all processed and in place, all that is left is to perfor
 
 \section{Calculation of query results}
 \label{sec:querystep}
-This chapter will explain how queries are answered in \textbf{dragn}. The implementation shown here is just an example, the data output outlined in \ref{sec:indexstep} can be used in different ways and for different projects. In this chapter however the output of the previous chapter will be used as is. \\
+This chapter will explain how queries are answered in \textbf{dragn}. The implementation shown here is just an example, the data output outlined in chapter \ref{sec:indexstep} can be used in different ways and for different projects. In this chapter however the output of the previous chapter will be used as is. \\
 
 \subsection{Calculation of relevance to the query}
 \label{sec:popdict}
-First a \textit{Fuzzy Set} over all relations that contain a query term is calculated using the mapping of tokens to their contained relations, see \ref{sec:makerelationlist}. The original implementation of the fuzzy sets and the idea to use them in this way come from Vit Novacek \cite{novavcek2014skimmr}.\\
+First a \textit{Fuzzy Set} over all relations that contain a query term is calculated using the mapping of tokens to their contained relations, see chapter \ref{sec:makerelationlist}. The original implementation of the fuzzy sets and the idea to use them in this way come from Vit Novacek \cite{novavcek2014skimmr}.\\
 Whereas a "normal" set has a binary relation to its contained elements (an element is either part of the set or not) a fuzzy set has a degree of membership, as introduced in \cite{zadeh1965fuzzy}.\\
 Calculating a fuzzy set in the context of the system and specifically the query results in a fuzzy set describing how high the membership of a token to the query is.\\
 If a query contains more than one query term and terms share a relation but with different scores, the higher of the scores is used as the membership.\\
@@ -474,7 +474,7 @@ The navigation bar is where the user enters the information for their query. It 
     \item 3: The maximum number of edges to have in the result graph. As edges can overlap and generally go both ways, this is not an exact value.
     \item 4: The number of paragraphs to return.
     \item 5: Whether to consider relations between words that are not in the query or not.
-    \item 6: The dropdown from which the Alias (see \ref{sec:alias}) for the query is selected.
+    \item 6: The dropdown from which the Alias (see chapter \ref{sec:alias}) for the query is selected.
     \item 7: The button to initiate the query.
     \item 8: The context reader. Used to quickly move between texts that contain a certain word.
     \item 9: The button to scroll back to the top of the page where the result graph is shown.
@@ -496,8 +496,8 @@ The result graphs can be re-ordered or be used to add certain tokens to the quer
     \item 2: Hides all but the selected node and all connected nodes.
     \item 3: Shows all previously hidden nodes.
     \item 4: Adds the token to the query.
-    \item 5: Shows only the "related to" edges, the ones described in \ref{sec:kbcompute}.
-    \item 6: Shows only the "close to" edges, the ones described in \ref{sec:kbcreate}.
+    \item 5: Shows only the "related to" edges, the ones described in chapter \ref{sec:kbcompute}.
+    \item 6: Shows only the "close to" edges, the ones described in chapter \ref{sec:kbcreate}.
     \item 7: Layout options for the nodes.
     \item 8: Adds the token to the context reader.
 \end{itemize}
@@ -526,7 +526,7 @@ The following relations can be found in the result graph:
 
 \subsection{Result paragraphs and relations}
 Each query produces not only the result graph, but a list of paragraphs relevant to the query with relations relevant to the query that appear in those paragraphs.\\
-The paragraphs are scored based on their relevancy to the query as described in \ref{sec:querystep}, with the highest scoring paragraph having a score of 1. For each paragraph the contained relations that are relevant to the query are shown in a sortable table, containing both the relations based on the FMI (see \ref{sec:kbcreate}) as well as those over the cosine similarity (see \ref{sec:kbcompute}).\\
+The paragraphs are scored based on their relevancy to the query as described in chapter \ref{sec:querystep}, with the highest scoring paragraph having a score of 1. For each paragraph the contained relations that are relevant to the query are shown in a sortable table, containing both the relations based on the FMI (see chapter \ref{sec:kbcreate}) as well as those over the cosine similarity (see \ref{sec:kbcompute}).\\
 Additionally each paragraph in the result has buttons for "Previous" and "Next" paragraphs, respectively showing the paragraph preceding or following the paragraph for which the button was pressed in an overlay, which contains the same buttons. With this it is possible to get additional understanding of a certain paragraph by reading the paragraphs surrounding it.\\
 Words in the result paragraphs can be added to the query directly by simply clicking them, thus allowing the user to explore possible links found in the paragraphs directly and easily.
 
@@ -539,7 +539,7 @@ Words in the result paragraphs can be added to the query directly by simply clic
 \item Calculating the modified PMI, the FMI, to establish connections between tokens in the texts, \ref{sec:kbcreate}
 \item Calculating the Cosine Similarity based on the FMI of the tokens, as shown in \ref{sec:kbcompute}
 \item Formatting the results into files to use for the queries, \ref{sec:indexstep}
-\item Performing the queries based on the available data of the processed texts, as produced in the previous steps, was described in \ref{sec:querystep}
+\item Performing the queries based on the available data of the processed texts, as produced in the previous steps, was described in chapter \ref{sec:querystep}
 \end{itemize}
 The system was built upon the foundation of "Skimmr", the predecessor tool developed by Vit Novacek, who has written about it in \cite{novavcek2014skimmr}.\\
 The code of the new system is up to current technical standards and a more intuitive user interface lets the user perform their tasks better and helps them understand the connections between tokens in their texts better.

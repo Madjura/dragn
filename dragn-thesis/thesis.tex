@@ -2,10 +2,19 @@
 \documentclass[12pt]{report}
 \usepackage{ramsstyle}
 \usepackage{csquotes}
-\usepackage{draftwatermark}
-\SetWatermarkText{DRAFT}
-\SetWatermarkScale{2}
-\hypersetup{citecolor=blue} % TODO: set to black for printing
+%\usepackage{draftwatermark}
+%\SetWatermarkText{DRAFT}
+%\SetWatermarkScale{2}
+\usepackage{hyperref}
+\hypersetup{%
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue}
+
+
+\let\oldcite\cite
+\renewcommand{\cite}[1]{\textbf{\oldcite{#1}}}
+
 %%===================================
 \begin{document}
 
