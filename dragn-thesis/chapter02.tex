@@ -80,8 +80,9 @@ The following chapters are intended to give a detailed insight into the differen
 This chapter aims to provide the reader with a comprehensive understanding of the first step in the \textbf{dragn} pipeline, \textit{extract\_step}.\\
 As briefly touched upon in the previous chapter \ref{sec:alias}, each of the four main steps of the \textbf{dragn} pipeline produces persistent files that are contained in folders named after the Alias of the texts. The folders for those files are created as part of this first step and the uploaded texts are moved into the corresponding directory.\\
 The texts are then processed one by one. Initially, the paragraphs are extracted from the texts. They are part of the result of the queries, paragraphs containing words relevant to the query (see \ref{sec:querystep}). The system operates under the assumption that paragraphs in a text are logical, self-contained units and as such the system works on a per-paragraph basis. A clarification with an example will follow shortly.\\
-Next is the POS-tagging of the sentences in the current paragraph. POS stands for "Part Of Speech" and tagging words in such a way means to assign labels such as "Noun", "Proper Noun", "Adjective". The tagset used is the Penn Treebank \cite{marcus1993building}. Grammatical inconsistencies may exist in text, especially if it is not a properly published work where editors are proofreading, but generally it can be assumed that the grammar is correct enough to properly label the parts of the sentences.\\
-The POS-tags are useful because they allow for the extraction of Noun Phrases from the sentences. For this extraction, grammar from the original system developed by \cite{novavcek2014skimmr} is used. This grammar, combined with parsers from NLTK (Natural Language Toolkit) is used by the parser to find Noun Phrases. Noun Phrases are concatenated words in a text that describe a single entity, such as \textit{yellow dog}, as described in \cite{abney1987english}.\\
+Next is the POS-tagging of the sentences in the current paragraph. POS stands for "Part Of Speech" and tagging words in such a way means to assign labels such as "Noun", "Proper Noun", "Adjective". The tagset used is the Penn Treebank \cite{marcus1993building}.
+Grammatical inconsistencies may exist in text, especially if it is not a properly published work where editors are proofreading, but generally it can be assumed that the grammar is correct enough to properly label the parts of the sentences.\\
+The POS-tags are useful because they allow for the extraction of Noun Phrases from the sentences. For this extraction, grammar from the original system developed by \cite{novavcek2014skimmr} is used. This grammar, combined with parsers from NLTK (Natural Language Toolkit, \cite{bird2009natural}) is used by the parser to find Noun Phrases. Noun Phrases are concatenated words in a text that describe a single entity, such as \textit{yellow dog}, as described in \cite{abney1987english}.\\
 Two grammars for the English language are currently in the system, developed by \cite{novavcek2014skimmr}.
 \begin{lstlisting}[frame=single, caption={Noun Phrase grammars}, label=npgrammar]
 NP_GRAMMAR_COMPOUND = """
@@ -507,7 +508,7 @@ The context reader has been briefly mentioned in \ref{subsec:navbar}. It allows 
 \subsection{Result graph}
 \label{sec:resultgraph}
 A result graph can be seen in figure \ref{fig:graph-options}.\\
-The result graph is interactive and created with Cytoscape.js \cite{doi:10.1093/bioinformatics/btv557}, \cite{Cytoscapejs}. By default the ordering is random, but different automatic node alignments are available.\\
+The result graph is interactive and created with Cytoscape.js \cite{doi:10.1093/bioinformatics/btv557}, \cite{Cytoscapejs}. By default the ordering is random, but different automatic node alignments are available. As described in \cite{moretti2011network}, networks and visual graphs are useful for work in the literary sciences, not only to plot character networks as discussed therein, but as will be shown here for plotting connections between tokens and the nature of their co-occurrence to aid in the task of distant reading.\\
 The following relations can be found in the result graph:
 \begin{table}[H]
 \centering
@@ -541,6 +542,6 @@ Words in the result paragraphs can be added to the query directly by simply clic
 \item Formatting the results into files to use for the queries, \ref{sec:indexstep}
 \item Performing the queries based on the available data of the processed texts, as produced in the previous steps, was described in chapter \ref{sec:querystep}
 \end{itemize}
-The system was built upon the foundation of "Skimmr", the predecessor tool developed by Vit Novacek, who has written about it in \cite{novavcek2014skimmr}.\\
+The system was built upon the foundation of Skimmr, the predecessor tool developed by Vit Novacek, who has written about it in \cite{novavcek2014skimmr}.\\
 The code of the new system is up to current technical standards and a more intuitive user interface lets the user perform their tasks better and helps them understand the connections between tokens in their texts better.
 Next follows an example use case utilising the new system's capabilities.
