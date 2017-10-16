@@ -137,9 +137,10 @@ def process(request):
             # perform all steps in the pipeline
             if settings.USE_CELERY:
                 from .tasks import all_steps_task
+                alias_object = alias
                 alias = alias.identifier
                 task_id = all_steps_task.delay(processform.cleaned_data["texts"], processform.cleaned_data["language"],
-                                               alias)
+                                               alias, alias_object)
                 context["task"] = task_id
             else:
                 print("NO CELERY")

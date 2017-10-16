@@ -28,7 +28,7 @@ from pycallgraph.pycallgraph import PyCallGraph
 from query import querystep
 
 
-def all_steps(texts, query=None, language="english", alias=None, task=None):
+def all_steps(texts, query=None, language="english", alias=None, task=None, alias_celery=None):
     """
     Performs all steps in the pipeline, up to and including query_step.
 
@@ -37,6 +37,7 @@ def all_steps(texts, query=None, language="english", alias=None, task=None):
     :param language: Optional. Default: English. The language of the texts.
     :param alias: The Alias used for the text(s).
     :param task: Optional. Used when running the system with Celery to update the current state.
+    :param alias_celery: Optional. Used to update the Alias status when using Celery.
     :return:
     """
     alias_object = alias
@@ -67,6 +68,9 @@ def all_steps(texts, query=None, language="english", alias=None, task=None):
     if not task:
         alias_object.processed = True
         alias_object.save()
+    else:
+        alias_celery.processed = True
+        alias_celery.save()
     if query:
         querystep.query(query)
 
