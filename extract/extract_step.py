@@ -153,5 +153,5 @@ def with_graphviz_output():
         extract_step(language="english")
 
 if __name__ == "__main__":
-    make_folders(alias="/azatoth.txt")
-    extract_step(language="english", alias="/azatoth.txt")
+    # make_folders(alias="/azatoth.txt")
+    extract_step(language="english", alias="/bib5.txt", texts=["bib5.txt"])

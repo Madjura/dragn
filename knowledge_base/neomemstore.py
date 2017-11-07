@@ -1,3 +1,5 @@
+import os
+
 __copyright__ = """
 Copyright (C) 2017 Thomas Huber <huber150@stud.uni-passau.de, madjura@gmail.com>
 Copyright (C) 2012 Vit Novacek (vit.novacek@deri.org), Digital Enterprise
@@ -188,15 +190,15 @@ class NeoMemStore(object):
     def import_memstore(self, path=paths.MEMSTORE_PATH):
         """Imports the lexicon, relations and corpus from disk."""
 
-        with (gzip.open(path + "/lexicon.tsv.gz", "r")) as lexicon_file:
+        with (gzip.open(os.path.join(path, "lexicon.tsv.gz"), "r")) as lexicon_file:
             self.lexicon_from_file(lexicon_file)
         lexicon_file.close()
 
-        with (gzip.open(path + "/relations.tsv.gz", "rb")) as sources_file:
+        with (gzip.open(os.path.join(path, "relations.tsv.gz"), "rb")) as sources_file:
             self.relations.from_file(sources_file)
         sources_file.close()
 
-        with (gzip.open(path + "/corpus.tsv.gz", "rb")) as corpus_file:
+        with (gzip.open(os.path.join(path, "corpus.tsv.gz"), "rb")) as corpus_file:
             self.corpus.from_file(corpus_file)
         corpus_file.close()
 

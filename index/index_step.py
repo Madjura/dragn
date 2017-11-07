@@ -99,4 +99,6 @@ def index_step(alias):
 
 if __name__ == "__main__":
     index_step(alias="/bible_full.txt")
+    index_step(alias="/bib5.txt")
+    index_step(alias="/bib4.txt")
     # with_graphvizoutput()

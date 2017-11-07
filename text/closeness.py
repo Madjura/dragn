@@ -43,3 +43,8 @@ class Closeness(object):
         """
         return "Term: " + self.term + "\nClose to:" + self.close_to + "\nParagraph id:" + str(
             self.paragraph_id) + "\nCloseness:" + str(self.closeness)
+
+    def __eq__(self, other):
+        if self.term == other.term and self.close_to == other.close_to and self.closeness == other.closeness:
+            return True
+        return False

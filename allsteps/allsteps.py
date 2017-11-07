@@ -64,6 +64,8 @@ def all_steps(texts, query=None, language="english", alias=None, task=None, alia
     if task:
         task.update_state(state="index_step. Step 4/4.")
     index_step(alias=alias)
+    # i don't know why but this fixes the problems
+    index_step(alias=alias)
     print("INDEX DONE")
     if not task:
         alias_object.processed = True
