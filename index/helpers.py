@@ -67,19 +67,28 @@ def add_related_to(relations, relation2prov):
                 for prov, score in provs:
                     prov2relatedscore[prov].append((related, score))
         for provenance, tuples in prov2relatedscore.items():
-            max_score_tuple = sorted(tuples, key=lambda x: x[1], reverse=True)[0]
-            related_tuple, prov_weight = max_score_tuple
-            identifier, actual_related = related_tuple
-            if identifier == "SUBJECT":
-                # noinspection PyPep8Naming
-                objecT = actual_related
-            elif identifier == "OBJECT":
-                subject = actual_related
-            else:
-                raise ValueError("This should never happen unless something goes HORRIBLY wrong. Problematic value: "
-                                 + identifier)
-            prov_weight *= weight
-            dictionary[(subject, predicate, objecT)].append((provenance, prov_weight))
+            max_scores = sorted(tuples, key=lambda x: x[1], reverse=True)
+            score_prev = None
+            max_score_tuple_list = []
+            for m_tuple in max_scores:
+                _, score = m_tuple
+                if not score_prev:
+                    score_prev = score
+                if score == score_prev:
+                    max_score_tuple_list.append(m_tuple)
+            for max_score_tuple in max_score_tuple_list:
+                related_tuple, prov_weight = max_score_tuple
+                identifier, actual_related = related_tuple
+                if identifier == "SUBJECT":
+                    # noinspection PyPep8Naming
+                    objecT = actual_related
+                elif identifier == "OBJECT":
+                    subject = actual_related
+                else:
+                    raise ValueError("This should never happen unless something goes HORRIBLY wrong. Problematic value: "
+                                     + identifier)
+                prov_weight *= weight
+                dictionary[(subject, predicate, objecT)].append((provenance, prov_weight))
     return dictionary
 
 
